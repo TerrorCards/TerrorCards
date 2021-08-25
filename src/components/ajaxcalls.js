@@ -1,4 +1,4 @@
-export const serverpath = "http://gisgames.com/CardTemplateWork/";
+export const serverpath = "https://gisgames.com/CardTemplateWork/";
 
 export function prepData(pData) {
     if(pData !== null) {
