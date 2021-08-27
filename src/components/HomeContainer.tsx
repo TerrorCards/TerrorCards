@@ -330,12 +330,12 @@ class HomeContainer extends React.Component<props, state> {
           onDidDismiss={() => this.setState({ showPopover: false, event: undefined })}
         >
         <IonList>
-          <IonItem><IonButton fill='clear' onClick={()=> {this.sendTradeCallback(this.state.tradePartner)}}><IonIcon  slot="icon-only" icon={repeat} color="dark"/></IonButton><IonLabel>Trade</IonLabel></IonItem>
-          <IonItem><IonButton fill='clear' onClick={()=> { this.addFriend(this.state.tradePartner) }}><IonIcon  slot="icon-only" icon={personAdd} color="dark" /></IonButton><IonLabel>Add Friend</IonLabel></IonItem>
+          <IonItem><IonButton fill='clear' onClick={()=> {this.sendTradeCallback(this.state.tradePartner)}}><IonIcon  slot="icon-only" icon={repeat} color="dark"/></IonButton><IonLabel onClick={()=> {this.sendTradeCallback('EliDeGeer')}}>Trade</IonLabel></IonItem>
+          <IonItem><IonButton fill='clear' onClick={()=> { this.addFriend(this.state.tradePartner) }}><IonIcon  slot="icon-only" icon={personAdd} color="dark" /></IonButton><IonLabel onClick={()=> { this.addFriend(this.state.tradePartner) }}>Add Friend</IonLabel></IonItem>
           <IonItem><IonButton fill='clear'><IonIcon  slot="icon-only" icon={bookmark} color="dark" /></IonButton><IonLabel>Profile</IonLabel></IonItem>
           <IonItem></IonItem>
-          <IonItem><IonButton fill='clear' onClick={()=> { this.flagPost(this.state.tradePartner) }}><IonIcon  slot="icon-only" icon={flag} color="dark" /></IonButton><IonLabel>Flag</IonLabel></IonItem>
-          <IonItem><IonButton fill='clear' onClick={()=> { this.blockPlayer(this.state.tradePartner) }}><IonIcon  slot="icon-only" icon={closeCircle} color="dark" /></IonButton><IonLabel>Block</IonLabel></IonItem>
+          <IonItem><IonButton fill='clear' onClick={()=> { this.flagPost(this.state.tradePartner) }}><IonIcon  slot="icon-only" icon={flag} color="dark" /></IonButton><IonLabel onClick={()=> { this.flagPost(this.state.tradePartner) }}>Flag</IonLabel></IonItem>
+          <IonItem><IonButton fill='clear' onClick={()=> { this.blockPlayer(this.state.tradePartner) }}><IonIcon  slot="icon-only" icon={closeCircle} color="dark" /></IonButton><IonLabel onClick={()=> { this.blockPlayer(this.state.tradePartner) }}>Block</IonLabel></IonItem>
         </IonList>
       </IonPopover>
 

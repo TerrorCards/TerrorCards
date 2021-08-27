@@ -280,7 +280,8 @@ export function callServer(pTask,pData,pUserId) {
             formData.append("uContent1", c1);
             formData.append("uContent2", c2);
             formData.append("uMsg", pData.msg);
-            formData.append("uAction", "saveTrade");            
+            formData.append("uAction", "saveTrade"); 
+            /*           
             let test = fetch(serverpath + "trade.php", {
               method: 'POST',
               headers: {
@@ -288,6 +289,14 @@ export function callServer(pTask,pData,pUserId) {
               },
               body: formData
             });
+            */
+            let test = fetch(serverpath + "trade.php?" + new URLSearchParams({
+              uUserId: pUserId,
+              uAction: "saveTrade",
+              uContent1: c1,
+              uContent2: c2,
+              uMsg: pData.msg
+            }));           
             return test;
             break;
         } 

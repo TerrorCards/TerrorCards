@@ -22,6 +22,8 @@ interface state {
   showInfoPopover: boolean,
   showOverLimitAlert: boolean,
   showFilterMenu: boolean,
+  showTradeSaveResult: boolean,
+  showTradeSaveResultMessage: string,
   alertType: string,
   event: any,
 
@@ -34,6 +36,7 @@ interface state {
   otherCards: Array<any>;
   otherChunkList: Array<any>;
   selectionCardList: Array<any>;
+  tradeMessage: string;
 }
 
 class TradeSetup extends React.Component<props, state> {
@@ -46,6 +49,8 @@ class TradeSetup extends React.Component<props, state> {
       showInfoPopover: false,
       showOverLimitAlert: false,
       showFilterMenu: false,
+      showTradeSaveResult: false,
+      showTradeSaveResultMessage: '',
       alertType: '',
       event: undefined,
 
@@ -63,7 +68,8 @@ class TradeSetup extends React.Component<props, state> {
       yourChunkList: [],
       otherCards: [],
       otherChunkList: [],
-      selectionCardList: []     
+      selectionCardList: [],
+      tradeMessage: ""   
     };
   }
 
@@ -149,6 +155,40 @@ class TradeSetup extends React.Component<props, state> {
     });
   }
 
+  sendTradeToServer =() => {
+    if(this.state.tradeCardsList.length > 0) {
+      let yourList: Array<any> = [];
+      let otherList: Array<any> = [];
+      this.state.tradeCardsList.map((cl:any) => {
+        if(cl.UserID === this.props.user.ID) {
+          yourList.push(cl.ID+"_"+cl.Card_Year+"_"+cl.Count);
+        } else {
+          otherList.push(cl.ID+"_"+cl.Card_Year+"_"+cl.Count);
+        }
+      });
+
+      callServer("saveTrade",{
+        uContent1: {cards:yourList.join(","), userId: this.props.user.ID}, 
+        uContent2: {cards:otherList.join(","), userId: this.props.otherUser}, 
+        msg: this.state.tradeMessage
+      },this.props.user.ID)?.then((resp)=>{ console.log(resp); return resp.json(); })
+      .then((json)=>{ 
+        if(json === "Saved") {
+          console.log(json);
+          this.setState({showAlert:false, alertType:''}, () => {
+            this.setState({showTradeSaveResult: true, showTradeSaveResultMessage: "Trade saved. Other party has 24 hours to respond."})
+          });
+        } else {
+          this.setState({showAlert:false, alertType:''}, () => {
+            this.setState({showTradeSaveResult: true, showTradeSaveResultMessage: json})
+          });
+        }
+      })
+
+    }    
+  }
+
+
   //Functions to do chunking of data
   chunkCards = (array: Array<any>) => {
     const localList = [...array];
@@ -172,8 +212,6 @@ class TradeSetup extends React.Component<props, state> {
 
 
   render() {
-
-    const pic = 'http://placekitten.com/g/200/300';
 
     let content: any = '';
     if(this.state.step === 'you' || this.state.step === 'other') {
@@ -235,7 +273,11 @@ class TradeSetup extends React.Component<props, state> {
                 text: 'Yes',
                 handler: () => {
                   console.log('Confirm Okay');
-                  this.setState({showAlert:false, alertType:''});
+                  if(this.state.alertType === "submit") {
+                    this.sendTradeToServer();
+                  } else {
+                    this.props.closePanel();
+                  }
                 }
               }
             ]}
@@ -254,6 +296,26 @@ class TradeSetup extends React.Component<props, state> {
                 cssClass: 'secondary',
                 handler: (blah:any) => {
                   this.setState({showOverLimitAlert:false});
+                }
+              }
+            ]}
+          />
+
+          <IonAlert
+            isOpen={this.state.showTradeSaveResult}
+            onDidDismiss={() => this.setState({showTradeSaveResult:false})}
+            cssClass='my-custom-class'
+            header={'Alert'}
+            message={this.state.showTradeSaveResultMessage}
+            buttons={[
+              {
+                text: 'Dismiss',
+                role: 'cancel',
+                cssClass: 'secondary',
+                handler: (blah:any) => {
+                  this.setState({showTradeSaveResult:false}, () => {
+                    this.props.closePanel();
+                  });
                 }
               }
             ]}
@@ -333,7 +395,11 @@ class TradeSetup extends React.Component<props, state> {
           <IonCol>
             <IonItem>
               <IonLabel position="stacked">Add a message to this trade (optional)</IonLabel>
-              <IonTextarea placeholder="type here" rows={5}></IonTextarea>
+              <IonTextarea placeholder="type here" rows={5} value={this.state.tradeMessage} onChange={
+                (e:any)=> {
+                  this.setState({tradeMessage: e.currentTarget.value})
+                }
+              }></IonTextarea>
             </IonItem>
           </IonCol>
       </IonRow>
@@ -558,7 +624,6 @@ class TradeSetup extends React.Component<props, state> {
   }
 
   generateTradeItemCol =(person:string) => {
-    const pic = 'http://placekitten.com/g/200/300';
     let filtered:Array<any> = [];
     let itemsList = [];    
       filtered = this.state.tradeCardsList.filter((cl:any) => {
@@ -594,7 +659,6 @@ class TradeSetup extends React.Component<props, state> {
   }
 
   generateSummaryItems =(person:string) => {
-    const pic = 'http://placekitten.com/g/200/300';
     let filtered:Array<any> = [];
     let itemsList = [];    
     if(this.state.tradeCardsList.length > 0) {
