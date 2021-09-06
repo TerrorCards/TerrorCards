@@ -173,7 +173,7 @@ class GalleryContainer extends React.Component<props, state> {
         }
         item.push(
           <IonCol key={c.ID}>
-            <IonImg src={imgSrc} class={(c.UserID === null)?'need-card-alpha':''} onClick={
+            <IonImg style={{width:"100%"}} src={imgSrc} class={(c.UserID === null)?'need-card-alpha':''} onClick={
               () => {this.showCardetails(c)}
               }>
             </IonImg>
