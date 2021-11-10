@@ -99,21 +99,22 @@ class GalleryContainer extends React.Component<props, state> {
   //End chunking functions
 
   showCardetails =(card:any) => {
+    //Recent trades: {result[0].recentTrades} <br></br>(past 48 hrs)
     this.pullCardDetails(this.props.user.ID, card).then((result:any) => {
       const details =  
       <IonGrid>
-        <IonRow><IonCol><div style={{height:50}}></div></IonCol></IonRow>      
-        <IonRow>
-        <IonCol><img src={card.Image} width="100%" /></IonCol> 
-        </IonRow>
+        <IonRow><IonCol><div style={{height:10}}></div></IonCol></IonRow> 
         <IonRow>
           <IonCol>Card Count: {result[0].count}</IonCol> 
           <IonCol>Sold Out: {result[0].cardSoldOut}</IonCol> 
         </IonRow> 
         <IonRow>
           <IonCol>Set: {card.SetName.replace(/_/g, " ")}</IonCol> 
-          <IonCol>Recent trades: {result[0].recentTrades} <br></br>(past 48 hrs)</IonCol> 
-        </IonRow>                
+          <IonCol></IonCol> 
+        </IonRow>              
+        <IonRow>
+        <IonCol><img src={card.Image} width="100%" /></IonCol> 
+        </IonRow>               
       </IonGrid>;
       this.setState({cardDetails:details, showDetails:true})
     })
@@ -168,9 +169,13 @@ class GalleryContainer extends React.Component<props, state> {
       const item:Array<any> = [];
       ch.map((c:any, z:number) => {
         let imgSrc = c.Image;
+        let message = c.SoldOut;
         if(this.props.galleryProps.layoutCount > 2) {
           imgSrc = imgSrc.replace("full", "thumbs");
         }
+        if(this.props.galleryProps.layoutCount > 3) {
+          message = "S.O."
+        }        
         item.push(
           <IonCol key={c.ID}>
             <IonImg style={{width:"100%"}} src={imgSrc} class={(c.UserID === null)?'need-card-alpha':''} onClick={
@@ -178,6 +183,7 @@ class GalleryContainer extends React.Component<props, state> {
               }>
             </IonImg>
             {(c.Count !== null && c.Count > 1) && <IonBadge class="quantity-badge">{c.Count}</IonBadge>}
+            {<IonBadge class="message-badge ">{message}</IonBadge>} 
           </IonCol>
         )
         if(i === (this.state.chunkedList.length -1)){

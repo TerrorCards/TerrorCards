@@ -25,10 +25,12 @@ import HomeContainer from './components/HomeContainer';
 import GalleryContainer from './components/GalleryContainer';
 import ProfileContainer from './components/ProfileContainer';
 import StoreContainer from './components/StoreContainer';
+import FactoryContainer from './components/FactoryContainer';
 import TradeContainer from './components/TradeContainer';
 import SignInContainer from './components/SignInContainer';
 
 import TradeSetup from './components/TradeSetup';
+import ProfileManagerContainer from './components/ProfileManagerContainer';
 import GalleryMenu from './components/GalleryMenu';
 
 /* Core CSS required for Ionic components to work properly */
@@ -61,6 +63,8 @@ interface state {
   user:any,
   showTradeSetupModel: boolean,
   tradeUser:string,
+  showProfileManageModel: boolean,
+  showFactorySetupModel: boolean,
   refreshTime: number
 }
 
@@ -92,6 +96,8 @@ class App extends React.Component<props, state> {
       },
       showTradeSetupModel: false,
       tradeUser:'',
+      showProfileManageModel: false,
+      showFactorySetupModel: false,
       refreshTime: 0   
     }
   }   
@@ -187,6 +193,22 @@ class App extends React.Component<props, state> {
     }
   }
 
+  showProfileModal = (e:any) => {
+    if(this.state.showProfileManageModel) {
+      this.setState({showProfileManageModel: false});
+    } else {
+      this.setState({showProfileManageModel: true});
+    }
+  }
+
+  showFactoryModal = (e:any) => {
+    if(this.state.showFactorySetupModel) {
+      this.setState({showFactorySetupModel: false});
+    } else {
+      this.setState({showFactorySetupModel: true});
+    }
+  }
+
   /*
   setTimeout(() => {
     if(galleryState.year === -1) {
@@ -219,7 +241,7 @@ class App extends React.Component<props, state> {
           <Route path="/store">
             <ProfileContainer menuAction={this.showPoperAction} user={this.state.user} profileCallback={this.fnUpdateUserInfo} lastRefreshed={this.state.refreshTime}  /> 
             <StoreContainer storeProps={''} user={this.state.user} callbackPackOpenTimer={this.fnCallbackRefreshTime} />
-          </Route>
+          </Route>        
           <Route path="/trade">
             <ProfileContainer menuAction={this.showPoperAction} user={this.state.user} profileCallback={this.fnUpdateUserInfo} lastRefreshed={this.state.refreshTime}  /> 
             <TradeContainer user={this.state.user} />
@@ -255,10 +277,10 @@ class App extends React.Component<props, state> {
             <IonIcon icon={skull} />
           </IonFabButton>
           <IonFabList side="top">
-            <IonFabButton color="dark" onClick={()=>{}}><IonIcon icon={person} /></IonFabButton>
+            <IonFabButton color="dark" onClick={(e)=>{this.showProfileModal(e)}}><IonIcon icon={person} /></IonFabButton>
           </IonFabList>
           <IonFabList side="start">
-            <IonFabButton color="dark"><IonIcon icon={flask} /></IonFabButton>
+            <IonFabButton color="dark" onClick={(e)=>{this.showFactoryModal(e)}}><IonIcon icon={flask} /></IonFabButton>
           </IonFabList>
           <IonFabList side="end">
             <IonFabButton color="dark"><IonIcon icon={trophy} /></IonFabButton>
@@ -276,6 +298,14 @@ class App extends React.Component<props, state> {
       {this.state.showTradeSetupModel && <IonModal isOpen={this.state.showTradeSetupModel} cssClass='my-custom-class'>          
           <TradeSetup otherUser={this.state.tradeUser} user={this.state.user} closePanel={this.showTradeModal} />          
       </IonModal>}
+
+      {this.state.showProfileManageModel && <IonModal isOpen={this.state.showProfileManageModel} cssClass='my-custom-class'>          
+          <ProfileManagerContainer user={this.state.user} closePanel={this.showProfileModal} />          
+      </IonModal>}
+
+      {this.state.showFactorySetupModel && <IonModal isOpen={this.state.showFactorySetupModel} cssClass='my-custom-class'>          
+        <FactoryContainer user={this.state.user} closePanel={this.showFactoryModal} />         
+      </IonModal>}      
 
     </IonReactRouter>
   </IonApp>

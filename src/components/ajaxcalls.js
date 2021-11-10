@@ -395,6 +395,7 @@ export function callServer(pTask,pData,pUserId) {
             let formData  = new FormData();
             formData.append("uUserId", pUserId);
             formData.append("uContent", pData);
+            /*
             let test = fetch(serverpath + "meld_pull_list.php", {
               method: 'POST',
               headers: {
@@ -402,6 +403,11 @@ export function callServer(pTask,pData,pUserId) {
               },
               body: formData
             });
+            */
+            let test = fetch(serverpath + "meld_pull_list.php?" + new URLSearchParams({
+              uUserId: pUserId,
+              uContent: pData
+            }));             
             return test;
             break;
         } 
@@ -410,6 +416,7 @@ export function callServer(pTask,pData,pUserId) {
             let formData  = new FormData();
             formData.append("uUserId", pUserId);
             formData.append("uContent", jsonstr);
+            /*
             let test = fetch(serverpath + "meldCreateResult.php", {
               method: 'POST',
               headers: {
@@ -417,6 +424,11 @@ export function callServer(pTask,pData,pUserId) {
               },
               body: formData
             });
+            */
+            let test = fetch(serverpath + "meldCreateResult.php?" + new URLSearchParams({
+              uUserId: pUserId,
+              uContent: jsonstr
+            }));              
             return test;
             break;
         }  
