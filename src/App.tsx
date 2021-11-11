@@ -276,15 +276,13 @@ class App extends React.Component<props, state> {
           <IonFabButton color="dark">
             <IonIcon icon={skull} />
           </IonFabButton>
-          <IonFabList side="top">
-            <IonFabButton color="dark" onClick={(e)=>{this.showProfileModal(e)}}><IonIcon icon={person} /></IonFabButton>
-          </IonFabList>
           <IonFabList side="start">
+            <IonFabButton color="dark" onClick={(e)=>{this.showProfileModal(e)}}><IonIcon icon={person} /></IonFabButton>
             <IonFabButton color="dark" onClick={(e)=>{this.showFactoryModal(e)}}><IonIcon icon={flask} /></IonFabButton>
           </IonFabList>
           <IonFabList side="end">
             <IonFabButton color="dark"><IonIcon icon={trophy} /></IonFabButton>
-          </IonFabList>
+          </IonFabList>        
         </IonFab>
 
         <IonPopover

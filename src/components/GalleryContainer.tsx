@@ -98,22 +98,26 @@ class GalleryContainer extends React.Component<props, state> {
   }
   //End chunking functions
 
-  showCardetails =(card:any) => {
+  showCardetails =(card:any, front:boolean) => {
     //Recent trades: {result[0].recentTrades} <br></br>(past 48 hrs)
     this.pullCardDetails(this.props.user.ID, card).then((result:any) => {
+      let currImg = card.Image;
+      if(!front) {
+        currImg = card.Image.replace(/front/g, "back");
+      }
       const details =  
       <IonGrid>
-        <IonRow><IonCol><div style={{height:10}}></div></IonCol></IonRow> 
         <IonRow>
           <IonCol>Card Count: {result[0].count}</IonCol> 
           <IonCol>Sold Out: {result[0].cardSoldOut}</IonCol> 
         </IonRow> 
         <IonRow>
-          <IonCol>Set: {card.SetName.replace(/_/g, " ")}</IonCol> 
-          <IonCol></IonCol> 
+          <IonCol>Set: {card.SetName.replace(/_/g, " ")}</IonCol>
         </IonRow>              
         <IonRow>
-        <IonCol><img src={card.Image} width="100%" /></IonCol> 
+        <IonCol><IonImg src={currImg} onClick={() => {
+          this.showCardetails(card, !front);
+        }}></IonImg></IonCol> 
         </IonRow>               
       </IonGrid>;
       this.setState({cardDetails:details, showDetails:true})
@@ -179,7 +183,7 @@ class GalleryContainer extends React.Component<props, state> {
         item.push(
           <IonCol key={c.ID}>
             <IonImg style={{width:"100%"}} src={imgSrc} class={(c.UserID === null)?'need-card-alpha':''} onClick={
-              () => {this.showCardetails(c)}
+              () => {this.showCardetails(c, true)}
               }>
             </IonImg>
             {(c.Count !== null && c.Count > 1) && <IonBadge class="quantity-badge">{c.Count}</IonBadge>}

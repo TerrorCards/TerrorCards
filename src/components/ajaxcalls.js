@@ -547,7 +547,49 @@ export function callServer(pTask,pData,pUserId) {
               });
               return test;
               break;
-        }  
+        } 
+        case "checkEmailExist": {
+          var jsonstr = prepData(pData);
+          let formData  = new FormData();
+          formData.append("uUserId", pUserId);
+          formData.append("uContent", jsonstr);
+          /*
+          let test = fetch(serverpath + "register.php", {
+            method: 'POST',
+            headers: {
+              "Content-Type": 'multipart/form-data'
+            },
+            body: formData
+          });
+          */
+          let test = fetch(serverpath + "checkEmailExist.php?" + new URLSearchParams({
+            uUserId: pUserId,
+            uContent: jsonstr
+            }));           
+          return test;
+          break;
+        } 
+        case "changePassword": {
+          var jsonstr = prepData(pData);
+          let formData  = new FormData();
+          formData.append("uUserId", pUserId);
+          formData.append("uContent", jsonstr);
+          /*
+          let test = fetch(serverpath + "register.php", {
+            method: 'POST',
+            headers: {
+              "Content-Type": 'multipart/form-data'
+            },
+            body: formData
+          });
+          */
+          let test = fetch(serverpath + "changePassword.php?" + new URLSearchParams({
+            uUserId: pUserId,
+            uContent: jsonstr
+            }));           
+          return test;
+          break;
+        }                  
         case "pullFriendsList": {
               var jsonstr = prepData(pData);
               let formData  = new FormData();

@@ -9,8 +9,7 @@ import {
     IonTitle, IonPage,
     withIonLifeCycle
 } from '@ionic/react';
-import { settingsOutline, closeCircleOutline } from 'ionicons/icons';
-import { star, listCircle, create, refresh, repeat, personAdd, flag, closeCircle, bookmark, newspaper, chatbubble, statsChart, settings } from 'ionicons/icons';
+import { checkmark, close, closeCircleOutline } from 'ionicons/icons';
 import { callServer } from './ajaxcalls';
 
 interface props {
@@ -24,6 +23,11 @@ interface state {
     infoRender: any,
     initialSlide: number,
     speed: number
+
+    currEmail: string;
+    currPassword: string;
+    requestType: string;
+    status: boolean;
 };
 
 class ProfileManagerContainer extends React.Component<props, state> {
@@ -35,7 +39,11 @@ class ProfileManagerContainer extends React.Component<props, state> {
             info: {},
             infoRender: null,
             initialSlide: 0,
-            speed: 400
+            speed: 400,
+            currEmail: "",
+            currPassword: "",
+            requestType: "",
+            status: false
         }
     }
 
@@ -81,7 +89,7 @@ class ProfileManagerContainer extends React.Component<props, state> {
             .then((json) => {
                 console.log(json);
                 if (json) {
-                    this.setState({ info: json }, () => {
+                    this.setState({ info: json, currEmail: json.Email, currPassword: json.Password }, () => {
                         //this.props.profileCallback(json);
                     });
                 }
@@ -91,13 +99,60 @@ class ProfileManagerContainer extends React.Component<props, state> {
             });
     }
 
-    setEmail(value: any) {
+    setEmail() {
+        //check if email is already used
+        if(this.state.currEmail !== "") {
+            callServer("checkEmailExist", {email: this.state.currEmail}, this.props.user.ID)?.then((resp) => { return resp.json(); })
+            .then((json) => {
+                if (json) {
+                    if(json.Response === "Success") {
+                        this.setState({requestType: "email", status: true});
+                    } else {
+                        this.setState({requestType: "email", status: false});
+                    }
+                }
+            })
+            .catch((err: any) => {
+                console.log(err);
+            });
+        }
+    }
+
+    setBio(value: any) {
 
     }
+
+    setPassword() {
+        callServer("changePassword", {password: this.state.currPassword}, this.props.user.ID)?.then((resp) => { return resp.json(); })
+            .then((json) => {
+                console.log(json);
+                if (json) {
+                    if(json.Response === "Success") {
+                        this.setState({requestType: "password", status: true});
+                    } else {
+                        this.setState({requestType: "password", status: false});
+                    }
+                }
+            })
+            .catch((err: any) => {
+                console.log(err);
+            });        
+    }
+
+    setCrypto(value: any) {
+        
+    }
+
 
     sectionContent() {
         return (<IonCol></IonCol>)
     }
+
+    confirmRemove() {
+
+    }
+
+
 
     render() {
         return (
@@ -124,47 +179,74 @@ class ProfileManagerContainer extends React.Component<props, state> {
                                 <IonLabel position="stacked">Tap on image to update</IonLabel>
                                 <IonImg style={{ width: "100px", height: "100px" }} src={this.state.info.Image}></IonImg>
                             </IonCol>
+                            <IonCol key={"bio"}>
+                                <IonLabel position="stacked">Small bio for others to see</IonLabel>
+                                <IonTextarea value={""} placeholder="About yourself" onIonChange={(e) => this.setBio(e.detail.value!)}></IonTextarea>
+                            </IonCol>                            
                         </IonRow>
                         <IonRow>
                             <IonCol key={"email"}>
                                 <IonLabel position="stacked">Account email</IonLabel>
-                                <IonInput value={this.state.info.Email} placeholder="Your contact email" onIonChange={(e) => this.setEmail(e.detail.value!)}></IonInput>
+                                <IonInput value={this.state.currEmail} placeholder="Your contact email" onIonChange={(e) => {
+                                    this.setState({currEmail: e.detail.value!})
+                                }}
+                                onIonBlur={(e) => {
+                                    if(this.state.currEmail !== this.state.info.Email) {
+                                        this.setEmail()
+                                    }
+                                }}
+                                ></IonInput>
+                                {(this.state.requestType === "email" && this.state.status)?
+                                    <IonIcon slot="icon-only" icon={checkmark} color="success" size="s" />:
+                                    <IonIcon slot="icon-only" icon={close} color="danger" size="s" />    
+                                }
                             </IonCol>
                         </IonRow>
                         <IonRow>
                             <IonCol key={"password"}>
                                 <IonLabel position="stacked">Password</IonLabel>
-                                <IonInput type="password" value={this.state.info.Password} placeholder="Enter a name password" onIonChange={(e) => this.setEmail(e.detail.value!)}></IonInput>
+                                <IonInput type="password" value={this.state.currPassword} placeholder="Enter a name password"  onIonChange={(e) => {
+                                    this.setState({currPassword: e.detail.value!})
+                                }}
+                                onIonBlur={(e) => {
+                                    if(this.state.currPassword !== this.state.info.Password) {
+                                        this.setPassword()
+                                    }                                    
+                                }}></IonInput>
                             </IonCol>
                         </IonRow>  
                         <IonRow>
                             <IonCol key={"wallet"}>
                                 <IonLabel position="stacked">Crypto wallet (wax)</IonLabel>
-                                <IonInput value={""} placeholder="Enter your Wax id (.wam)" onIonChange={(e) => this.setEmail(e.detail.value!)}></IonInput>
+                                <IonInput value={""} placeholder="Enter your Wax id (.wam)" onIonChange={(e) => this.setCrypto(e.detail.value!)}></IonInput>
                             </IonCol>
-                        </IonRow>                                              
+                        </IonRow>  
                         <IonRow>
-                            <IonCol key={"bio"}>
-                                <IonLabel position="stacked">Small bio for others to see</IonLabel>
-                                <IonTextarea value={""} placeholder="About yourself" onIonChange={(e) => this.setEmail(e.detail.value!)}></IonTextarea>
-                            </IonCol>
-                        </IonRow>
+                            <IonCol key={"ContactUs"}>
+                                <IonLabel position="stacked">Contact Us</IonLabel>
+                                <IonTextarea value={""} placeholder="Your message" onIonChange={(e) => this.setBio(e.detail.value!)}></IonTextarea>
+                            </IonCol>                                                       
+                        </IonRow>                                            
                     </IonGrid>
                     <IonGrid id="list">
                         <IonRow>
-                            <IonCol key={"custom"}>
-                                <IonItem>
-                                    <IonLabel>Community Lists</IonLabel>
-                                    <IonSelect value={""} placeholder="Select One" onIonChange={(e) => this.setEmail(e.detail.value)}>
-                                        <IonSelectOption value="Friends">Friends</IonSelectOption>
-                                        <IonSelectOption value="Blocklist">Blocked list</IonSelectOption>
-                                    </IonSelect>
-                                </IonItem>
-                            </IonCol>
-                        </IonRow>
-                        <IonRow>
                             {this.sectionContent()}
                         </IonRow>
+                        <IonRow>
+                            <IonCol key={"custom"}>{''}</IonCol>
+                        </IonRow>   
+                        <IonRow>
+                            <IonCol key={"custom"}>{''}</IonCol>
+                        </IonRow> 
+                        <IonRow>
+                            <IonCol key={"custom"}>{''}</IonCol>
+                        </IonRow>                                                                      
+                        <IonRow>
+                            <IonCol key={"delete"}>
+                                <IonButton expand="block" onClick={() => {this.confirmRemove()}} color={"danger"}>{"Remove Account"}</IonButton>
+                                <IonLabel position="stacked">By removing your account, you will lose all your cards and contribute them to a collection pool</IonLabel>
+                            </IonCol>
+                        </IonRow>                         
                     </IonGrid>
                 </IonContent>
             </IonPage>
