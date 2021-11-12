@@ -106,15 +106,19 @@ class ProfileManagerContainer extends React.Component<props, state> {
             .then((json) => {
                 if (json) {
                     if(json.Response === "Success") {
-                        this.setState({requestType: "email", status: true});
+                        this.setState({requestType: "email", status: true}, () => {
+                            this.pullProfile();
+                        });
                     } else {
-                        this.setState({requestType: "email", status: false});
+                        this.setState({requestType: "email", status: false, currEmail: this.state.info.Email});
                     }
                 }
             })
             .catch((err: any) => {
                 console.log(err);
             });
+        } else {
+            this.setState({requestType: "email", status: false, currEmail: this.state.info.Email});
         }
     }
 
@@ -123,20 +127,25 @@ class ProfileManagerContainer extends React.Component<props, state> {
     }
 
     setPassword() {
+        if(this.state.currPassword !== "") {
         callServer("changePassword", {password: this.state.currPassword}, this.props.user.ID)?.then((resp) => { return resp.json(); })
             .then((json) => {
-                console.log(json);
                 if (json) {
                     if(json.Response === "Success") {
-                        this.setState({requestType: "password", status: true});
+                        this.setState({requestType: "password", status: true},() => {
+                            this.pullProfile();
+                        });
                     } else {
-                        this.setState({requestType: "password", status: false});
+                        this.setState({requestType: "password", status: false, currPassword: this.state.info.Password});
                     }
                 }
             })
             .catch((err: any) => {
                 console.log(err);
-            });        
+            }); 
+        }  else {
+            this.setState({requestType: "password", status: false, currPassword: this.state.info.Password});
+        }      
     }
 
     setCrypto(value: any) {
@@ -186,7 +195,14 @@ class ProfileManagerContainer extends React.Component<props, state> {
                         </IonRow>
                         <IonRow>
                             <IonCol key={"email"}>
-                                <IonLabel position="stacked">Account email</IonLabel>
+                                <IonLabel position="stacked">Account email
+                                {(this.state.requestType === "email")?
+                                        (this.state.status)?
+                                        <IonIcon slot="icon-only" icon={checkmark} color="success" size="l" />:
+                                        <IonIcon slot="icon-only" icon={close} color="danger" size="l" />   
+                                    :null 
+                                }                                
+                                </IonLabel>
                                 <IonInput value={this.state.currEmail} placeholder="Your contact email" onIonChange={(e) => {
                                     this.setState({currEmail: e.detail.value!})
                                 }}
@@ -196,15 +212,18 @@ class ProfileManagerContainer extends React.Component<props, state> {
                                     }
                                 }}
                                 ></IonInput>
-                                {(this.state.requestType === "email" && this.state.status)?
-                                    <IonIcon slot="icon-only" icon={checkmark} color="success" size="s" />:
-                                    <IonIcon slot="icon-only" icon={close} color="danger" size="s" />    
-                                }
                             </IonCol>
                         </IonRow>
                         <IonRow>
                             <IonCol key={"password"}>
-                                <IonLabel position="stacked">Password</IonLabel>
+                                <IonLabel position="stacked">Password
+                                {(this.state.requestType === "password")?
+                                        (this.state.status)?
+                                        <IonIcon slot="icon-only" icon={checkmark} color="success" size="l" />:
+                                        <IonIcon slot="icon-only" icon={close} color="danger" size="l" />   
+                                    :null 
+                                }                                    
+                                </IonLabel>
                                 <IonInput type="password" value={this.state.currPassword} placeholder="Enter a name password"  onIonChange={(e) => {
                                     this.setState({currPassword: e.detail.value!})
                                 }}
@@ -234,13 +253,7 @@ class ProfileManagerContainer extends React.Component<props, state> {
                         </IonRow>
                         <IonRow>
                             <IonCol key={"custom"}>{''}</IonCol>
-                        </IonRow>   
-                        <IonRow>
-                            <IonCol key={"custom"}>{''}</IonCol>
-                        </IonRow> 
-                        <IonRow>
-                            <IonCol key={"custom"}>{''}</IonCol>
-                        </IonRow>                                                                      
+                        </IonRow>                                                                        
                         <IonRow>
                             <IonCol key={"delete"}>
                                 <IonButton expand="block" onClick={() => {this.confirmRemove()}} color={"danger"}>{"Remove Account"}</IonButton>
