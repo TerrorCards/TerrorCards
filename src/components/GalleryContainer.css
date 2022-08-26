@@ -38,6 +38,15 @@
   border-radius: 5%;
 }
 
+.message-badge-left {
+  background-color: rgba(255, 0, 0, 1);
+  color: white;
+  position: absolute;
+  bottom: 10px;
+  left: 0px;
+  border-radius: 5%;
+}
+
 .need-card-alpha {
   opacity: 0.5;
 }

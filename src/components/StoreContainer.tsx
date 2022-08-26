@@ -236,9 +236,11 @@ class StoreContainer extends React.Component<props, state> {
     let items: Array<any> = [];  
     if(cards.length > 0) {
       cards.map((c:any) => {
-        items.push(<IonSlide key={c.Image}>
-        <IonImg src={c.Image} />
-      </IonSlide>)
+        items.push(<IonCard key={c.Image}>
+          <IonCardContent>
+          <IonImg src={c.Image} />
+          </IonCardContent>
+      </IonCard>)
       });
     }
     this.setState({cardsResult:items}, ()=> {
@@ -282,9 +284,7 @@ class StoreContainer extends React.Component<props, state> {
 
           <IonModal isOpen={this.state.showCards}>
             <IonContent>
-            <IonSlides pager={false} options={this.slideOpts}>
               {this.state.cardsResult}
-            </IonSlides>
             </IonContent>
             <IonButton onClick={() => {this.closeCardsPopup()}}>Close</IonButton>
 

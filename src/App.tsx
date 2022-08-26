@@ -128,7 +128,7 @@ class App extends React.Component<props, state> {
   }  
 
   getUserStorage = () => {
-    //await store.create();
+    //store.create();
     //store.clear();
     //await store.set('username', "TerrorCards");
     store.get('userProfile').then((userProfile:any) => {
@@ -152,6 +152,11 @@ class App extends React.Component<props, state> {
     store.set('userProfile', info).then(()=> {
       this.getUserStorage();
     });    
+  }
+
+  removeUserFromStore =() => {
+    store.clear();
+    this.setState({appReady:false});
   }
 
 
@@ -278,10 +283,9 @@ class App extends React.Component<props, state> {
           </IonFabButton>
           <IonFabList side="start">
             <IonFabButton color="dark" onClick={(e)=>{this.showProfileModal(e)}}><IonIcon icon={person} /></IonFabButton>
-            <IonFabButton color="dark" onClick={(e)=>{this.showFactoryModal(e)}}><IonIcon icon={flask} /></IonFabButton>
           </IonFabList>
           <IonFabList side="end">
-            <IonFabButton color="dark"><IonIcon icon={trophy} /></IonFabButton>
+          <IonFabButton color="dark" onClick={(e)=>{this.showFactoryModal(e)}}><IonIcon icon={flask} /></IonFabButton>
           </IonFabList>        
         </IonFab>
 
@@ -298,7 +302,7 @@ class App extends React.Component<props, state> {
       </IonModal>}
 
       {this.state.showProfileManageModel && <IonModal isOpen={this.state.showProfileManageModel} cssClass='my-custom-class'>          
-          <ProfileManagerContainer user={this.state.user} closePanel={this.showProfileModal} />          
+          <ProfileManagerContainer user={this.state.user} closePanel={this.showProfileModal} signOut={this.removeUserFromStore} />          
       </IonModal>}
 
       {this.state.showFactorySetupModel && <IonModal isOpen={this.state.showFactorySetupModel} cssClass='my-custom-class'>          
@@ -314,6 +318,7 @@ class App extends React.Component<props, state> {
   )
   }
 
+  //<IonFabButton color="dark"><IonIcon icon={trophy} /></IonFabButton>
 
 };
 

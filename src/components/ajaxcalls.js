@@ -538,6 +538,7 @@ export function callServer(pTask,pData,pUserId) {
               formData.append("uUserId", pUserId);
               formData.append("uAction", "register");
               formData.append("uContent", jsonstr);
+              /*
               let test = fetch(serverpath + "register.php", {
                 method: 'POST',
                 headers: {
@@ -545,6 +546,12 @@ export function callServer(pTask,pData,pUserId) {
                 },
                 body: formData
               });
+              */
+             let test = fetch(serverpath + "register.php?" + new URLSearchParams({
+              uUserId: pUserId,
+              uContent: jsonstr,
+              uAction: "register"
+              }));              
               return test;
               break;
         } 
@@ -589,7 +596,49 @@ export function callServer(pTask,pData,pUserId) {
             }));           
           return test;
           break;
-        }                  
+        }  
+        case "changeWallet": {
+          var jsonstr = prepData(pData);
+          let formData  = new FormData();
+          formData.append("uUserId", pUserId);
+          formData.append("uContent", jsonstr);
+          /*
+          let test = fetch(serverpath + "register.php", {
+            method: 'POST',
+            headers: {
+              "Content-Type": 'multipart/form-data'
+            },
+            body: formData
+          });
+          */
+          let test = fetch(serverpath + "changeWallet.php?" + new URLSearchParams({
+            uUserId: pUserId,
+            uContent: jsonstr
+            }));           
+          return test;
+          break;
+        } 
+        case "changeDescription": {
+          var jsonstr = prepData(pData);
+          let formData  = new FormData();
+          formData.append("uUserId", pUserId);
+          formData.append("uContent", jsonstr);
+          /*
+          let test = fetch(serverpath + "register.php", {
+            method: 'POST',
+            headers: {
+              "Content-Type": 'multipart/form-data'
+            },
+            body: formData
+          });
+          */
+          let test = fetch(serverpath + "changeDescription.php?" + new URLSearchParams({
+            uUserId: pUserId,
+            uContent: jsonstr
+            }));           
+          return test;
+          break;
+        }                                  
         case "pullFriendsList": {
               var jsonstr = prepData(pData);
               let formData  = new FormData();
@@ -827,7 +876,48 @@ export function callServer(pTask,pData,pUserId) {
 
           return test;
           break;
-        }                                
+        }  
+        case "contactUs": {
+          var jsonstr = prepData(pData);
+          let formData  = new FormData();
+          formData.append("uUserId", pUserId);
+          formData.append("uAction", "email");
+          formData.append("uContent", jsonstr);
+          /*
+          let test = fetch(serverpath + "inAppList.php", {
+            method: 'POST',
+            headers: {
+              "Content-Type": 'multipart/form-data'
+            },
+            body: formData
+          });
+          */
+          let test = fetch(serverpath + "contactUs.php?" + new URLSearchParams({
+            uUserId: pUserId,
+            uAction: "email",
+            uContent: jsonstr
+          })); 
+          return test;
+          break;
+        } 
+        case "deleteAccount": {
+          let formData  = new FormData();
+          formData.append("uUserId", pUserId);
+          /*
+          let test = fetch(serverpath + "inAppList.php", {
+            method: 'POST',
+            headers: {
+              "Content-Type": 'multipart/form-data'
+            },
+            body: formData
+          });
+          */
+          let test = fetch(serverpath + "deleteAccount.php?" + new URLSearchParams({
+            uUserId: pUserId,
+          })); 
+          return test;
+          break;
+        }                                              
         default:
             break;
     }
@@ -893,16 +983,7 @@ export function callServer2(pTask,pData,pUserId,pCallback) {
              var data = jQuery.parseJSON(result);
              pCallback(data);
         });      
-    } 
-    else if (pTask === "forgotPassword") {
-    	var jsonstr = prepData(pData);
-        $.post( serverpath + "forgetPassword.php", { uContent: jsonstr, uUserId: pUserId, uAction: "recoverPassword" })
-          .done(function( result ) {
-          	//console.log(result);
-             var data = jQuery.parseJSON(result);
-             pCallback(data);
-        });      
-    }     
+    }    
     else if (pTask === "updateUserPic") {
     	var jsonstr = prepData(pData);
         $.post( serverpath + "updateUserPic.php", { uContent: jsonstr, uUserId: pUserId, uAction: "update" })

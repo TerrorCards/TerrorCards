@@ -3,7 +3,7 @@ import {withIonLifeCycle, IonGrid, IonRow, IonCol, IonInfiniteScroll, IonInfinit
   IonButtons, IonContent, IonHeader, IonMenuButton, IonFooter, IonPage, IonTitle, IonToolbar, IonFab, IonFabButton, IonIcon, IonFabList,
   IonChip, IonLabel, IonItem, IonSlides, IonSlide, IonBadge
 } from '@ionic/react';
-import {close, add, settings, share, person, arrowForwardCircle, arrowBackCircle, arrowUpCircle, logoVimeo, logoFacebook, logoInstagram, logoTwitter } from 'ionicons/icons';
+import {copyOutline, flashOutline} from 'ionicons/icons';
 import './GalleryContainer.css';
 import {callServer} from './ajaxcalls';
 
@@ -21,7 +21,10 @@ interface state {
   length:number,
   list:any,
   infiniteScroll:any,
-  imgList: Array<any>
+  imgList: Array<any>,
+  viewState:string,
+  nftList: Array<any>
+  nftImgList: Array<any>
 }
 
 class GalleryContainer extends React.Component<props, state> {
@@ -38,7 +41,10 @@ class GalleryContainer extends React.Component<props, state> {
       length: 0,
       list: null,
       infiniteScroll: null ,
-      imgList: []        
+      imgList: [],
+      viewState: "cards"  ,
+      nftList: [],
+      nftImgList: []
     }
   }
 
@@ -131,7 +137,7 @@ class GalleryContainer extends React.Component<props, state> {
     .then((json)=>{ 
       if(json.length > 0) {
         //dataList = json;
-        console.log(json);
+        //console.log(json);
         const chunkedList = this.chunkVersions(json);
         this.setState({chunkedList:chunkedList, dataList:json}, ()=> {
           this.imgList();
@@ -150,10 +156,10 @@ class GalleryContainer extends React.Component<props, state> {
 
   pullCardDetails =(user:string, card: any) => {
     return new Promise ((resolve:any, reject:any) => {
-      console.log(card);
+      //console.log(card);
       callServer("cardDetail",{number: card.Number, year:card.Year},user)?.then((resp)=>{ return resp.json(); })
       .then((json)=>{ 
-        console.log(json);
+        //console.log(json);
         if(json) {
           resolve(json);
         } else {
@@ -208,6 +214,64 @@ class GalleryContainer extends React.Component<props, state> {
     this.setState({imgList:list});
   }
 
+  pullNFTs =() => {
+    const url = "https://wax.api.atomicassets.io/atomicassets/v1/assets?collection_name=terrorcards1&owner=z15b2.wam&page=1&limit=100&order=desc&sort=asset_id";    
+  
+    fetch(url).then((resp)=>{ return resp.json(); })
+    .then((json)=>{ 
+      console.log(json);
+      if(json.success) {
+        const chunkedList = this.chunkVersions(json.data);
+        this.setState({nftList: chunkedList, nftImgList: []},()=> {
+          this.nftList()
+        })
+      } else {
+        this.setState({nftList: [], nftImgList: []})       
+      }
+    })
+    .catch((err:any) => {
+      console.log(err);
+    });
+  
+  }
+
+  nftList =() => {
+    const list:Array<any> = [];
+    const rowCount = this.state.nftList.length / this.props.galleryProps.layoutCount;
+    let item:Array<any> = [];
+    this.state.nftList.map((nl:any,a:number) => {
+      item = [];
+      nl.map((ch:any,i:number) => {
+          let imgSrc = ch.data.img; 
+          if(typeof(imgSrc) !== "undefined") {
+            item.push(
+              <IonCol key={ch.asset_id}>
+                <IonImg style={{width:"100px", height:"100px", objectFit: "contain"}} src={"https://ipfs.io/ipfs/" + imgSrc}></IonImg>
+                {<IonBadge class="message-badge-left">{"mint " + ch.template_mint}</IonBadge>} 
+              </IonCol>
+            )
+          } else {
+            let vidSrc = ch.data.video;
+            let poster = ch.data["video cover art"];
+            item.push(
+              <IonCol key={ch.asset_id}>
+                <video width="100px" height="100px" controls preload="none" poster={"https://ipfs.io/ipfs/" + poster}>
+                  <source src={"https://ipfs.io/ipfs/" + vidSrc} type="video/mp4"></source>
+                </video>
+                {<IonBadge class="message-badge-left">{"mint " + ch.template_mint}</IonBadge>} 
+              </IonCol>
+            )
+          }      
+      });
+      list.push(
+        <IonRow key={a}>{item}</IonRow>
+      );
+    })
+    this.setState({nftImgList:list});
+  }
+
+
+
   resetChunks = () => {
     const newChunks = this.chunkVersions(this.state.dataList);
     this.setState({chunkedList: newChunks}, () => {
@@ -218,9 +282,27 @@ class GalleryContainer extends React.Component<props, state> {
   render() {
 
     return (
-      <IonContent style={{height:'92%'}}>
+      <IonContent style={{height:'92%'}} scrollY={false}>
 
-      <IonGrid id="list">{this.state.imgList}</IonGrid>
+        <IonGrid>
+          <IonRow>
+            <IonCol>
+              <IonButton color={(this.state.viewState === 'cards')?'danger':'dark'} expand="full" size='small' onClick={()=>{
+                this.setState({viewState:"cards"})
+              }}><IonIcon  slot="start" icon={copyOutline}  color="light" /> Cards</IonButton>        
+            </IonCol>
+            <IonCol>
+              <IonButton color={(this.state.viewState === 'nft')?'danger':'dark'}  expand="full" size='small' onClick={()=>{
+                this.setState({viewState:"nft"});
+                this.pullNFTs();
+              }}><IonIcon  slot="start" icon={flashOutline}  color="light" />NFTs</IonButton> 
+            </IonCol>       
+          </IonRow>
+        </IonGrid>
+
+        <IonContent style={{height:'92%'}}>
+          <IonGrid id="list">{(this.state.viewState === 'cards')?this.state.imgList:this.state.nftImgList}</IonGrid>
+        </IonContent>
 
 
       <IonModal isOpen={this.state.showDetails}>

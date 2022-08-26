@@ -262,6 +262,11 @@ class HomeContainer extends React.Component<props, state> {
     this.props.tradeCallback(tradePartner);
   }
 
+/*
+          <IonCol>
+            <IonButton color={(this.state.viewState === 'Stats')?'danger':'dark'}  expand="full" size='small' onClick={()=>{this.showPanel('Stats')}}>Stats <IonIcon  slot="end" icon={statsChart}  color="light" /></IonButton>          
+          </IonCol> 
+*/
   render() {
     return (
       <IonContent>
@@ -287,10 +292,7 @@ class HomeContainer extends React.Component<props, state> {
           </IonCol>
           <IonCol>
             <IonButton color={(this.state.viewState === 'News')?'danger':'dark'}  expand="full" size='small' onClick={()=>{this.showPanel('News')}}><IonIcon  slot="start" icon={newspaper}  color="light" />News</IonButton> 
-          </IonCol>
-          <IonCol>
-            <IonButton color={(this.state.viewState === 'Stats')?'danger':'dark'}  expand="full" size='small' onClick={()=>{this.showPanel('Stats')}}>Stats <IonIcon  slot="end" icon={statsChart}  color="light" /></IonButton>          
-          </IonCol>        
+          </IonCol>       
         </IonRow>
       </IonGrid>
 

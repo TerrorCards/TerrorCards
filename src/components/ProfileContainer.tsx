@@ -77,7 +77,7 @@ class ProfileContainer extends React.Component<props, state> {
   pullProfile() {
     callServer("userInfo","",this.props.user.ID)?.then((resp)=>{ return resp.json(); })
     .then((json)=>{ 
-      console.log(json);
+      //console.log(json);
       if(json) {
         const infoRender = this.renderProfileItem(json);
         this.setState({info: json, infoRender: infoRender}, () => {
