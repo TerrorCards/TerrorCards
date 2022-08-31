@@ -1,14 +1,17 @@
 import React from 'react';
 import {withIonLifeCycle, IonGrid, IonRow, IonCol, IonInfiniteScroll, IonInfiniteScrollContent, IonList, IonModal, IonButton, IonImg, IonThumbnail,
   IonButtons, IonContent, IonHeader, IonMenuButton, IonFooter, IonPage, IonTitle, IonToolbar, IonFab, IonFabButton, IonIcon, IonFabList,
-  IonChip, IonLabel, IonItem, IonSlides, IonSlide, IonBadge
+  IonChip, IonLabel, IonItem, IonSlides, IonSlide, IonBadge, IonPopover
 } from '@ionic/react';
-import {copyOutline, flashOutline} from 'ionicons/icons';
+import {copyOutline, flashOutline, settingsOutline} from 'ionicons/icons';
 import './GalleryContainer.css';
+import GalleryMenu from './GalleryMenu';
 import {callServer} from './ajaxcalls';
 
 interface props {
   galleryProps: any;
+  nftProps: any;
+  settingsCallback: any;
   user: any;
 }
 
@@ -25,6 +28,8 @@ interface state {
   viewState:string,
   nftList: Array<any>
   nftImgList: Array<any>
+  showSettingPopover:boolean
+  event: any
 }
 
 class GalleryContainer extends React.Component<props, state> {
@@ -44,7 +49,9 @@ class GalleryContainer extends React.Component<props, state> {
       imgList: [],
       viewState: "cards"  ,
       nftList: [],
-      nftImgList: []
+      nftImgList: [],
+      showSettingPopover: false,
+      event: undefined
     }
   }
 
@@ -56,12 +63,17 @@ class GalleryContainer extends React.Component<props, state> {
   componentDidUpdate(prevProps:any) {
     if(prevProps.galleryProps.year !== this.props.galleryProps.year ||
       prevProps.galleryProps.view !== this.props.galleryProps.view || 
-      prevProps.galleryProps.set !== this.props.galleryProps.set
+      prevProps.galleryProps.set !== this.props.galleryProps.set ||
+      prevProps.nftProps.collection !== this.props.nftProps.collection
       ) {
-      this.pullCards();
+        if(this.state.viewState === "nft") {
+          this.pullNFTs();
+        } else {
+          this.pullCards();
+        }
       console.log('Props updated'); 
     }  
-    if(prevProps.galleryProps.layoutCount !== this.props.galleryProps.layoutCount) {
+    if(prevProps.galleryProps.layoutCount !== this.props.galleryProps.layoutCount || prevProps.nftProps.layoutCount !== this.props.nftProps.layoutCount) {
       this.resetChunks();
     }
   }
@@ -75,7 +87,11 @@ class GalleryContainer extends React.Component<props, state> {
   }
 
   ionViewDidEnter() {
-    this.pullCards();
+    if(this.state.viewState === "nft") {
+      this.pullNFTs();
+    } else {
+      this.pullCards();
+    }
     console.log('ionViewDidEnter event fired')
   }
 
@@ -88,7 +104,7 @@ class GalleryContainer extends React.Component<props, state> {
     const localList = [...array];
     let chunkList:Array<any> = [];
     if (localList.length > 0) {
-      chunkList = this.chunk(localList, this.props.galleryProps.layoutCount);
+      chunkList = this.chunk(localList, (this.state.viewState === "nft")?this.props.nftProps.layoutCount:this.props.galleryProps.layoutCount);
     }
     return chunkList;
   }
@@ -215,18 +231,19 @@ class GalleryContainer extends React.Component<props, state> {
   }
 
   pullNFTs =() => {
-    const url = "https://wax.api.atomicassets.io/atomicassets/v1/assets?collection_name=terrorcards1&owner=z15b2.wam&page=1&limit=100&order=desc&sort=asset_id";    
+    //https://wax.api.atomicassets.io/atomicassets/v1/assets?collection_name=terrorcards1&owner=z15b2.wam&page=1&limit=100&order=desc&sort=asset_id
+    const url = "https://wax.api.atomicassets.io/atomicassets/v1/assets?collection_name="+this.props.nftProps.collection+"&owner=z15b2.wam&page=1&limit=100&order=desc&sort=asset_id";    
   
     fetch(url).then((resp)=>{ return resp.json(); })
     .then((json)=>{ 
       console.log(json);
       if(json.success) {
         const chunkedList = this.chunkVersions(json.data);
-        this.setState({nftList: chunkedList, nftImgList: []},()=> {
+        this.setState({chunkedList: chunkedList, dataList: json.data},()=> {
           this.nftList()
         })
       } else {
-        this.setState({nftList: [], nftImgList: []})       
+        this.setState({nftList: []})       
       }
     })
     .catch((err:any) => {
@@ -237,9 +254,8 @@ class GalleryContainer extends React.Component<props, state> {
 
   nftList =() => {
     const list:Array<any> = [];
-    const rowCount = this.state.nftList.length / this.props.galleryProps.layoutCount;
     let item:Array<any> = [];
-    this.state.nftList.map((nl:any,a:number) => {
+    this.state.chunkedList.map((nl:any,a:number) => {
       item = [];
       nl.map((ch:any,i:number) => {
           let imgSrc = ch.data.img; 
@@ -275,7 +291,11 @@ class GalleryContainer extends React.Component<props, state> {
   resetChunks = () => {
     const newChunks = this.chunkVersions(this.state.dataList);
     this.setState({chunkedList: newChunks}, () => {
-      this.imgList();
+      if(this.state.viewState === "nft") {
+        this.nftList();
+      } else {
+        this.imgList();
+      }      
     });
   }
 
@@ -288,15 +308,25 @@ class GalleryContainer extends React.Component<props, state> {
           <IonRow>
             <IonCol>
               <IonButton color={(this.state.viewState === 'cards')?'danger':'dark'} expand="full" size='small' onClick={()=>{
-                this.setState({viewState:"cards"})
+                this.setState({viewState:"cards"},()=>{
+                  this.pullCards();
+                })
               }}><IonIcon  slot="start" icon={copyOutline}  color="light" /> Cards</IonButton>        
             </IonCol>
             <IonCol>
               <IonButton color={(this.state.viewState === 'nft')?'danger':'dark'}  expand="full" size='small' onClick={()=>{
-                this.setState({viewState:"nft"});
-                this.pullNFTs();
+                this.setState({viewState:"nft"}, () => {
+                  this.pullNFTs();
+                });
               }}><IonIcon  slot="start" icon={flashOutline}  color="light" />NFTs</IonButton> 
-            </IonCol>       
+            </IonCol> 
+            <IonCol>
+              <IonButton fill='clear' onClick={(e:any)=>{
+                this.setState({showSettingPopover:true});
+              }}>
+                <IonIcon  slot="end" icon={settingsOutline}  color="dark" />
+              </IonButton> 
+            </IonCol>                 
           </IonRow>
         </IonGrid>
 
@@ -304,6 +334,15 @@ class GalleryContainer extends React.Component<props, state> {
           <IonGrid id="list">{(this.state.viewState === 'cards')?this.state.imgList:this.state.nftImgList}</IonGrid>
         </IonContent>
 
+        <IonPopover
+        cssClass='popper-custom-menu-size'
+        isOpen={this.state.showSettingPopover}
+        onDidDismiss={() => this.setState({ showSettingPopover: false, event: undefined })}
+      >
+        <GalleryMenu layoutAction={this.props.settingsCallback}  layoutProps={this.props.galleryProps} nftProps={this.props.nftProps} user={this.props.user}
+          type={this.state.viewState}
+        />
+      </IonPopover>
 
       <IonModal isOpen={this.state.showDetails}>
         {this.state.cardDetails}

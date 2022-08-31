@@ -58,7 +58,8 @@ interface props {
 interface state {
   appReady: boolean,
   showPopover: boolean,
-  galleryState: any;
+  galleryDigitalSettings: any;
+  galleryNFTSettings: any;
   event: any,
   user:any,
   showTradeSetupModel: boolean,
@@ -80,12 +81,20 @@ class App extends React.Component<props, state> {
     this.state = {
       appReady: false,
       showPopover: false,
-      galleryState: {
+      galleryDigitalSettings: {
         isInitialize: false,
         layoutCount: 3,        
         year: (new Date()).getFullYear(),
         set: "All",
         view: "owned",
+        viewOptions: "all"
+      },
+      galleryNFTSettings: {
+        isInitialize: false,
+        layoutCount: 3,        
+        collection: "terrorcards1",
+        schema: "all",
+        template: "all",
         viewOptions: "all"
       },
 
@@ -145,12 +154,36 @@ class App extends React.Component<props, state> {
         this.setState({appReady:true});
       }  
     });
-   
+  }
+
+  getGallerySettingStorage =() => {
+    store.get('galleryDigitalSettings').then((galleryDigitalSettings:any) => {
+      console.log(galleryDigitalSettings);
+      if(galleryDigitalSettings !== null) {
+        //continue normally
+        this.setState({galleryDigitalSettings: galleryDigitalSettings});
+      }  
+    }); 
+    store.get('galleryNFTSettings').then((galleryNFTSettings:any) => {
+      console.log(galleryNFTSettings);
+      if(galleryNFTSettings !== null) {
+        //continue normally
+        this.setState({galleryNFTSettings: galleryNFTSettings});
+      }  
+    });       
   }
 
   setUserName = (info:any) => {
     store.set('userProfile', info).then(()=> {
       this.getUserStorage();
+    });    
+  }
+
+  setGallerySettingsStorage =(digital:any, nft:any) => {
+    store.set('galleryDigitalSettings', digital).then(()=> {
+      store.set('galleryNFTSettings', nft).then(()=> {
+        this.getGallerySettingStorage();
+      });
     });    
   }
 
@@ -171,10 +204,10 @@ class App extends React.Component<props, state> {
 
   //Gallery functions
   fnGalleryLayout =(param:string, item:number) => {
-    const localSettings: any = {...this.state.galleryState};
+    const localSettings: any = {...this.state.galleryDigitalSettings};
     localSettings[param] = item;
     const newState = {layoutCount: localSettings.layoutCount, isInitialize:true ,year:localSettings.year, set:localSettings.set, view:localSettings.view, viewOptions:localSettings.viewOptions}
-    this.setState({galleryState: newState}); 
+    this.setState({galleryDigitalSettings: newState}); 
 
     //setGalleryLayout({ layoutCount: item, isInitialize:true });
     //setTimeout(() => {
@@ -224,7 +257,7 @@ class App extends React.Component<props, state> {
   */
 
   //this.nav.parent.select(tabIndex);
-
+//{menuContent = <GalleryMenu layoutAction={this.fnGalleryLayout}  layoutProps={this.state.galleryDigitalSettings} user={this.state.user} />}
   render() {
 
   return (
@@ -240,8 +273,9 @@ class App extends React.Component<props, state> {
           </Route>
           <Route exact path="/gallery">
             <ProfileContainer menuAction={this.showPoperAction} user={this.state.user} profileCallback={this.fnUpdateUserInfo} lastRefreshed={this.state.refreshTime}   />  
-            <GalleryContainer galleryProps={this.state.galleryState} key={this.state.galleryState.layoutCount} user={this.state.user} />
-            {menuContent = <GalleryMenu layoutAction={this.fnGalleryLayout}  layoutProps={this.state.galleryState} user={this.state.user} />}
+            <GalleryContainer galleryProps={this.state.galleryDigitalSettings} nftProps={this.state.galleryNFTSettings} 
+              settingsCallback={this.setGallerySettingsStorage}
+              key={this.state.galleryDigitalSettings.layoutCount} user={this.state.user} />
           </Route>
           <Route path="/store">
             <ProfileContainer menuAction={this.showPoperAction} user={this.state.user} profileCallback={this.fnUpdateUserInfo} lastRefreshed={this.state.refreshTime}  /> 
@@ -289,13 +323,6 @@ class App extends React.Component<props, state> {
           </IonFabList>        
         </IonFab>
 
-        <IonPopover
-        cssClass='popper-custom-menu-size'
-        isOpen={this.state.showPopover}
-        onDidDismiss={() => this.setState({ showPopover: false, event: undefined })}
-      >
-        {menuContent}
-      </IonPopover>
 
       {this.state.showTradeSetupModel && <IonModal isOpen={this.state.showTradeSetupModel} cssClass='my-custom-class'>          
           <TradeSetup otherUser={this.state.tradeUser} user={this.state.user} closePanel={this.showTradeModal} />          
@@ -317,6 +344,16 @@ class App extends React.Component<props, state> {
     </IonApp> 
   )
   }
+
+/*
+        <IonPopover
+        cssClass='popper-custom-menu-size'
+        isOpen={this.state.showPopover}
+        onDidDismiss={() => this.setState({ showPopover: false, event: undefined })}
+      >
+        {menuContent}
+      </IonPopover>
+*/      
 
   //<IonFabButton color="dark"><IonIcon icon={trophy} /></IonFabButton>
 

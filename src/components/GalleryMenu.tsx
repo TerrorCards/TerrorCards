@@ -10,7 +10,9 @@ import {callServer} from './ajaxcalls';
 interface props {
   layoutAction: any;
   layoutProps: any;
+  nftProps: any;
   user:any;
+  type:string;
 }
 
 interface state {
@@ -72,7 +74,11 @@ class GalleryMenu extends React.Component<props, state> {
     data.map((d:any, i:number) => {
       if(d.Year === this.props.layoutProps.year) {
         const cleanName = (d.SetName).replace(/_/g, " ");
-        availableSets.push(<IonSelectOption key={i} value={d.SetName}>{cleanName}</IonSelectOption>);
+        if(d.SetName === this.props.layoutProps.set) {
+          availableSets.push(<IonSelectOption key={i} value={d.SetName}>{cleanName}</IonSelectOption>);
+        } else {
+          availableSets.push(<IonSelectOption key={i} value={d.SetName}>{cleanName}</IonSelectOption>);
+        }
       }
     });
     this.setState({availableSets: availableSets, setList:data});
@@ -98,41 +104,82 @@ class GalleryMenu extends React.Component<props, state> {
     this.props.layoutAction('set', 'All');
   }
 
+  updateSettings =(setting:any, value:any, type:any) => {
+    const localDigitalSettings = {...this.props.layoutProps};
+    const localNFTSettings = {...this.props.nftProps};
+    if(type === 'digital') {
+      localDigitalSettings[setting] = value;
+    } else {
+      localNFTSettings[setting] = value;
+    }
+    this.props.layoutAction(localDigitalSettings, localNFTSettings)
+  }
+
+  renderDigitalUI = () => {
+    return(<IonList>
+      <IonListHeader>Gallery Settings</IonListHeader>
+      <IonListHeader>Filters</IonListHeader>
+      <IonItem>
+        <IonLabel>Year</IonLabel>
+        <IonSelect value={this.props.layoutProps.year} placeholder="" onIonChange={(e:any) => {this.updateSettings('year', e.detail.value, 'digital')} }>
+          {this.state.availableYears}
+        </IonSelect>
+      </IonItem>
+      <IonItem>
+        <IonLabel>Set</IonLabel>
+        <IonSelect value={this.props.layoutProps.set} placeholder="" onIonChange={(e:any) => {this.updateSettings('set', e.detail.value, 'digital')} }>
+          {this.state.availableSets}
+        </IonSelect> 
+      </IonItem>     
+      <IonItem>
+        <IonLabel>View</IonLabel>
+        <IonSelect value={this.props.layoutProps.view} placeholder="" onIonChange={(e:any) => {this.updateSettings('view', e.detail.value, 'digital')} }>
+          {this.state.availableViews}
+        </IonSelect>  
+      </IonItem>    
+      <IonListHeader>Layout Settings</IonListHeader>
+      <IonItem>
+        <IonLabel># per row</IonLabel>
+        <IonSelect value={(this.props.layoutProps.layoutCount).toString()} placeholder="" onIonChange={(e:any) => {this.updateSettings('layoutCount', parseInt(e.detail.value), 'digital')} }>
+          <IonSelectOption value="1">1</IonSelectOption>
+          <IonSelectOption value="2">2</IonSelectOption>
+          <IonSelectOption value="3">3</IonSelectOption>
+          <IonSelectOption value="4">4</IonSelectOption>
+          <IonSelectOption value="5">5</IonSelectOption>
+        </IonSelect>
+      </IonItem>
+    </IonList>)
+  }
+
+  renderNFTUI =() => {
+    return(<IonList>
+      <IonListHeader>NFT Gallery Settings</IonListHeader>
+      <IonListHeader>Filters</IonListHeader>
+      <IonItem>
+        <IonLabel>Collection</IonLabel>
+        <IonSelect value={this.props.nftProps.collection} placeholder="" onIonChange={(e:any) => {this.updateSettings('collection', e.detail.value, 'nft')} }>
+          <IonSelectOption value="terrorcards1">Terror Cards</IonSelectOption>
+          <IonSelectOption value="terrorkisses">Terror Kisses</IonSelectOption>
+        </IonSelect>
+      </IonItem>   
+      <IonListHeader>Layout Settings</IonListHeader>
+      <IonItem>
+        <IonLabel># per row</IonLabel>
+        <IonSelect value={(this.props.nftProps.layoutCount).toString()} placeholder="" onIonChange={(e:any) => {this.updateSettings('layoutCount', parseInt(e.detail.value), 'nft')} }>
+          <IonSelectOption value="1">1</IonSelectOption>
+          <IonSelectOption value="2">2</IonSelectOption>
+          <IonSelectOption value="3">3</IonSelectOption>
+          <IonSelectOption value="4">4</IonSelectOption>
+          <IonSelectOption value="5">5</IonSelectOption>
+        </IonSelect>
+      </IonItem>
+    </IonList>)    
+  }
+
+
   render() {
     return (
-      <IonList>
-        <IonListHeader>Gallery Settings</IonListHeader>
-        <IonListHeader>Filters</IonListHeader>
-        <IonItem>
-          <IonLabel>Year</IonLabel>
-          <IonSelect value={this.props.layoutProps.year} placeholder="" onIonChange={(e:any) => {this.yearSetHook(e.detail.value)} }>
-            {this.state.availableYears}
-          </IonSelect>
-        </IonItem>
-        <IonItem>
-          <IonLabel>Set</IonLabel>
-          <IonSelect value={this.props.layoutProps.set} placeholder="" onIonChange={(e:any) => {this.props.layoutAction('set', e.detail.value)} }>
-            {this.state.availableSets}
-          </IonSelect> 
-        </IonItem>     
-        <IonItem>
-          <IonLabel>View</IonLabel>
-          <IonSelect value={this.props.layoutProps.view} placeholder="" onIonChange={(e:any) => {this.props.layoutAction('view', e.detail.value)} }>
-            {this.state.availableViews}
-          </IonSelect>  
-        </IonItem>    
-        <IonListHeader>Layout Settings</IonListHeader>
-        <IonItem>
-          <IonLabel># per row</IonLabel>
-          <IonSelect value={(this.props.layoutProps.layoutCount).toString()} placeholder="" onIonChange={(e:any) => {this.props.layoutAction('layoutCount', parseInt(e.detail.value))} }>
-            <IonSelectOption value="1">1</IonSelectOption>
-            <IonSelectOption value="2">2</IonSelectOption>
-            <IonSelectOption value="3">3</IonSelectOption>
-            <IonSelectOption value="4">4</IonSelectOption>
-            <IonSelectOption value="5">5</IonSelectOption>
-          </IonSelect>
-        </IonItem>
-      </IonList>
+      (this.props.type === "nft")?this.renderNFTUI() : this.renderDigitalUI()
     );    
   }
 
