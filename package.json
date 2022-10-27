@@ -3,6 +3,7 @@
   "version": "0.0.1",
   "private": true,
   "dependencies": {
+    "@awesome-cordova-plugins/in-app-purchase-2": "^5.46.0",
     "@capacitor/core": "2.4.6",
     "@ionic-native/device": "^5.36.0",
     "@ionic/react": "^5.5.0",
@@ -18,6 +19,7 @@
     "@types/react-router": "^5.1.11",
     "@types/react-router-dom": "^5.1.7",
     "cordova-plugin-device": "^2.0.3",
+    "cordova-plugin-purchase": "^11.0.0",
     "ionicons": "^5.4.0",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",

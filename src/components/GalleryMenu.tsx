@@ -17,6 +17,10 @@ interface props {
 
 interface state {
   setList: Array<any>,
+  nftSchemaList: Array<any>
+  nftTemplateList: Array<any>,
+  availableNFTSchema: Array<any>,
+  availableNFTTemplates: Array<any>,
   availableSets: Array<any>,
   availableYears: Array<any>,
   availableViews: Array<any>
@@ -29,6 +33,10 @@ class GalleryMenu extends React.Component<props, state> {
 
     this.state = {
       setList: [],
+      nftSchemaList: [],
+      nftTemplateList: [],
+      availableNFTSchema: [],
+      availableNFTTemplates: [],
       availableSets: [],
       availableYears: [], 
       availableViews: []    
@@ -40,15 +48,20 @@ class GalleryMenu extends React.Component<props, state> {
   viewOptions = ['active','all','needs','owned'];
 
   componentDidMount() {
-    let years:Array<any> = [];
-    for(let i = 0; i <= this.diffYear; i++) {
-      years.push(<IonSelectOption key={this.TCYearStart+i} value={this.TCYearStart+i}>{this.TCYearStart+i}</IonSelectOption>);
-    }
-    this.setState({availableYears:years}, () => {
-      this.setRenderViews();
-      this.pullSets();
-      console.log('ionViewDidEnter event fired') 
-    })   
+    if(this.props.type === 'cards') {
+      let years:Array<any> = [];
+      for(let i = 0; i <= this.diffYear; i++) {
+        years.push(<IonSelectOption key={this.TCYearStart+i} value={this.TCYearStart+i}>{this.TCYearStart+i}</IonSelectOption>);
+      }
+      this.setState({availableYears:years}, () => {
+        this.setRenderViews();
+        this.pullSets();
+        console.log('ionViewDidEnter event fired') 
+      }) 
+    } else {
+      this.pullNFTSchemas();
+      this.pullNFTTemplates();
+    }  
   }  
 
   componentDidUpdate(prevProps:any) {
@@ -67,6 +80,72 @@ class GalleryMenu extends React.Component<props, state> {
       console.log(err);   
     });
   }
+
+  pullNFTTemplates =() => {
+    //https://wax.api.atomicassets.io/atomicassets/v1/templates?collection_name=terrorcards1&schema_name=bodh&page=1&limit=100&order=desc&sort=created
+    //https://wax.api.atomicassets.io/atomicassets/v1/templates?collection_name=terrorcards1&page=1&limit=100&order=desc&sort=created
+    //https://wax.api.atomicassets.io/atomicassets/v1/templates?collection_name=terrorcards1&page=1&limit=100&order=desc&sort=created
+    let url = "https://wax.api.atomicassets.io/atomicassets/v1/templates?collection_name="+this.props.nftProps.collection+"&page=1&limit=1000&order=desc&sort=created";
+    if(this.props.nftProps.schema !== "all") {
+      url = "https://wax.api.atomicassets.io/atomicassets/v1/templates?collection_name="+this.props.nftProps.collection+"&schema_name="+this.props.nftProps.schema+"&page=1&limit=1000&order=desc&sort=created";
+    }   
+  
+    fetch(url).then((resp)=>{ return resp.json(); })
+    .then((json)=>{ 
+      console.log(json);
+      if(json.success) {
+        this.setState({nftTemplateList: json.data}, () => {
+          this.renderNFTTemplates();
+        })
+      } else {
+        this.setState({nftTemplateList: []})       
+      }
+    })
+    .catch((err:any) => {
+      console.log(err);
+    });
+  
+  }
+
+  pullNFTSchemas =() => {
+    //https://wax.api.atomicassets.io/atomicassets/v1/schemas?collection_name=terrorcards1&page=1&limit=1000&order=desc&sort=created
+    let url = "https://wax.api.atomicassets.io/atomicassets/v1/schemas?collection_name="+this.props.nftProps.collection+"&page=1&limit=1000&order=desc&sort=created";  
+  
+    fetch(url).then((resp)=>{ return resp.json(); })
+    .then((json)=>{ 
+      console.log(json);
+      if(json.success) {
+        this.setState({nftSchemaList: json.data}, () => {
+          this.renderNFTSchema();
+        })
+      } else {
+        this.setState({nftSchemaList: []})       
+      }
+    })
+    .catch((err:any) => {
+      console.log(err);
+    });
+  
+  }
+
+  renderNFTSchema =() => {
+    const availableSets:any = [];
+    availableSets.push(<IonSelectOption key={'all'} value={'All'}>{'All'}</IonSelectOption>);
+    this.state.nftSchemaList.forEach((d:any, i:number) => {
+        availableSets.push(<IonSelectOption key={i} value={d.schema_name}>{d.schema_name}</IonSelectOption>);
+    });
+    this.setState({availableNFTSchema: availableSets});
+  }
+
+  renderNFTTemplates =() => {
+    const availableSets:any = [];
+    availableSets.push(<IonSelectOption key={'all'} value={'All'}>{'All'}</IonSelectOption>);
+    this.state.nftTemplateList.forEach((d:any, i:number) => {
+        availableSets.push(<IonSelectOption key={i} value={d.template_id}>{d.name}</IonSelectOption>);
+    });
+    this.setState({availableNFTTemplates: availableSets});
+  }
+
 
   setRenderSets =(data:any) => {
     const availableSets:any = [];
@@ -157,11 +236,37 @@ class GalleryMenu extends React.Component<props, state> {
       <IonListHeader>Filters</IonListHeader>
       <IonItem>
         <IonLabel>Collection</IonLabel>
-        <IonSelect value={this.props.nftProps.collection} placeholder="" onIonChange={(e:any) => {this.updateSettings('collection', e.detail.value, 'nft')} }>
+        <IonSelect value={this.props.nftProps.collection} placeholder="" onIonChange={(e:any) => {
+          this.updateSettings('collection', e.detail.value, 'nft')
+          setTimeout(()=> {
+            this.pullNFTSchemas();
+            this.pullNFTTemplates();
+          },1000)
+          } 
+        }>
           <IonSelectOption value="terrorcards1">Terror Cards</IonSelectOption>
           <IonSelectOption value="terrorkisses">Terror Kisses</IonSelectOption>
         </IonSelect>
-      </IonItem>   
+      </IonItem> 
+      <IonItem>
+        <IonLabel>Schema</IonLabel>
+        <IonSelect value={this.props.nftProps.schema} placeholder="" onIonChange={(e:any) => {
+          this.updateSettings('schema', e.detail.value, 'nft')
+          setTimeout(()=> {
+            this.pullNFTTemplates();
+          },1000)            
+          } }>
+          {this.state.availableNFTSchema}
+        </IonSelect> 
+      </IonItem> 
+      <IonItem>
+        <IonLabel>Templates</IonLabel>
+        <IonSelect value={this.props.nftProps.template} placeholder="" onIonChange={(e:any) => {
+          this.updateSettings('template', e.detail.value, 'nft')           
+          } }>
+          {this.state.availableNFTTemplates}
+        </IonSelect> 
+      </IonItem>                
       <IonListHeader>Layout Settings</IonListHeader>
       <IonItem>
         <IonLabel># per row</IonLabel>
