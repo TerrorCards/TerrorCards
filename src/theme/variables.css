@@ -233,11 +233,4 @@ http://ionicframework.com/docs/theming/ */
 
     --ion-card-background: #1e1e1e;
   }
-
 }
-
-  /* custom app css */
-  .popper-custom-menu-size .popover-content {
-    --width: 90%;
-    left: 5% !important;
-  }
