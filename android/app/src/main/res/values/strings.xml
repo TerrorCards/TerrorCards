@@ -1,7 +1,0 @@
-<?xml version='1.0' encoding='utf-8'?>
-<resources>
-    <string name="app_name">Terror Cards</string>
-    <string name="title_activity_main">Terror Cards</string>
-    <string name="package_name">com.terrorcards.app</string>
-    <string name="custom_url_scheme">com.terrorcards.app</string>
-</resources>
