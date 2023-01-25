@@ -1,13 +1,11 @@
 {
-  "appId": "com.terrorcards",
+  "appId": "com.terrorcards.app",
   "appName": "TerrorCards",
   "bundledWebRuntime": false,
-  "npmClient": "npm",
-  "webDir": "build",
+  "webDir": "dist",
   "plugins": {
     "SplashScreen": {
       "launchShowDuration": 0
     }
-  },
-  "cordova": {}
+  }
 }
