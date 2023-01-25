@@ -477,7 +477,6 @@ class GalleryContainer extends React.Component<props, state> {
         </IonContent>
 
         <IonPopover
-          cssClass="popper-custom-menu-size"
           isOpen={this.state.showSettingPopover}
           onDidDismiss={() =>
             this.setState({ showSettingPopover: false, event: undefined })

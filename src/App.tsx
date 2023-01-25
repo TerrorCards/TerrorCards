@@ -395,10 +395,7 @@ class App extends React.Component<props, state> {
           </IonFab>
 
           {this.state.showTradeSetupModel && (
-            <IonModal
-              isOpen={this.state.showTradeSetupModel}
-              cssClass="my-custom-class"
-            >
+            <IonModal isOpen={this.state.showTradeSetupModel}>
               <TradeSetup
                 otherUser={this.state.tradeUser}
                 user={this.state.user}
