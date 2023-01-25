@@ -1,5 +1,7 @@
 {
   "name": "TerrorCards",
-  "integrations": {},
+  "integrations": {
+    "capacitor": {}
+  },
   "type": "react"
 }

@@ -2,6 +2,6 @@
 <resources>
     <string name="app_name">TerrorCards</string>
     <string name="title_activity_main">TerrorCards</string>
-    <string name="package_name">com.terrorcards.app</string>
-    <string name="custom_url_scheme">com.terrorcards.app</string>
+    <string name="package_name">com.terrorcards</string>
+    <string name="custom_url_scheme">com.terrorcards</string>
 </resources>
