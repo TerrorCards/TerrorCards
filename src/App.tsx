@@ -408,10 +408,7 @@ class App extends React.Component<props, state> {
           )}
 
           {this.state.showProfileManageModel && (
-            <IonModal
-              isOpen={this.state.showProfileManageModel}
-              cssClass="my-custom-class"
-            >
+            <IonModal isOpen={this.state.showProfileManageModel}>
               <ProfileManagerContainer
                 user={this.state.user}
                 closePanel={this.showProfileModal}
@@ -421,10 +418,7 @@ class App extends React.Component<props, state> {
           )}
 
           {this.state.showFactorySetupModel && (
-            <IonModal
-              isOpen={this.state.showFactorySetupModel}
-              cssClass="my-custom-class"
-            >
+            <IonModal isOpen={this.state.showFactorySetupModel}>
               <FactoryContainer
                 user={this.state.user}
                 closePanel={this.showFactoryModal}
