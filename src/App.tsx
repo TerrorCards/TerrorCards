@@ -41,7 +41,7 @@ import StoreContainer from "./components/StoreContainer";
 import FactoryContainer from "./components/FactoryContainer";
 import TradeContainer from "./components/TradeContainer";
 import SignInContainer from "./components/SignInContainer";
-
+import HuntContainer from "./components/HuntContainer";
 import TradeSetup from "./components/TradeSetup";
 import ProfileManagerContainer from "./components/ProfileManagerContainer";
 import GalleryMenu from "./components/GalleryMenu";
@@ -78,6 +78,7 @@ interface state {
   tradeUser: string;
   showProfileManageModel: boolean;
   showFactorySetupModel: boolean;
+  showHuntModel: boolean;
   refreshTime: number;
 }
 
@@ -122,6 +123,7 @@ class App extends React.Component<props, state> {
       tradeUser: "",
       showProfileManageModel: false,
       showFactorySetupModel: false,
+      showHuntModel: false,
       refreshTime: 0,
     };
   }
@@ -266,6 +268,14 @@ class App extends React.Component<props, state> {
     }
   };
 
+  showHuntModal = (e: any) => {
+    if (this.state.showHuntModel) {
+      this.setState({ showHuntModel: false });
+    } else {
+      this.setState({ showHuntModel: true });
+    }
+  };
+
   /*
   setTimeout(() => {
     if(galleryState.year === -1) {
@@ -392,6 +402,16 @@ class App extends React.Component<props, state> {
                 <IonIcon icon={flask} />
               </IonFabButton>
             </IonFabList>
+            <IonFabList side="top">
+              <IonFabButton
+                color="dark"
+                onClick={(e) => {
+                  this.showHuntModal(e);
+                }}
+              >
+                <IonIcon icon={flask} />
+              </IonFabButton>
+            </IonFabList>
           </IonFab>
 
           {this.state.showTradeSetupModel && (
@@ -419,6 +439,15 @@ class App extends React.Component<props, state> {
               <FactoryContainer
                 user={this.state.user}
                 closePanel={this.showFactoryModal}
+              />
+            </IonModal>
+          )}
+
+          {this.state.showHuntModel && (
+            <IonModal isOpen={this.state.showHuntModel}>
+              <HuntContainer
+                user={this.state.user}
+                closePanel={this.showHuntModal}
               />
             </IonModal>
           )}
