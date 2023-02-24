@@ -45,6 +45,7 @@ interface state {
   showCards: boolean;
   cardsResult: Array<any>;
   packOpenTimer: number;
+  coinMsg: any;
 }
 
 class StoreContainer extends React.Component<props, state> {
@@ -59,6 +60,7 @@ class StoreContainer extends React.Component<props, state> {
       showCards: false,
       cardsResult: [],
       packOpenTimer: 0,
+      coinMsg: "",
     };
   }
 
@@ -228,6 +230,9 @@ class StoreContainer extends React.Component<props, state> {
             <IonCardContent>
               <IonGrid>
                 <IonRow>
+                  <IonCol>{this.state.coinMsg}</IonCol>
+                </IonRow>
+                <IonRow>
                   <IonCol>
                     <IonImg src={""} />
                   </IonCol>
@@ -240,7 +245,7 @@ class StoreContainer extends React.Component<props, state> {
                         <IonButton
                           expand="block"
                           onClick={() => {
-                            this._canBuy(p);
+                            this.canBuyCoins(p.ID);
                           }}
                         >
                           {p.Amount}
@@ -305,9 +310,9 @@ class StoreContainer extends React.Component<props, state> {
   renderCards = (cards: any) => {
     let items: Array<any> = [];
     if (cards.length > 0) {
-      cards.map((c: any) => {
+      cards.map((c: any, i: number) => {
         items.push(
-          <IonCard key={c.Image}>
+          <IonCard key={i}>
             <IonCardContent>
               <IonImg src={c.Image} />
             </IonCardContent>
@@ -334,7 +339,6 @@ class StoreContainer extends React.Component<props, state> {
   //end pop up cards
 
   render() {
-    const items = "http://placekitten.com/g/200/300";
     return (
       <IonContent>
         <IonSegment
@@ -357,6 +361,7 @@ class StoreContainer extends React.Component<props, state> {
         <IonList>{this.state.packItems}</IonList>
 
         <IonModal isOpen={this.state.showCards}>
+          <IonButton fill="clear"></IonButton>
           <IonContent>{this.state.cardsResult}</IonContent>
           <IonButton
             onClick={() => {
@@ -365,6 +370,7 @@ class StoreContainer extends React.Component<props, state> {
           >
             Close
           </IonButton>
+          <IonButton fill="clear"></IonButton>
         </IonModal>
       </IonContent>
     );
@@ -385,6 +391,12 @@ class StoreContainer extends React.Component<props, state> {
           resolve(true);
         });
       this.appstore.refresh();
+    });
+  };
+
+  canBuyCoins = (item: any) => {
+    this.appstore.order(item).then((msg: any) => {
+      this.setState({ coinMsg: msg.toString() });
     });
   };
 }

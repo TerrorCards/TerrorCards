@@ -18,6 +18,9 @@ import {
   IonItem,
   IonPopover,
   IonModal,
+  IonGrid,
+  IonCol,
+  IonRow,
 } from "@ionic/react";
 import React, { useState, useEffect } from "react";
 import { IonReactRouter } from "@ionic/react-router";
@@ -253,6 +256,7 @@ class App extends React.Component<props, state> {
   };
 
   showProfileModal = (e: any) => {
+    console.log(this.state.showProfileManageModel);
     if (this.state.showProfileManageModel) {
       this.setState({ showProfileManageModel: false });
     } else {
@@ -424,33 +428,48 @@ class App extends React.Component<props, state> {
             </IonModal>
           )}
 
-          {this.state.showProfileManageModel && (
-            <IonModal isOpen={this.state.showProfileManageModel}>
-              <ProfileManagerContainer
-                user={this.state.user}
-                closePanel={this.showProfileModal}
-                signOut={this.removeUserFromStore}
-              />
-            </IonModal>
-          )}
+          <IonModal isOpen={this.state.showProfileManageModel}>
+            <IonGrid>
+              <IonRow>
+                <IonCol>
+                  <div style={{ height: 35 }}></div>
+                </IonCol>
+              </IonRow>
+            </IonGrid>
+            <ProfileManagerContainer
+              user={this.state.user}
+              closePanel={this.showProfileModal}
+              signOut={this.removeUserFromStore}
+            />
+          </IonModal>
 
-          {this.state.showFactorySetupModel && (
-            <IonModal isOpen={this.state.showFactorySetupModel}>
-              <FactoryContainer
-                user={this.state.user}
-                closePanel={this.showFactoryModal}
-              />
-            </IonModal>
-          )}
+          <IonModal isOpen={this.state.showFactorySetupModel}>
+            <IonGrid>
+              <IonRow>
+                <IonCol>
+                  <div style={{ height: 35 }}></div>
+                </IonCol>
+              </IonRow>
+            </IonGrid>
+            <FactoryContainer
+              user={this.state.user}
+              closePanel={this.showFactoryModal}
+            />
+          </IonModal>
 
-          {this.state.showHuntModel && (
-            <IonModal isOpen={this.state.showHuntModel}>
-              <HuntContainer
-                user={this.state.user}
-                closePanel={this.showHuntModal}
-              />
-            </IonModal>
-          )}
+          <IonModal isOpen={this.state.showHuntModel}>
+            <IonGrid>
+              <IonRow>
+                <IonCol>
+                  <div style={{ height: 35 }}></div>
+                </IonCol>
+              </IonRow>
+            </IonGrid>
+            <HuntContainer
+              user={this.state.user}
+              closePanel={this.showHuntModal}
+            />
+          </IonModal>
         </IonReactRouter>
       </IonApp>
     ) : (

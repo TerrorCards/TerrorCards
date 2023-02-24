@@ -295,7 +295,7 @@ class ProfileManagerContainer extends React.Component<props, state> {
                             <IonLabel>Profile</IonLabel>
                             <IonLabel>
                                 <div style={{ textAlign: 'end' }}>
-                                    <IonButton fill='clear' onClick={(e: any) => { this.props.closePanel() }}>
+                                    <IonButton fill='clear' onClick={(e: any) => { this.props.closePanel(e) }}>
                                         <IonIcon slot="icon-only" icon={closeCircleOutline} color="dark" size="l" />
                                     </IonButton>
                                 </div>

@@ -492,14 +492,33 @@ class GalleryContainer extends React.Component<props, state> {
         </IonPopover>
 
         <IonModal isOpen={this.state.showDetails}>
-          {this.state.cardDetails}
-          <IonButton
-            onClick={() =>
-              this.setState({ showDetails: false, cardDetails: null })
-            }
-          >
-            Close Details
-          </IonButton>
+          <IonGrid>
+            <IonRow>
+              <IonCol>
+                <div style={{ height: 35 }}></div>
+              </IonCol>
+            </IonRow>
+            <IonRow>
+              <IonCol>{this.state.cardDetails}</IonCol>
+            </IonRow>
+            <IonRow>
+              <IonCol>
+                <IonButton
+                  expand="block"
+                  onClick={() =>
+                    this.setState({ showDetails: false, cardDetails: null })
+                  }
+                >
+                  Close Details
+                </IonButton>
+              </IonCol>
+            </IonRow>
+            <IonRow>
+              <IonCol>
+                <div style={{ height: 35 }}></div>
+              </IonCol>
+            </IonRow>
+          </IonGrid>
         </IonModal>
       </IonContent>
     );
