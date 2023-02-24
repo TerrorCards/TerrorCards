@@ -27,7 +27,7 @@ import {
 } from "@ionic/react";
 import "./StoreContainer.css";
 import { callServer } from "./ajaxcalls";
-import { InAppPurchase2 } from "@awesome-cordova-plugins/in-app-purchase-2/ngx";
+import { InAppPurchase2 } from "@awesome-cordova-plugins/in-app-purchase-2";
 import { isPlatform, getPlatforms } from "@ionic/react";
 import { promises } from "fs";
 
@@ -49,7 +49,7 @@ interface state {
 }
 
 class StoreContainer extends React.Component<props, state> {
-  constructor(props: any, private appstore: InAppPurchase2) {
+  constructor(props: any) {
     super(props);
 
     this.state = {
@@ -379,23 +379,22 @@ class StoreContainer extends React.Component<props, state> {
   //In app purchase code
   registerAppStoreProduct = (productId: any) => {
     new Promise((resolve, reject) => {
-      this.appstore.register({
+      InAppPurchase2.register({
         id: productId,
-        type: this.appstore.CONSUMABLE,
+        type: InAppPurchase2.CONSUMABLE,
       });
-      this.appstore
-        .when(productId)
+      InAppPurchase2.when(productId)
         .approved((p: any) => p.verify())
         .verified((p: any) => {
           p.finish();
           resolve(true);
         });
-      this.appstore.refresh();
+      InAppPurchase2.refresh();
     });
   };
 
   canBuyCoins = (item: any) => {
-    this.appstore.order(item).then((msg: any) => {
+    InAppPurchase2.order(item).then((msg: any) => {
       this.setState({ coinMsg: msg.toString() });
     });
   };
