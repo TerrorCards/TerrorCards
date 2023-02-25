@@ -429,13 +429,6 @@ class App extends React.Component<props, state> {
           )}
 
           <IonModal isOpen={this.state.showProfileManageModel}>
-            <IonGrid>
-              <IonRow>
-                <IonCol>
-                  <div style={{ height: 35 }}></div>
-                </IonCol>
-              </IonRow>
-            </IonGrid>
             <ProfileManagerContainer
               user={this.state.user}
               closePanel={this.showProfileModal}
@@ -444,13 +437,6 @@ class App extends React.Component<props, state> {
           </IonModal>
 
           <IonModal isOpen={this.state.showFactorySetupModel}>
-            <IonGrid>
-              <IonRow>
-                <IonCol>
-                  <div style={{ height: 35 }}></div>
-                </IonCol>
-              </IonRow>
-            </IonGrid>
             <FactoryContainer
               user={this.state.user}
               closePanel={this.showFactoryModal}
@@ -458,13 +444,6 @@ class App extends React.Component<props, state> {
           </IonModal>
 
           <IonModal isOpen={this.state.showHuntModel}>
-            <IonGrid>
-              <IonRow>
-                <IonCol>
-                  <div style={{ height: 35 }}></div>
-                </IonCol>
-              </IonRow>
-            </IonGrid>
             <HuntContainer
               user={this.state.user}
               closePanel={this.showHuntModal}

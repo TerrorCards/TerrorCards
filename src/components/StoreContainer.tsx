@@ -260,6 +260,19 @@ class StoreContainer extends React.Component<props, state> {
         );
       });
     }
+    items.push(
+      <IonCard key={"spaceerCoin"}>
+        <IonCardContent>
+          <IonGrid>
+            <IonRow>
+              <IonCol>
+                <div style={{ height: 35 }}></div>
+              </IonCol>
+            </IonRow>
+          </IonGrid>
+        </IonCardContent>
+      </IonCard>
+    );
     this.setState({ packItems: items });
   };
 
@@ -383,10 +396,12 @@ class StoreContainer extends React.Component<props, state> {
         id: productId,
         type: InAppPurchase2.CONSUMABLE,
       });
+      this.setState({ coinMsg: InAppPurchase2.when(productId) });
       InAppPurchase2.when(productId)
         .approved((p: any) => p.verify())
         .verified((p: any) => {
           p.finish();
+          this.setState({ coinMsg: p.toString() });
           resolve(true);
         });
       InAppPurchase2.refresh();
