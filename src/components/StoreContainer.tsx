@@ -221,7 +221,6 @@ class StoreContainer extends React.Component<props, state> {
     let items: Array<any> = [];
     if (this.state.allCoinList.length > 0) {
       this.state.allCoinList.map((p: any) => {
-        console.log(p);
         items.push(
           <IonCard key={p.Name}>
             <IonCardHeader>
@@ -396,7 +395,9 @@ class StoreContainer extends React.Component<props, state> {
         id: productId,
         type: InAppPurchase2.CONSUMABLE,
       });
-      this.setState({ coinMsg: InAppPurchase2.when(productId) });
+      this.setState({
+        coinMsg: JSON.stringify(InAppPurchase2.when(productId)),
+      });
       InAppPurchase2.when(productId)
         .approved((p: any) => p.verify())
         .verified((p: any) => {
