@@ -395,14 +395,13 @@ class StoreContainer extends React.Component<props, state> {
         id: productId,
         type: InAppPurchase2.CONSUMABLE,
       });
-      this.setState({
-        coinMsg: JSON.stringify(InAppPurchase2.when(productId)),
-      });
       InAppPurchase2.when(productId)
         .approved((p: any) => p.verify())
         .verified((p: any) => {
           p.finish();
-          this.setState({ coinMsg: p.toString() });
+          this.setState({
+            coinMsg: JSON.stringify(p),
+          });
           resolve(true);
         });
       InAppPurchase2.refresh();
@@ -411,7 +410,7 @@ class StoreContainer extends React.Component<props, state> {
 
   canBuyCoins = (item: any) => {
     InAppPurchase2.order(item).then((msg: any) => {
-      this.setState({ coinMsg: msg.toString() });
+      this.setState({ coinMsg: JSON.stringify(msg) });
     });
   };
 }
