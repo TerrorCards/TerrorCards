@@ -410,7 +410,29 @@ class StoreContainer extends React.Component<props, state> {
 
   canBuyCoins = (item: any) => {
     InAppPurchase2.order(item).then((msg: any) => {
-      this.setState({ coinMsg: JSON.stringify(msg) });
+      let value = 0;
+      if (item.indexOf("25k") > -1) {
+        value = 25000;
+      } else if (item.indexOf("100k") > -1) {
+        value = 100000;
+      } else if (item.indexOf("250k") > -1) {
+        value = 250000;
+      } else if (item.indexOf("500k") > -1) {
+        value = 500000;
+      } else if (item.indexOf("750k") > -1) {
+        value = 750000;
+      } else if (item.indexOf("1m") > -1) {
+        value = 1000000;
+      } else {
+        value = 0;
+      }
+      callServer(
+        "updateCredit",
+        { credit: value },
+        this.props.user.ID
+      )?.then((result: any) => [
+        this.setState({ coinMsg: JSON.stringify(msg) }),
+      ]);
     });
   };
 }

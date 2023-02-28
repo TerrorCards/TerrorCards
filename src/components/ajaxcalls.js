@@ -1106,6 +1106,32 @@ export function callServer(pTask, pData, pUserId) {
       return test;
       break;
     }
+    case "updateCredit": {
+      let formData = new FormData();
+      formData.append("uUserId", pUserId);
+      formData.append("uContent", jsonstr);
+      formData.append("uAction", "update");
+      /*
+          let test = fetch(serverpath + "inAppList.php", {
+            method: 'POST',
+            headers: {
+              "Content-Type": 'multipart/form-data'
+            },
+            body: formData
+          });
+          */
+      let test = fetch(
+        serverpath +
+          "updateUserCredit.php?" +
+          new URLSearchParams({
+            uUserId: pUserId,
+            uContent: jsonstr,
+            uAction: "update",
+          })
+      );
+      return test;
+      break;
+    }
     default:
       break;
   }
