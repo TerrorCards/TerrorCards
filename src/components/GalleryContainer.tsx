@@ -254,13 +254,16 @@ class GalleryContainer extends React.Component<props, state> {
     this.state.chunkedList.map((ch: any, i: number) => {
       const item: Array<any> = [];
       ch.map((c: any, z: number) => {
+        console.log(c);
         let imgSrc = c.Image;
-        let message = c.SoldOut;
+        let message = c.Active == "0" ? "Sold Out" : "";
         if (this.props.galleryProps.layoutCount > 2) {
           imgSrc = imgSrc.replace("full", "thumbs");
         }
         if (this.props.galleryProps.layoutCount > 3) {
-          message = "S.O.";
+          if (message == "Sold Out") {
+            message = "S.O.";
+          }
         }
         item.push(
           <IonCol key={c.ID}>
@@ -423,7 +426,7 @@ class GalleryContainer extends React.Component<props, state> {
 
   render() {
     return (
-      <IonContent style={{ height: "92%" }} scrollY={false}>
+      <IonContent style={{ height: "90%" }} scrollY={false}>
         <IonGrid>
           <IonRow>
             <IonCol>
@@ -468,7 +471,7 @@ class GalleryContainer extends React.Component<props, state> {
           </IonRow>
         </IonGrid>
 
-        <IonContent style={{ height: "92%" }}>
+        <IonContent style={{ height: "90%" }}>
           <IonGrid id="list">
             {this.state.viewState === "cards"
               ? this.state.imgList

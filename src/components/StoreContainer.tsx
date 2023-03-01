@@ -1,5 +1,6 @@
 import React from "react";
 import {
+  IonAlert,
   IonContent,
   IonHeader,
   IonPage,
@@ -46,6 +47,10 @@ interface state {
   cardsResult: Array<any>;
   packOpenTimer: number;
   coinMsg: any;
+  showNoCoinAlert: boolean;
+  showConfirmPurchase: boolean;
+  targetItem: any;
+  targetType: any;
 }
 
 class StoreContainer extends React.Component<props, state> {
@@ -61,6 +66,10 @@ class StoreContainer extends React.Component<props, state> {
       cardsResult: [],
       packOpenTimer: 0,
       coinMsg: "",
+      showNoCoinAlert: false,
+      showConfirmPurchase: false,
+      targetItem: null,
+      targetType: null,
     };
   }
 
@@ -184,8 +193,16 @@ class StoreContainer extends React.Component<props, state> {
                         <IonButton
                           expand="block"
                           onClick={() => {
-                            this._canBuy(p);
+                            this.setState({
+                              showConfirmPurchase: true,
+                              targetItem: p,
+                              targetType: "pack",
+                            });
+                            //this._canBuy(p);
                           }}
+                          disabled={
+                            this.props.user.credit >= p.Cost ? false : true
+                          }
                         >
                           {p.Cost}
                         </IonButton>
@@ -244,7 +261,12 @@ class StoreContainer extends React.Component<props, state> {
                         <IonButton
                           expand="block"
                           onClick={() => {
-                            this.canBuyCoins(p.ID);
+                            this.setState({
+                              showConfirmPurchase: true,
+                              targetItem: p,
+                              targetType: "coin",
+                            });
+                            //this.canBuyCoins(p.ID);
                           }}
                         >
                           {p.Amount}
@@ -286,37 +308,41 @@ class StoreContainer extends React.Component<props, state> {
   };
 
   //Buying checks
-  _canBuy = (p: any) => {
+  _canBuy = () => {
     //call server to get latest credit and see if user can buy
-    //if(this.props.user.Credit >= p.Cost) {
-    //call to pull packs.
-    let packOrder = {
-      packID: p.ID,
-      packName: p.Name,
-      userID: this.props.user.ID,
-      packSets: p.Set,
-      packChase: p.Chase,
-      packCost: p.Cost,
-      packPer: p.PerPack,
-    };
+    if (this.state.targetItem !== null) {
+      const p = this.state.targetItem;
+      if (this.props.user.credit >= p.Cost) {
+        //call to pull packs.
+        let packOrder = {
+          packID: p.ID,
+          packName: p.Name,
+          userID: this.props.user.ID,
+          packSets: p.Set,
+          packChase: p.Chase,
+          packCost: p.Cost,
+          packPer: p.PerPack,
+        };
 
-    callServer("packsOrder", packOrder, this.props.user.ID)
-      ?.then((resp) => {
-        return resp.json();
-      })
-      .then((json) => {
-        console.log(json);
-        if (json.length > 0) {
-          this.renderCards(json);
-          this.props.callbackPackOpenTimer(Date.now());
-        }
-      })
-      .catch((err: any) => {
-        console.log(err);
-      });
-    //} else {
-    //warn not enough credit
-    //}
+        callServer("packsOrder", packOrder, this.props.user.ID)
+          ?.then((resp) => {
+            return resp.json();
+          })
+          .then((json) => {
+            if (json.length > 0) {
+              this.renderCards(json);
+              this.props.callbackPackOpenTimer(Date.now());
+              this.setState({ targetItem: null, targetType: null });
+            }
+          })
+          .catch((err: any) => {
+            console.log(err);
+          });
+      } else {
+        this.setState({ showNoCoinAlert: true });
+        //warn not enough credit
+      }
+    }
   };
 
   renderCards = (cards: any) => {
@@ -384,6 +410,59 @@ class StoreContainer extends React.Component<props, state> {
           </IonButton>
           <IonButton fill="clear"></IonButton>
         </IonModal>
+
+        <IonAlert
+          isOpen={this.state.showNoCoinAlert}
+          onDidDismiss={() => {
+            this.setState({ showNoCoinAlert: false });
+          }}
+          header="Warning"
+          subHeader="Purchase Error"
+          message={"You do not have enough coins to purchase."}
+          buttons={[
+            {
+              text: "Ok",
+              role: "cancel",
+              cssClass: "secondary",
+              handler: (blah: any) => {
+                this.setState({ showNoCoinAlert: false });
+              },
+            },
+          ]}
+        />
+
+        <IonAlert
+          isOpen={this.state.showConfirmPurchase}
+          onDidDismiss={() => {
+            this.setState({ showConfirmPurchase: false });
+          }}
+          header="Confirm"
+          message={"Are you sure you want to purchase?"}
+          buttons={[
+            {
+              text: "Yes",
+              role: "ok",
+              cssClass: "secondary",
+              handler: (blah: any) => {
+                this.setState({ showConfirmPurchase: false }, () => {
+                  if (this.state.targetType === "coin") {
+                    this.canBuyCoins();
+                  } else {
+                    this._canBuy();
+                  }
+                });
+              },
+            },
+            {
+              text: "No",
+              role: "ok",
+              cssClass: "secondary",
+              handler: (blah: any) => {
+                this.setState({ showConfirmPurchase: false });
+              },
+            },
+          ]}
+        />
       </IonContent>
     );
   }
@@ -408,7 +487,8 @@ class StoreContainer extends React.Component<props, state> {
     });
   };
 
-  canBuyCoins = (item: any) => {
+  canBuyCoins = () => {
+    const item = this.state.targetItem;
     InAppPurchase2.order(item).then((msg: any) => {
       let value = 0;
       if (item.indexOf("25k") > -1) {
@@ -426,13 +506,12 @@ class StoreContainer extends React.Component<props, state> {
       } else {
         value = 0;
       }
-      callServer(
-        "updateCredit",
-        { credit: value },
-        this.props.user.ID
-      )?.then((result: any) => [
-        this.setState({ coinMsg: JSON.stringify(msg) }),
-      ]);
+      callServer("updateCredit", { credit: value }, this.props.user.ID)?.then(
+        (result: any) => {
+          this.setState({ targetItem: null, targetType: null });
+          this.setState({ coinMsg: JSON.stringify(msg) });
+        }
+      );
     });
   };
 }
