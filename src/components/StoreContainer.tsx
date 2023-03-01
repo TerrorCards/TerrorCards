@@ -201,7 +201,9 @@ class StoreContainer extends React.Component<props, state> {
                             //this._canBuy(p);
                           }}
                           disabled={
-                            this.props.user.credit >= p.Cost ? false : true
+                            parseInt(this.props.user.credit) >= parseInt(p.Cost)
+                              ? false
+                              : true
                           }
                         >
                           {p.Cost}
@@ -312,7 +314,7 @@ class StoreContainer extends React.Component<props, state> {
     //call server to get latest credit and see if user can buy
     if (this.state.targetItem !== null) {
       const p = this.state.targetItem;
-      if (this.props.user.credit >= p.Cost) {
+      if (parseInt(this.props.user.credit) >= parseInt(p.Cost)) {
         //call to pull packs.
         let packOrder = {
           packID: p.ID,

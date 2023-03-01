@@ -172,10 +172,11 @@ class GalleryContainer extends React.Component<props, state> {
         <IonGrid>
           <IonRow>
             <IonCol>Card Count: {result[0].count}</IonCol>
-            <IonCol>Sold Out: {result[0].cardSoldOut}</IonCol>
+            <IonCol>You Own: {card.Count !== null ? card.Count : 0}</IonCol>
           </IonRow>
           <IonRow>
             <IonCol>Set: {card.SetName.replace(/_/g, " ")}</IonCol>
+            <IonCol>Sold Out: {result[0].cardSoldOut}</IonCol>
           </IonRow>
           <IonRow>
             <IonCol>
@@ -229,8 +230,8 @@ class GalleryContainer extends React.Component<props, state> {
 
   pullCardDetails = (user: string, card: any) => {
     return new Promise((resolve: any, reject: any) => {
-      //console.log(card);
-      callServer("cardDetail", { number: card.Number, year: card.Year }, user)
+      console.log(card);
+      callServer("cardDetail", { number: card.ID, year: card.Year }, user)
         ?.then((resp) => {
           return resp.json();
         })

@@ -513,12 +513,6 @@ class HomeContainer extends React.Component<props, state> {
                 Add Friend
               </IonLabel>
             </IonItem>
-            <IonItem>
-              <IonButton fill="clear">
-                <IonIcon slot="icon-only" icon={bookmark} color="dark" />
-              </IonButton>
-              <IonLabel>Profile</IonLabel>
-            </IonItem>
             <IonItem></IonItem>
             <IonItem>
               <IonButton
