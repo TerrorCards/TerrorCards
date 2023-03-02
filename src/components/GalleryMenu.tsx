@@ -104,8 +104,10 @@ class GalleryMenu extends React.Component<props, state> {
         console.log("ionViewDidEnter event fired");
       });
     } else {
-      this.pullNFTSchemas();
-      this.pullNFTTemplates();
+      if (this.props.type === "nft") {
+        this.pullNFTSchemas();
+        this.pullNFTTemplates();
+      }
     }
   }
 
@@ -291,7 +293,7 @@ class GalleryMenu extends React.Component<props, state> {
   updateSettings = (setting: any, value: any, type: any) => {
     const localDigitalSettings = { ...this.props.layoutProps };
     const localNFTSettings = { ...this.props.nftProps };
-    if (type === "digital") {
+    if (type === "cards") {
       localDigitalSettings[setting] = value;
     } else {
       localNFTSettings[setting] = value;
@@ -310,7 +312,7 @@ class GalleryMenu extends React.Component<props, state> {
             value={this.props.layoutProps.year}
             placeholder=""
             onIonChange={(e: any) => {
-              this.updateSettings("year", e.detail.value, "digital");
+              this.updateSettings("year", e.detail.value, "cards");
             }}
           >
             {this.state.availableYears}
@@ -322,7 +324,7 @@ class GalleryMenu extends React.Component<props, state> {
             value={this.props.layoutProps.set}
             placeholder=""
             onIonChange={(e: any) => {
-              this.updateSettings("set", e.detail.value, "digital");
+              this.updateSettings("set", e.detail.value, "cards");
             }}
           >
             {this.state.availableSets}
@@ -334,7 +336,7 @@ class GalleryMenu extends React.Component<props, state> {
             value={this.props.layoutProps.view}
             placeholder=""
             onIonChange={(e: any) => {
-              this.updateSettings("view", e.detail.value, "digital");
+              this.updateSettings("view", e.detail.value, "cards");
             }}
           >
             {this.state.availableViews}
@@ -350,7 +352,7 @@ class GalleryMenu extends React.Component<props, state> {
               this.updateSettings(
                 "layoutCount",
                 parseInt(e.detail.value),
-                "digital"
+                "cards"
               );
             }}
           >

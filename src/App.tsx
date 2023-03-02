@@ -256,7 +256,6 @@ class App extends React.Component<props, state> {
   };
 
   showProfileModal = (e: any) => {
-    console.log(this.state.showProfileManageModel);
     if (this.state.showProfileManageModel) {
       this.setState({ showProfileManageModel: false });
     } else {
@@ -418,15 +417,13 @@ class App extends React.Component<props, state> {
             </IonFabList>
           </IonFab>
 
-          {this.state.showTradeSetupModel && (
-            <IonModal isOpen={this.state.showTradeSetupModel}>
-              <TradeSetup
-                otherUser={this.state.tradeUser}
-                user={this.state.user}
-                closePanel={this.showTradeModal}
-              />
-            </IonModal>
-          )}
+          <IonModal isOpen={this.state.showTradeSetupModel}>
+            <TradeSetup
+              otherUser={this.state.tradeUser}
+              user={this.state.user}
+              closePanel={this.showTradeModal}
+            />
+          </IonModal>
 
           <IonModal isOpen={this.state.showProfileManageModel}>
             <ProfileManagerContainer

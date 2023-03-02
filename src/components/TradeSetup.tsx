@@ -426,6 +426,7 @@ class TradeSetup extends React.Component<props, state> {
               layoutAction={this.processCardListFilters}
               layoutProps={this.state.layoutState}
               user={this.props.user}
+              type={"cards"}
             />
           </IonPopover>
         </IonContent>
@@ -440,7 +441,7 @@ class TradeSetup extends React.Component<props, state> {
         localObj[key] = value;
       }
     }
-    this.setState({ layoutState: localObj }, () => {
+    this.setState({ layoutState: type }, () => {
       this.pullCards(this.props.user.ID, this.props.otherUser).then(
         (result) => {
           this.pullCards(this.props.otherUser, this.props.user.ID).then(
@@ -556,9 +557,15 @@ class TradeSetup extends React.Component<props, state> {
       const item: Array<any> = [];
       ch.map((c: any, z: number) => {
         let imgSrc = c.Image;
+        let message = c.Active == "0" ? "Sold Out" : "";
         const cardWidth = 100 / this.state.layoutState.layoutCount - 1;
         if (this.state.layoutState.layoutCount > 2) {
           imgSrc = imgSrc.replace("full", "thumbs");
+        }
+        if (this.state.layoutState.layoutCount > 3) {
+          if (message == "Sold Out") {
+            message = "S.O.";
+          }
         }
         item.push(
           <div
@@ -593,6 +600,7 @@ class TradeSetup extends React.Component<props, state> {
             {c.Count !== null && c.Count > 1 && (
               <IonBadge class="quantity-badge">{c.Count}</IonBadge>
             )}
+            {<IonBadge class="message-badge-left">{message}</IonBadge>}
           </div>
         );
         if (i === personList.length - 1) {

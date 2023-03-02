@@ -490,7 +490,7 @@ class HomeContainer extends React.Component<props, state> {
               </IonButton>
               <IonLabel
                 onClick={() => {
-                  this.sendTradeCallback("EliDeGeer");
+                  this.sendTradeCallback(this.state.tradePartner);
                 }}
               >
                 Trade

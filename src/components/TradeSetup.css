@@ -1,12 +1,21 @@
 .trade-button-add {
-    --color: black;
-    position: absolute;
-    bottom: 0px;
-    right: 0px;
-  }
+  --color: black;
+  position: absolute;
+  bottom: 0px;
+  right: 0px;
+}
 
-  .trade-button-remove {
-    position: absolute;
-    bottom: 0px;
-    left: 0px;
-  }
+.trade-button-remove {
+  position: absolute;
+  bottom: 0px;
+  left: 0px;
+}
+
+.message-badge-left {
+  background-color: rgba(255, 0, 0, 1);
+  color: white;
+  position: absolute;
+  bottom: 10px;
+  left: 0px;
+  border-radius: 5%;
+}
