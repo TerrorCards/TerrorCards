@@ -454,6 +454,33 @@ export function callServer(pTask, pData, pUserId) {
       return test;
       break;
     }
+    case "hasTrades": {
+      var jsonstr = prepData(pData);
+      let formData = new FormData();
+      formData.append("uUserId", pUserId);
+      formData.append("uContent", jsonstr);
+      /*
+            let test = fetch(serverpath + "tradeCardList.php", {
+              method: 'POST',
+              headers: {
+                "Content-Type": 'multipart/form-data'
+              },
+              body: formData
+            });
+            */
+
+      let test = fetch(
+        serverpath +
+          "trade_exists.php?" +
+          new URLSearchParams({
+            uUserId: pUserId,
+            uContent: jsonstr,
+          })
+      );
+
+      return test;
+      break;
+    }
     case "pullFactoryList": {
       //var jsonstr = prepData(pData);
       let formData = new FormData();

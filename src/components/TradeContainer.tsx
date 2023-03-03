@@ -286,7 +286,7 @@ class TradeContainer extends React.Component<props, state> {
     let content: any = "";
 
     return (
-      <IonContent>
+      <IonContent style={{ height: "85%" }}>
         <IonSegment
           value={this.state.tradeStatus}
           onIonChange={(e: any) => {

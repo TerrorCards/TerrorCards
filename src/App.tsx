@@ -48,6 +48,7 @@ import HuntContainer from "./components/HuntContainer";
 import TradeSetup from "./components/TradeSetup";
 import ProfileManagerContainer from "./components/ProfileManagerContainer";
 import GalleryMenu from "./components/GalleryMenu";
+import { callServer } from "./components/ajaxcalls";
 
 /* Core CSS required for Ionic components to work properly */
 import "@ionic/react/css/core.css";
@@ -83,6 +84,7 @@ interface state {
   showFactorySetupModel: boolean;
   showHuntModel: boolean;
   refreshTime: number;
+  hasTrades: boolean;
 }
 
 const store = new Storage();
@@ -128,15 +130,38 @@ class App extends React.Component<props, state> {
       showFactorySetupModel: false,
       showHuntModel: false,
       refreshTime: 0,
+      hasTrades: false,
     };
   }
+
+  tradesExist = false;
 
   componentDidMount() {
     console.log("componet did mount event fired");
     this.getUserStorage();
   }
 
-  componentDidUpdate(prevProps: any) {}
+  componentDidUpdate(prevProps: any) {
+    console.log("component did update");
+    callServer("hasTrades", "", this.state.user.ID)
+      ?.then((resp) => {
+        return resp.json();
+      })
+      .then((json) => {
+        if (json) {
+          console.log(json);
+          if (json == "Yes") {
+            this.tradesExist = true;
+            //this.setState({ hasTrades: true });
+          } else {
+            this.tradesExist = false;
+          }
+        }
+      })
+      .catch((err: any) => {
+        console.log(err);
+      });
+  }
 
   ionViewWillEnter() {
     console.log("ionViewWillEnter event fired");
@@ -176,14 +201,12 @@ class App extends React.Component<props, state> {
 
   getGallerySettingStorage = () => {
     store.get("galleryDigitalSettings").then((galleryDigitalSettings: any) => {
-      console.log(galleryDigitalSettings);
       if (galleryDigitalSettings !== null) {
         //continue normally
         this.setState({ galleryDigitalSettings: galleryDigitalSettings });
       }
     });
     store.get("galleryNFTSettings").then((galleryNFTSettings: any) => {
-      console.log(galleryNFTSettings);
       if (galleryNFTSettings !== null) {
         //continue normally
         this.setState({ galleryNFTSettings: galleryNFTSettings });
@@ -375,7 +398,10 @@ class App extends React.Component<props, state> {
                 <IonLabel>Store</IonLabel>
               </IonTabButton>
               <IonTabButton tab="trade" href="/trade">
-                <IonIcon icon={repeat} />
+                <IonIcon
+                  icon={repeat}
+                  color={this.tradesExist ? "danger" : ""}
+                />
                 <IonLabel>Trades</IonLabel>
               </IonTabButton>
             </IonTabBar>
