@@ -267,7 +267,9 @@ class HomeContainer extends React.Component<props, state> {
             </IonAvatar>
             <IonLabel>
               <div>{j.ID}</div>
-              <div style={{ fontSize: "smaller" }}>({j.Rating})</div>
+              <div style={{ display: "flex", flexDirection: "row" }}>
+                <div style={{ fontSize: "smaller" }}>({j.Rating})</div>
+              </div>
             </IonLabel>
             <IonIcon
               icon={listCircle}
@@ -557,6 +559,7 @@ class HomeContainer extends React.Component<props, state> {
           onDidDismiss={() =>
             this.setState({ showNewMsg: false, event: undefined })
           }
+          side="left"
         >
           <IonTextarea
             rows={10}

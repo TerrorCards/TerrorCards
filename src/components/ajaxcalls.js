@@ -316,7 +316,6 @@ export function callServer(pTask, pData, pUserId) {
       break;
     }
     case "saveTrade": {
-      console.log(pData.uContent1);
       let c1 = prepData(pData.uContent1);
       let c2 = prepData(pData.uContent2);
       let formData = new FormData();

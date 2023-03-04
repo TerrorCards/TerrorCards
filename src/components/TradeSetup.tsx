@@ -219,7 +219,7 @@ class TradeSetup extends React.Component<props, state> {
           otherList.push(cl.ID + "_" + cl.Card_Year + "_" + cl.Count);
         }
       });
-
+      console.log(this.state.tradeMessage);
       callServer(
         "saveTrade",
         {
@@ -498,7 +498,7 @@ class TradeSetup extends React.Component<props, state> {
                 placeholder="type here"
                 rows={5}
                 value={this.state.tradeMessage}
-                onChange={(e: any) => {
+                onIonChange={(e: any) => {
                   this.setState({ tradeMessage: e.currentTarget.value });
                 }}
               ></IonTextarea>

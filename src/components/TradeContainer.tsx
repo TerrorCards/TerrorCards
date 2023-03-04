@@ -161,7 +161,7 @@ class TradeContainer extends React.Component<props, state> {
           return resp.json();
         })
         .then((json) => {
-          console.log(json);
+          //console.log(json);
           if (json.length > 0) {
             resolve(json);
           } else {
@@ -250,7 +250,7 @@ class TradeContainer extends React.Component<props, state> {
           return resp.json();
         })
         .then((json) => {
-          console.log(json);
+          //console.log(json);
           if (json) {
             resolve(json);
           } else {
@@ -281,8 +281,6 @@ class TradeContainer extends React.Component<props, state> {
   };
 
   render() {
-    const pic = "http://placekitten.com/g/200/300";
-
     let content: any = "";
 
     return (
@@ -351,36 +349,45 @@ class TradeContainer extends React.Component<props, state> {
           onDidDismiss={() =>
             this.setState({ showInfoPopover: false, event: undefined })
           }
+          className={"contactPopover"}
         >
-          <IonLabel position="stacked">{this.state.tradeMessages}</IonLabel>
-          <IonGrid>
-            <IonRow>
-              <IonCol>
-                <IonItem>
-                  <IonLabel position="stacked">
-                    Add a message to this trade (optional)
-                  </IonLabel>
-                  <IonTextarea
-                    placeholder="type here"
-                    rows={2}
-                    value={this.state.messageText}
-                    onIonChange={(e: any) => {
-                      this.updateTextMessage(e);
-                    }}
-                  ></IonTextarea>
-                  <IonButton
-                    color="success"
-                    expand="block"
-                    onClick={() => {
-                      this.sendMessage();
-                    }}
-                  >
-                    Send Message
-                  </IonButton>
-                </IonItem>
-              </IonCol>
-            </IonRow>
-          </IonGrid>
+          <IonContent style={{ height: "100%" }}>
+            <IonGrid>
+              <IonRow>
+                <IonCol>
+                  <IonItem>
+                    <IonLabel position="stacked">
+                      Add a message to this trade (optional)
+                    </IonLabel>
+                    <IonTextarea
+                      placeholder="type here"
+                      rows={2}
+                      value={this.state.messageText}
+                      onIonChange={(e: any) => {
+                        this.updateTextMessage(e);
+                      }}
+                    ></IonTextarea>
+                    <IonButton
+                      color="success"
+                      expand="block"
+                      onClick={() => {
+                        this.sendMessage();
+                      }}
+                    >
+                      Send Message
+                    </IonButton>
+                  </IonItem>
+                </IonCol>
+              </IonRow>
+              <IonRow>
+                <IonCol>
+                  <IonContent style={{ height: "90%" }}>
+                    {this.state.tradeMessages}
+                  </IonContent>
+                </IonCol>
+              </IonRow>
+            </IonGrid>
+          </IonContent>
         </IonPopover>
 
         <IonModal isOpen={this.state.showDetails}>
@@ -413,7 +420,7 @@ class TradeContainer extends React.Component<props, state> {
       let otherLabel: string = "";
 
       this.state.filteredTradeList[key].map((card: any) => {
-        console.log(card);
+        //console.log(card);
         if (card.UserID === this.props.user.ID) {
           yourItems.push(
             <div
@@ -567,7 +574,7 @@ class TradeContainer extends React.Component<props, state> {
   displayTradeMessages = (ID: any) => {
     let msgList: Array<any> = [];
     this.pullTradesMessages(this.props.user.ID, ID).then((result: any) => {
-      console.log(result);
+      //console.log(result);
       result.map((res: any, i: number) => {
         msgList.push(
           <IonRow key={res.ID + "-" + i}>

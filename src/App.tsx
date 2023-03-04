@@ -21,6 +21,7 @@ import {
   IonGrid,
   IonCol,
   IonRow,
+  IonAlert,
 } from "@ionic/react";
 import React, { useState, useEffect } from "react";
 import { IonReactRouter } from "@ionic/react-router";
@@ -85,6 +86,8 @@ interface state {
   showHuntModel: boolean;
   refreshTime: number;
   hasTrades: boolean;
+  dailyLogin: boolean;
+  dailyMessage: string;
 }
 
 const store = new Storage();
@@ -131,6 +134,8 @@ class App extends React.Component<props, state> {
       showHuntModel: false,
       refreshTime: 0,
       hasTrades: false,
+      dailyLogin: false,
+      dailyMessage: "",
     };
   }
 
@@ -235,7 +240,13 @@ class App extends React.Component<props, state> {
 
   fnUpdateUserInfo = (info: any) => {
     const newState = { ID: info.Name, credit: info.Credit };
-    this.setState({ user: newState });
+    this.setState({ user: newState }, () => {
+      if (info.Daily === "Yes") {
+        this.setState({ dailyLogin: true, dailyMessage: info.DailyMessage });
+      } else {
+        this.setState({ dailyLogin: false, dailyMessage: "" });
+      }
+    });
   };
 
   fnCallbackRefreshTime = (value: number) => {
@@ -472,6 +483,25 @@ class App extends React.Component<props, state> {
               closePanel={this.showHuntModal}
             />
           </IonModal>
+
+          <IonAlert
+            isOpen={this.state.dailyLogin}
+            onDidDismiss={() => {
+              this.setState({ dailyLogin: false, dailyMessage: "" });
+            }}
+            header="Daily Login"
+            message={this.state.dailyMessage}
+            buttons={[
+              {
+                text: "Ok",
+                role: "cancel",
+                cssClass: "secondary",
+                handler: (blah: any) => {
+                  this.setState({ dailyLogin: false, dailyMessage: "" });
+                },
+              },
+            ]}
+          />
         </IonReactRouter>
       </IonApp>
     ) : (
