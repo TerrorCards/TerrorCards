@@ -259,6 +259,8 @@ class StoreContainer extends React.Component<props, state> {
                     <div style={{ display: "flex", flexDirection: "column" }}>
                       <div style={{ display: "flex", flex: 2 }}>
                         {p.description}
+                        <br></br>
+                        {p.productId}
                       </div>
                       <div
                         style={{ display: "flex", justifyItems: "flex-end" }}
@@ -534,43 +536,36 @@ class StoreContainer extends React.Component<props, state> {
 
   canBuyCoins = () => {
     const item = this.state.targetItem;
-    InAppPurchase2.order(item)
-      .then((msg: any) => {
-        let value = 0;
-        if (item.productId.indexOf("25k") > -1) {
-          value = 25000;
-        } else if (item.productId.indexOf("100k") > -1) {
-          value = 100000;
-        } else if (item.productId.indexOf("250k") > -1) {
-          value = 250000;
-        } else if (item.productId.indexOf("500k") > -1) {
-          value = 500000;
-        } else if (item.productId.indexOf("750k") > -1) {
-          value = 750000;
-        } else if (item.productId.indexOf("1m") > -1) {
-          value = 1000000;
-        } else {
-          value = 0;
+    InAppPurchase2.order(item).then((msg: any) => {
+      let value = 0;
+      if (item.productId.indexOf("25k") > -1) {
+        value = 25000;
+      } else if (item.productId.indexOf("100k") > -1) {
+        value = 100000;
+      } else if (item.productId.indexOf("250k") > -1) {
+        value = 250000;
+      } else if (item.productId.indexOf("500k") > -1) {
+        value = 500000;
+      } else if (item.productId.indexOf("750k") > -1) {
+        value = 750000;
+      } else if (item.productId.indexOf("1m") > -1) {
+        value = 1000000;
+      } else {
+        value = 0;
+      }
+      callServer("updateCredit", { credit: value }, this.props.user.ID)?.then(
+        (result: any) => {
+          this.setState({
+            targetItem: null,
+            targetType: null,
+            showCoinMessage: true,
+            coinPurchaseMsg:
+              "Thank you. Account updated by " + value + " credits",
+          });
+          this.setState({ coinMsg: JSON.stringify(msg) });
         }
-        callServer("updateCredit", { credit: value }, this.props.user.ID)?.then(
-          (result: any) => {
-            this.setState({
-              targetItem: null,
-              targetType: null,
-              showCoinMessage: true,
-              coinPurchaseMsg:
-                "Thank you. Account updated by " +
-                value +
-                " credits" +
-                item.productId,
-            });
-            this.setState({ coinMsg: JSON.stringify(msg) });
-          }
-        );
-      })
-      .catch((e: any) => {
-        this.setState({ showCoinMessage: true, coinPurchaseMsg: e });
-      });
+      );
+    });
   };
 }
 
