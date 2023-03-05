@@ -51,6 +51,8 @@ interface state {
   showConfirmPurchase: boolean;
   targetItem: any;
   targetType: any;
+  showCoinMessage: boolean;
+  coinPurchaseMsg: any;
 }
 
 class StoreContainer extends React.Component<props, state> {
@@ -70,6 +72,8 @@ class StoreContainer extends React.Component<props, state> {
       showConfirmPurchase: false,
       targetItem: null,
       targetType: null,
+      showCoinMessage: false,
+      coinPurchaseMsg: null,
     };
   }
 
@@ -131,7 +135,7 @@ class StoreContainer extends React.Component<props, state> {
             regArray.push(this.registerAppStoreProduct(item.ID));
           });
           Promise.all(regArray).then((resp) => {
-            this.setState({ allCoinList: json }, () => {
+            this.setState({ allCoinList: InAppPurchase2.products }, () => {
               //this.renderCoinsList();
             });
           });
@@ -241,22 +245,21 @@ class StoreContainer extends React.Component<props, state> {
     if (this.state.allCoinList.length > 0) {
       this.state.allCoinList.map((p: any) => {
         items.push(
-          <IonCard key={p.Name}>
+          <IonCard key={p.title}>
             <IonCardHeader>
-              <IonCardSubtitle>{p.Name}</IonCardSubtitle>
+              <IonCardSubtitle>{p.title}</IonCardSubtitle>
             </IonCardHeader>
             <IonCardContent>
               <IonGrid>
-                <IonRow>
-                  <IonCol>{this.state.coinMsg}</IonCol>
-                </IonRow>
                 <IonRow>
                   <IonCol>
                     <IonImg src={""} />
                   </IonCol>
                   <IonCol>
                     <div style={{ display: "flex", flexDirection: "column" }}>
-                      <div style={{ display: "flex", flex: 2 }}>{p.Desc}</div>
+                      <div style={{ display: "flex", flex: 2 }}>
+                        {p.description}
+                      </div>
                       <div
                         style={{ display: "flex", justifyItems: "flex-end" }}
                       >
@@ -271,7 +274,7 @@ class StoreContainer extends React.Component<props, state> {
                             //this.canBuyCoins(p.ID);
                           }}
                         >
-                          {p.Amount}
+                          {p.price} {p.currency}
                         </IonButton>
                       </div>
                     </div>
@@ -465,6 +468,25 @@ class StoreContainer extends React.Component<props, state> {
             },
           ]}
         />
+
+        <IonAlert
+          isOpen={this.state.showCoinMessage}
+          onDidDismiss={() => {
+            this.setState({ showCoinMessage: false });
+          }}
+          header="Message"
+          message={this.state.coinPurchaseMsg}
+          buttons={[
+            {
+              text: "Ok",
+              role: "cancel",
+              cssClass: "secondary",
+              handler: (blah: any) => {
+                this.setState({ showCoinMessage: false });
+              },
+            },
+          ]}
+        />
       </IonContent>
     );
   }
@@ -489,32 +511,63 @@ class StoreContainer extends React.Component<props, state> {
     });
   };
 
+  /*
+  registerAppStoreProduct = (productId: any) => {
+    new Promise((resolve, reject) => {
+      InAppPurchase2.register({
+        id: productId,
+        type: InAppPurchase2.CONSUMABLE,
+      });
+      InAppPurchase2.when(productId)
+        .approved((p: any) => p.verify())
+        .verified((p: any) => {
+          p.finish();
+          this.setState({
+            coinMsg: JSON.stringify(p),
+          });
+          resolve(true);
+        });
+      InAppPurchase2.refresh();
+    });
+  };
+  */
+
   canBuyCoins = () => {
     const item = this.state.targetItem;
-    InAppPurchase2.order(item).then((msg: any) => {
-      let value = 0;
-      if (item.indexOf("25k") > -1) {
-        value = 25000;
-      } else if (item.indexOf("100k") > -1) {
-        value = 100000;
-      } else if (item.indexOf("250k") > -1) {
-        value = 250000;
-      } else if (item.indexOf("500k") > -1) {
-        value = 500000;
-      } else if (item.indexOf("750k") > -1) {
-        value = 750000;
-      } else if (item.indexOf("1m") > -1) {
-        value = 1000000;
-      } else {
-        value = 0;
-      }
-      callServer("updateCredit", { credit: value }, this.props.user.ID)?.then(
-        (result: any) => {
-          this.setState({ targetItem: null, targetType: null });
-          this.setState({ coinMsg: JSON.stringify(msg) });
+    InAppPurchase2.order(item).then(
+      (msg: any) => {
+        let value = 0;
+        if (item.indexOf("25k") > -1) {
+          value = 25000;
+        } else if (item.indexOf("100k") > -1) {
+          value = 100000;
+        } else if (item.indexOf("250k") > -1) {
+          value = 250000;
+        } else if (item.indexOf("500k") > -1) {
+          value = 500000;
+        } else if (item.indexOf("750k") > -1) {
+          value = 750000;
+        } else if (item.indexOf("1m") > -1) {
+          value = 1000000;
+        } else {
+          value = 0;
         }
-      );
-    });
+        callServer("updateCredit", { credit: value }, this.props.user.ID)?.then(
+          (result: any) => {
+            this.setState({
+              targetItem: null,
+              targetType: null,
+              showCoinMessage: true,
+              coinPurchaseMsg: "Thank you. Account updated by " + value + " coins"
+             });
+            this.setState({ coinMsg: JSON.stringify(msg)});
+          }
+        );
+      },
+      (e: any) => {
+        this.setState({ showCoinMessage: true, coinPurchaseMsg: e });
+      }
+    );
   };
 }
 
