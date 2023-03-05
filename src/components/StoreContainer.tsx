@@ -534,8 +534,8 @@ class StoreContainer extends React.Component<props, state> {
 
   canBuyCoins = () => {
     const item = this.state.targetItem;
-    InAppPurchase2.order(item).then(
-      (msg: any) => {
+    InAppPurchase2.order(item)
+      .then((msg: any) => {
         let value = 0;
         if (item.productId.indexOf("25k") > -1) {
           value = 25000;
@@ -559,16 +559,18 @@ class StoreContainer extends React.Component<props, state> {
               targetType: null,
               showCoinMessage: true,
               coinPurchaseMsg:
-                "Thank you. Account updated by " + value + " credits",
+                "Thank you. Account updated by " +
+                value +
+                " credits" +
+                item.productId,
             });
             this.setState({ coinMsg: JSON.stringify(msg) });
           }
         );
-      },
-      (e: any) => {
+      })
+      .catch((e: any) => {
         this.setState({ showCoinMessage: true, coinPurchaseMsg: e });
-      }
-    );
+      });
   };
 }
 
