@@ -537,17 +537,17 @@ class StoreContainer extends React.Component<props, state> {
     InAppPurchase2.order(item).then(
       (msg: any) => {
         let value = 0;
-        if (item.indexOf("25k") > -1) {
+        if (item.productId.indexOf("25k") > -1) {
           value = 25000;
-        } else if (item.indexOf("100k") > -1) {
+        } else if (item.productId.indexOf("100k") > -1) {
           value = 100000;
-        } else if (item.indexOf("250k") > -1) {
+        } else if (item.productId.indexOf("250k") > -1) {
           value = 250000;
-        } else if (item.indexOf("500k") > -1) {
+        } else if (item.productId.indexOf("500k") > -1) {
           value = 500000;
-        } else if (item.indexOf("750k") > -1) {
+        } else if (item.productId.indexOf("750k") > -1) {
           value = 750000;
-        } else if (item.indexOf("1m") > -1) {
+        } else if (item.productId.indexOf("1m") > -1) {
           value = 1000000;
         } else {
           value = 0;
@@ -558,9 +558,10 @@ class StoreContainer extends React.Component<props, state> {
               targetItem: null,
               targetType: null,
               showCoinMessage: true,
-              coinPurchaseMsg: "Thank you. Account updated by " + value + " coins"
-             });
-            this.setState({ coinMsg: JSON.stringify(msg)});
+              coinPurchaseMsg:
+                "Thank you. Account updated by " + value + " credits",
+            });
+            this.setState({ coinMsg: JSON.stringify(msg) });
           }
         );
       },
