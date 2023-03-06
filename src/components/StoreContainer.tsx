@@ -538,17 +538,17 @@ class StoreContainer extends React.Component<props, state> {
     const item = this.state.targetItem;
     InAppPurchase2.order(item).then((msg: any) => {
       let value = 0;
-      if (item.productId.indexOf("25k") > -1) {
+      if (item.id.indexOf("25k") > -1) {
         value = 25000;
-      } else if (item.productId.indexOf("100k") > -1) {
+      } else if (item.id.indexOf("100k") > -1) {
         value = 100000;
-      } else if (item.productId.indexOf("250k") > -1) {
+      } else if (item.id.indexOf("250k") > -1) {
         value = 250000;
-      } else if (item.productId.indexOf("500k") > -1) {
+      } else if (item.id.indexOf("500k") > -1) {
         value = 500000;
-      } else if (item.productId.indexOf("750k") > -1) {
+      } else if (item.id.indexOf("750k") > -1) {
         value = 750000;
-      } else if (item.productId.indexOf("1m") > -1) {
+      } else if (item.id.indexOf("1m") > -1) {
         value = 1000000;
       } else {
         value = 0;
