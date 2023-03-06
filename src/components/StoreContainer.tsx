@@ -260,7 +260,7 @@ class StoreContainer extends React.Component<props, state> {
                       <div style={{ display: "flex", flex: 2 }}>
                         {p.description}
                         <br></br>
-                        {p.productId}
+                        {JSON.stringify(p)}
                       </div>
                       <div
                         style={{ display: "flex", justifyItems: "flex-end" }}
@@ -560,7 +560,10 @@ class StoreContainer extends React.Component<props, state> {
             targetType: null,
             showCoinMessage: true,
             coinPurchaseMsg:
-              "Thank you. Account updated by " + value + " credits",
+              "Thank you. Account updated by " +
+              value +
+              " credits" +
+              JSON.stringify(msg),
           });
           this.setState({ coinMsg: JSON.stringify(msg) });
         }
