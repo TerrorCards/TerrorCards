@@ -501,8 +501,9 @@ class StoreContainer extends React.Component<props, state> {
         type: InAppPurchase2.CONSUMABLE,
       });
 
-      InAppPurchase2.when(productId).updated((p: any) => {
-        if (p.loaded && p.valid && p.state === p.APPROVED) {
+      InAppPurchase2.when(productId)
+        .approved((p: any) => p.verify())
+        .verified((p: any) => {
           let value = 0;
           if (p.id.indexOf("25k") > -1) {
             value = 25000;
@@ -535,18 +536,12 @@ class StoreContainer extends React.Component<props, state> {
                 JSON.stringify(p),
             });
             this.setState({ coinMsg: JSON.stringify(p) });
-            p.finish();
           });
-        }
-      });
 
-      InAppPurchase2.when(productId)
-        .approved((p: any) => p.verify())
-        .verified((p: any) => {
           p.finish();
-          resolve(true);
         });
       InAppPurchase2.refresh();
+      resolve(true);
     });
   };
 
