@@ -500,13 +500,50 @@ class StoreContainer extends React.Component<props, state> {
         id: productId,
         type: InAppPurchase2.CONSUMABLE,
       });
+
+      InAppPurchase2.when(productId).updated((p: any) => {
+        if (p.loaded && p.valid && p.state === p.APPROVED) {
+          let value = 0;
+          if (p.id.indexOf("25k") > -1) {
+            value = 25000;
+          } else if (p.id.indexOf("100k") > -1) {
+            value = 100000;
+          } else if (p.id.indexOf("250k") > -1) {
+            value = 250000;
+          } else if (p.id.indexOf("500k") > -1) {
+            value = 500000;
+          } else if (p.id.indexOf("750k") > -1) {
+            value = 750000;
+          } else if (p.id.indexOf("1m") > -1) {
+            value = 1000000;
+          } else {
+            value = 0;
+          }
+          callServer(
+            "updateCredit",
+            { credit: value },
+            this.props.user.ID
+          )?.then((result: any) => {
+            this.setState({
+              targetItem: null,
+              targetType: null,
+              showCoinMessage: true,
+              coinPurchaseMsg:
+                "Thank you. Account updated by " +
+                value +
+                " credits" +
+                JSON.stringify(p),
+            });
+            this.setState({ coinMsg: JSON.stringify(p) });
+            p.finish();
+          });
+        }
+      });
+
       InAppPurchase2.when(productId)
         .approved((p: any) => p.verify())
         .verified((p: any) => {
           p.finish();
-          this.setState({
-            coinMsg: JSON.stringify(p),
-          });
           resolve(true);
         });
       InAppPurchase2.refresh();
@@ -536,39 +573,7 @@ class StoreContainer extends React.Component<props, state> {
 
   canBuyCoins = () => {
     const item = this.state.targetItem;
-    InAppPurchase2.order(item).then((msg: any) => {
-      let value = 0;
-      if (item.id.indexOf("25k") > -1) {
-        value = 25000;
-      } else if (item.id.indexOf("100k") > -1) {
-        value = 100000;
-      } else if (item.id.indexOf("250k") > -1) {
-        value = 250000;
-      } else if (item.id.indexOf("500k") > -1) {
-        value = 500000;
-      } else if (item.id.indexOf("750k") > -1) {
-        value = 750000;
-      } else if (item.id.indexOf("1m") > -1) {
-        value = 1000000;
-      } else {
-        value = 0;
-      }
-      callServer("updateCredit", { credit: value }, this.props.user.ID)?.then(
-        (result: any) => {
-          this.setState({
-            targetItem: null,
-            targetType: null,
-            showCoinMessage: true,
-            coinPurchaseMsg:
-              "Thank you. Account updated by " +
-              value +
-              " credits" +
-              JSON.stringify(msg),
-          });
-          this.setState({ coinMsg: JSON.stringify(msg) });
-        }
-      );
-    });
+    InAppPurchase2.order(item);
   };
 }
 

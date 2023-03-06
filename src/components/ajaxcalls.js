@@ -1133,6 +1133,7 @@ export function callServer(pTask, pData, pUserId) {
       break;
     }
     case "updateCredit": {
+      var jsonstr = prepData(pData);
       let formData = new FormData();
       formData.append("uUserId", pUserId);
       formData.append("uContent", jsonstr);
