@@ -36,11 +36,10 @@ import {
   IonTitle,
   withIonLifeCycle,
 } from "@ionic/react";
-import { settingsOutline } from "ionicons/icons";
+import { settingsOutline, aperture } from "ionicons/icons";
 import { callServer } from "./ajaxcalls";
 
 interface props {
-  menuAction: any;
   user: any;
   profileCallback: any;
   lastRefreshed: any;
@@ -128,39 +127,26 @@ class ProfileContainer extends React.Component<props, state> {
           </IonCol>
         </IonRow>
         <IonRow>
-          <IonCol>
+          <IonCol size="auto">
             <IonItem>
-              <IonAvatar slot="start">
+              <IonAvatar>
                 <IonImg src={j.Image} />
               </IonAvatar>
-              <div
-                style={{ display: "flex", flexDirection: "row", width: "100%" }}
-              >
-                <div
-                  style={{ display: "flex", flex: 3, flexDirection: "column" }}
-                >
-                  <div>
-                    {j.Name} ({j.Rating})
-                  </div>
-                  <div style={{ fontSize: "smaller" }}>
-                    <IonIcon slot="end" icon={settingsOutline} color="dark" />{" "}
-                    {j.Credit}
-                  </div>
-                </div>
-                <div style={{ display: "flex", flex: 1 }}>
-                  <div style={{ textAlign: "end" }}>
-                    <IonButton
-                      fill="clear"
-                      onClick={(e: any) => {
-                        this.props.menuAction(e);
-                      }}
-                    >
-                      <IonIcon slot="end" icon={settingsOutline} color="dark" />
-                    </IonButton>
-                  </div>
-                </div>
-              </div>
             </IonItem>
+          </IonCol>
+          <IonCol>
+            <IonGrid>
+              <IonRow>
+                <IonCol>
+                  {j.Name} ({j.Rating})
+                </IonCol>
+              </IonRow>
+              <IonRow>
+                <IonCol>
+                  <IonIcon icon={aperture} color="dark" /> {j.Credit}
+                </IonCol>
+              </IonRow>
+            </IonGrid>
           </IonCol>
         </IonRow>
       </IonGrid>

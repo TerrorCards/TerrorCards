@@ -37,6 +37,7 @@ import {
   images,
   person,
   settings,
+  ribbon,
 } from "ionicons/icons";
 import HomeContainer from "./components/HomeContainer";
 import GalleryContainer from "./components/GalleryContainer";
@@ -273,14 +274,6 @@ class App extends React.Component<props, state> {
     //}, 500);
   };
 
-  showPoperAction = (e: any) => {
-    if (this.state.showPopover) {
-      this.setState({ showPopover: false, event: undefined });
-    } else {
-      this.setState({ showPopover: true, event: e });
-    }
-  };
-
   showTradeModal = (e: any) => {
     if (this.state.showTradeSetupModel) {
       this.setState({ showTradeSetupModel: false, tradeUser: "" });
@@ -332,7 +325,6 @@ class App extends React.Component<props, state> {
             <IonRouterOutlet>
               <Route exact path="/home">
                 <ProfileContainer
-                  menuAction={this.showPoperAction}
                   user={this.state.user}
                   profileCallback={this.fnUpdateUserInfo}
                   lastRefreshed={this.state.refreshTime}
@@ -345,7 +337,6 @@ class App extends React.Component<props, state> {
               </Route>
               <Route exact path="/gallery">
                 <ProfileContainer
-                  menuAction={this.showPoperAction}
                   user={this.state.user}
                   profileCallback={this.fnUpdateUserInfo}
                   lastRefreshed={this.state.refreshTime}
@@ -360,7 +351,6 @@ class App extends React.Component<props, state> {
               </Route>
               <Route path="/store">
                 <ProfileContainer
-                  menuAction={this.showPoperAction}
                   user={this.state.user}
                   profileCallback={this.fnUpdateUserInfo}
                   lastRefreshed={this.state.refreshTime}
@@ -373,7 +363,6 @@ class App extends React.Component<props, state> {
               </Route>
               <Route path="/trade">
                 <ProfileContainer
-                  menuAction={this.showPoperAction}
                   user={this.state.user}
                   profileCallback={this.fnUpdateUserInfo}
                   lastRefreshed={this.state.refreshTime}
@@ -382,7 +371,6 @@ class App extends React.Component<props, state> {
               </Route>
               <Route exact path="/">
                 <ProfileContainer
-                  menuAction={this.showPoperAction}
                   user={this.state.user}
                   profileCallback={this.fnUpdateUserInfo}
                   lastRefreshed={this.state.refreshTime}
@@ -449,7 +437,7 @@ class App extends React.Component<props, state> {
                   this.showHuntModal(e);
                 }}
               >
-                <IonIcon icon={flask} />
+                <IonIcon icon={ribbon} />
               </IonFabButton>
             </IonFabList>
           </IonFab>
@@ -506,10 +494,19 @@ class App extends React.Component<props, state> {
       </IonApp>
     ) : (
       <IonApp>
-        <SignInContainer
-          user={this.state.user}
-          signInCallback={this.setUserName}
-        />
+        <IonContent>
+          <IonGrid>
+            <IonRow>
+              <IonCol>
+                <div style={{ height: 50 }}></div>
+              </IonCol>
+            </IonRow>
+          </IonGrid>
+          <SignInContainer
+            user={this.state.user}
+            signInCallback={this.setUserName}
+          />
+        </IonContent>
       </IonApp>
     );
   }
