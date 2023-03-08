@@ -1045,6 +1045,7 @@ export function callServer(pTask, pData, pUserId) {
       formData.append("uAction", "setup");
       formData.append("uContent", jsonstr);
       formData.append("uType", "");
+      /*
       let test = fetch(serverpath + "battle/battle_result.php", {
         method: "POST",
         headers: {
@@ -1052,6 +1053,18 @@ export function callServer(pTask, pData, pUserId) {
         },
         body: formData,
       });
+      */
+      let test = fetch(
+        serverpath +
+          "battle/battle_result.php?" +
+          new URLSearchParams({
+            uUserId: pUserId,
+            uAction: "setup",
+            uContent: jsonstr,
+            uType: "",
+          })
+      );
+
       return test;
       break;
     }

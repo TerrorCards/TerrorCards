@@ -26,6 +26,7 @@ import {
   IonIcon,
   IonPopover,
   withIonLifeCycle,
+  IonAlert,
 } from "@ionic/react";
 import "./HuntContainer.css";
 import { settingsOutline, closeCircleOutline } from "ionicons/icons";
@@ -47,8 +48,13 @@ interface state {
   yourStats: any;
   isInBattle: boolean;
   opponent: string;
+  playerList: Array<any>;
   battleParams: any;
   battleResults: any;
+  yourDamMsg: string;
+  otherDamMsg: string;
+  battleIsRunning: boolean;
+  showWinnerAlert: boolean;
 }
 
 class HuntContainer extends React.Component<props, state> {
@@ -68,6 +74,11 @@ class HuntContainer extends React.Component<props, state> {
       opponent: "",
       battleParams: [],
       battleResults: "",
+      yourDamMsg: "",
+      otherDamMsg: "",
+      battleIsRunning: false,
+      playerList: [],
+      showWinnerAlert: false,
     };
   }
 
@@ -106,7 +117,7 @@ class HuntContainer extends React.Component<props, state> {
         return resp.json();
       })
       .then((json) => {
-        console.log(json);
+        //console.log(json);
         if (json.length > 0) {
           this.setState({ yourStats: json[0] });
         }
@@ -127,10 +138,10 @@ class HuntContainer extends React.Component<props, state> {
           return resp.json();
         })
         .then((json) => {
-          console.log(json);
+          //console.log(json);
           if (json.length > 0) {
             this.setState({ battleParams: json }, () => {
-              this.renderItems(json);
+              //this.renderItems(json);
             });
           }
         })
@@ -146,9 +157,9 @@ class HuntContainer extends React.Component<props, state> {
         return resp.json();
       })
       .then((json) => {
-        console.log(json);
+        //console.log(json);
         if (json.length > 0) {
-          this.renderPlayerList(json);
+          this.setState({ playerList: json });
         }
       })
       .catch((err: any) => {
@@ -163,7 +174,14 @@ class HuntContainer extends React.Component<props, state> {
         <IonRow>
           <IonCol>W: {s.Curr_Win}</IonCol>
           <IonCol>L: {s.Curr_Lose}</IonCol>
-          <IonCol>%: {s.Curr_Percentage}</IonCol>
+          <IonCol>
+            %:{" "}
+            {Math.ceil(
+              (parseInt(s.Curr_Win) /
+                (parseInt(s.Curr_Win) + parseInt(s.Curr_Lose))) *
+                100
+            )}
+          </IonCol>
           <IonCol>
             <IonButton expand="block">
               Moves<br></br>
@@ -175,27 +193,29 @@ class HuntContainer extends React.Component<props, state> {
     );
   };
 
-  renderPlayerList = (allList: any) => {
+  renderPlayerList = () => {
     let items: Array<any> = [];
-    let p = allList[0];
-    allList.forEach((p: any, i: any) => {
+    this.state.playerList.forEach((p: any, i: any) => {
       items.push(
         <IonCard key={i}>
           <IonCardContent>
             <IonGrid>
               <IonRow>
-                <IonCol>
+                <IonCol size="auto">
                   <IonImg
                     src={p.Img}
                     key={i + "image"}
                     class={"ListItemSizing"}
                   />
                 </IonCol>
-                <IonCol>{p.Player}</IonCol>
-                <IonCol>
+                <IonCol class="ion-text-center">{p.Player}</IonCol>
+                <IonCol size="auto">
                   <IonButton
                     color="success"
                     expand="block"
+                    disabled={
+                      this.state.yourStats.AvailablePlays > 0 ? false : true
+                    }
                     onClick={() => {
                       this.selectOpponent(p.Player);
                     }}
@@ -209,101 +229,119 @@ class HuntContainer extends React.Component<props, state> {
         </IonCard>
       );
     });
-    this.setState({ meldItems: items });
+    return items;
   };
 
-  renderItems = (allList: any) => {
+  renderItems = () => {
     let items: Array<any> = [];
-    let you = allList[0];
-    let other = allList[1];
-    console.log(this.state.battleResults);
+    let you = this.state.battleParams[0];
+    let other = this.state.battleParams[1];
+    //console.log(this.state.battleResults);
     //allList.forEach((p: any) => {
-    items.push(
-      <IonCard key={you.Player}>
-        <IonCardContent>
-          <IonGrid>
-            <IonRow class="ion-align-items-center">
-              <IonCol class="ion-text-center">{you.Player}</IonCol>
-            </IonRow>
-            <IonRow class="ion-align-items-center">
-              <IonCol class="ion-text-center">ATTACK</IonCol>
-              <IonCol class="ion-text-center">DEFENSE</IonCol>
-              <IonCol class="ion-text-center">LIFE</IonCol>
-            </IonRow>
-            <IonRow class="ion-align-items-center">
-              <IonCol class="ion-text-center">{you.AttackMax}</IonCol>
-              <IonCol class="ion-text-center">
-                {Math.floor(you.DefenseMax / 2)}
-              </IonCol>
-              <IonCol class="ion-text-center">{you.LifeMax}</IonCol>
-            </IonRow>
-            <IonRow class="ion-align-items-center">
-              <IonCol class="ion-text-center">
-                <IonImg src={you.AttackImg} class={"baseCardSize"} />
-              </IonCol>
-              <IonCol class="ion-text-center">
-                <IonImg src={you.DefenseImg} class={"baseCardSize"} />
-              </IonCol>
-              <IonCol class="ion-text-center">
-                <IonImg src={you.LifeImg} class={"baseCardSize"} />
-              </IonCol>
-            </IonRow>
-            <IonRow>
-              <IonCol class="ion-text-center">
-                {this.state.battleResults}
-              </IonCol>
-            </IonRow>
-            <IonRow class="ion-align-items-center">
-              <IonCol class="ion-text-center">{other.AttackMax}</IonCol>
-              <IonCol class="ion-text-center">
-                {Math.floor(other.DefenseMax / 2)}
-              </IonCol>
-              <IonCol class="ion-text-center">{other.LifeMax}</IonCol>
-            </IonRow>
-            <IonRow class="ion-align-items-center">
-              <IonCol class="ion-text-center">ATTACK</IonCol>
-              <IonCol class="ion-text-center">DEFENSE</IonCol>
-              <IonCol class="ion-text-center">LIFE</IonCol>
-            </IonRow>
-            <IonRow class="ion-align-items-center">
-              <IonCol class="ion-text-center">{other.Player}</IonCol>
-            </IonRow>
-            <IonRow class="ion-align-items-center">
-              <IonCol class="ion-text-center"></IonCol>
-            </IonRow>
-            <IonRow class="ion-align-items-center">
-              <IonCol class="ion-text-center">
-                <IonButton
-                  color="success"
-                  expand="block"
-                  onClick={() => {
+    return (
+      <IonCardContent key={you.Player}>
+        <IonGrid>
+          <IonRow class="ion-align-items-center">
+            <IonCol class="ion-text-center">{you.Player}</IonCol>
+          </IonRow>
+          <IonRow class="ion-align-items-center">
+            <IonCol class="ion-text-center">ATTACK</IonCol>
+            <IonCol class="ion-text-center">DEFENSE</IonCol>
+            <IonCol class="ion-text-center">LIFE</IonCol>
+          </IonRow>
+          <IonRow class="ion-align-items-center">
+            <IonCol class="ion-text-center">{you.AttackMax}</IonCol>
+            <IonCol class="ion-text-center">
+              {Math.floor(you.DefenseMax / 2)}
+            </IonCol>
+            <IonCol class="ion-text-center">{you.LifeMax}</IonCol>
+          </IonRow>
+          <IonRow class="ion-align-items-center">
+            <IonCol class="ion-text-center">{this.state.yourDamMsg}</IonCol>
+          </IonRow>
+          <IonRow class="ion-align-items-center">
+            <IonCol class="ion-text-center">
+              <IonImg src={you.AttackImg} class={"baseCardSize"} />
+            </IonCol>
+            <IonCol class="ion-text-center">
+              <IonImg src={you.DefenseImg} class={"baseCardSize"} />
+            </IonCol>
+            <IonCol class="ion-text-center">
+              <IonImg src={you.LifeImg} class={"baseCardSize"} />
+            </IonCol>
+          </IonRow>
+          <IonRow class="ion-align-items-center">
+            <IonCol class="ion-text-center">{this.state.otherDamMsg}</IonCol>
+          </IonRow>
+          <IonRow class="ion-align-items-center">
+            <IonCol class="ion-text-center">{other.AttackMax}</IonCol>
+            <IonCol class="ion-text-center">
+              {Math.floor(other.DefenseMax / 2)}
+            </IonCol>
+            <IonCol class="ion-text-center">{other.LifeMax}</IonCol>
+          </IonRow>
+          <IonRow class="ion-align-items-center">
+            <IonCol class="ion-text-center">ATTACK</IonCol>
+            <IonCol class="ion-text-center">DEFENSE</IonCol>
+            <IonCol class="ion-text-center">LIFE</IonCol>
+          </IonRow>
+          <IonRow class="ion-align-items-center">
+            <IonCol class="ion-text-center">{other.Player}</IonCol>
+          </IonRow>
+          <IonRow class="ion-align-items-center">
+            <IonCol class="ion-text-center"></IonCol>
+          </IonRow>
+          <IonRow class="ion-align-items-center">
+            <IonCol class="ion-text-center">
+              <IonButton
+                color="success"
+                expand="block"
+                disabled={this.state.battleIsRunning}
+                onClick={() => {
+                  this.setState({ battleIsRunning: true }, () => {
                     this.playOutBattle();
-                  }}
-                >
-                  Start
-                </IonButton>
-              </IonCol>
-              <IonCol class="ion-text-center">
-                <IonButton
-                  color="warning"
-                  expand="block"
-                  onClick={() => {
-                    this.setState({ isInBattle: false, opponent: "" }, () => {
+                  });
+                }}
+              >
+                Start
+              </IonButton>
+            </IonCol>
+            <IonCol class="ion-text-center">
+              <IonButton
+                color="warning"
+                expand="block"
+                disabled={this.state.battleIsRunning}
+                onClick={() => {
+                  this.setState(
+                    {
+                      isInBattle: false,
+                      opponent: "",
+                      battleIsRunning: false,
+                      battleResults: "",
+                      battleParams: [],
+                    },
+                    () => {
                       this.pullBattleYourStats();
                       this.pullBattleList();
-                    });
-                  }}
-                >
-                  Cancel
-                </IonButton>
-              </IonCol>
-            </IonRow>
-          </IonGrid>
-        </IonCardContent>
+                    }
+                  );
+                }}
+              >
+                Cancel
+              </IonButton>
+            </IonCol>
+          </IonRow>
+        </IonGrid>
+      </IonCardContent>
+    );
+  };
+
+  renderNoMoves = () => {
+    return (
+      <IonCard>
+        <IonCardContent>Sorry, no more moves.</IonCardContent>
       </IonCard>
     );
-    //});
-    this.setState({ meldItems: items });
   };
 
   render() {
@@ -335,8 +373,55 @@ class HuntContainer extends React.Component<props, state> {
         </IonHeader>
         <IonContent>
           {this.renderYourStats()}
-          <IonList>{this.state.meldItems}</IonList>
+          <IonList>
+            {this.state.battleParams.length > 0
+              ? this.renderItems()
+              : parseInt(this.state.yourStats.AvailablePlays) > 0
+              ? this.renderPlayerList()
+              : this.renderNoMoves()}
+          </IonList>
         </IonContent>
+        <IonAlert
+          isOpen={this.state.showWinnerAlert}
+          onDidDismiss={() => {
+            this.pullBattleYourStats();
+            this.pullBattleList();
+            this.setState({
+              showWinnerAlert: false,
+              battleResults: "",
+              battleParams: [],
+              battleIsRunning: false,
+            });
+            this.battleWinner = "";
+            this.battleLoser = "";
+            this.gBattleUser = {};
+            this.gBattleTarget = {};
+          }}
+          cssClass="my-custom-class"
+          header={"Winner"}
+          message={this.state.battleResults}
+          buttons={[
+            {
+              text: "Close",
+              role: "cancel",
+              cssClass: "secondary",
+              handler: (blah: any) => {
+                this.pullBattleYourStats();
+                this.pullBattleList();
+                this.setState({
+                  showWinnerAlert: false,
+                  battleResults: "",
+                  battleParams: [],
+                  battleIsRunning: false,
+                });
+                this.battleWinner = "";
+                this.battleLoser = "";
+                this.gBattleUser = {};
+                this.gBattleTarget = {};
+              },
+            },
+          ]}
+        />
       </IonPage>
     );
   }
@@ -449,7 +534,6 @@ class HuntContainer extends React.Component<props, state> {
   };
 
   battleEndGame = (params: any) => {
-    console.log(params);
     if (this.battleWinner == "") {
       if (this.gBattleUser.Life >= this.gBattleTarget.Life) {
         this.battleWinner = this.gBattleUser.ID;
@@ -475,7 +559,7 @@ class HuntContainer extends React.Component<props, state> {
           return resp.json();
         })
         .then((json) => {
-          this.playBattleResults(params);
+          this.playBattleResults(params, json);
         })
         .catch((err: any) => {
           console.log(err);
@@ -495,7 +579,7 @@ class HuntContainer extends React.Component<props, state> {
           return resp.json();
         })
         .then((json) => {
-          this.playBattleResults(params);
+          this.playBattleResults(params, json);
         })
         .catch((err: any) => {
           console.log(err);
@@ -503,19 +587,43 @@ class HuntContainer extends React.Component<props, state> {
     }
   };
 
-  playBattleResults(pParam: any) {
-    pParam.forEach((value: any, index: number) => {
-      let test = setTimeout(() => {
-        let txtResult = value.player + "hurt " + value.damage;
-        this.setState({ battleResults: txtResult }, () => {
+  playBattleResults = (pParam: any, result: any) => {
+    for (let index = 0; index < pParam.length; ) {
+      const value = pParam[index];
+      let txtResult = value.player + " hurt " + value.damage;
+      const test2 = { yourDamMsg: "", otherDamMsg: "" };
+      if (value.player === this.gBattleUser.ID) {
+        test2.yourDamMsg = txtResult;
+      } else {
+        test2.otherDamMsg = txtResult;
+      }
+      this.setState(
+        { yourDamMsg: test2.yourDamMsg, otherDamMsg: test2.otherDamMsg },
+        () => {
           if (index + 1 == pParam.length) {
+            let resultMsg = this.battleWinner + " is the winner!";
+            console.log(result[0]);
+            if (
+              result[0].Reward !== "" ||
+              typeof result[0].Reward !== "undefined"
+            ) {
+              resultMsg =
+                "<div>" +
+                this.battleWinner +
+                " is the winner!<br></br><img src='" +
+                result[0].Reward +
+                "' width='50'></img></div>";
+            }
             this.setState({
-              battleResults: this.battleWinner + " is the winner!",
+              battleResults: resultMsg,
+              showWinnerAlert: true,
             });
           }
-        });
-      }, 2000 * index);
-    });
+          index = index + 1;
+        }
+      );
+    }
+
     /*
     $.each(gArrResults, function (index, value) {
       var test = setTimeout(function() {
@@ -547,7 +655,7 @@ class HuntContainer extends React.Component<props, state> {
       },2000 * index);
     });
     */
-  }
+  };
 }
 
 export default withIonLifeCycle(HuntContainer);

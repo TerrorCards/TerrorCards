@@ -53,6 +53,7 @@ interface state {
   targetType: any;
   showCoinMessage: boolean;
   coinPurchaseMsg: any;
+  isInAppLoaded: boolean;
 }
 
 class StoreContainer extends React.Component<props, state> {
@@ -74,6 +75,7 @@ class StoreContainer extends React.Component<props, state> {
       targetType: null,
       showCoinMessage: false,
       coinPurchaseMsg: null,
+      isInAppLoaded: false,
     };
   }
 
@@ -89,12 +91,14 @@ class StoreContainer extends React.Component<props, state> {
   componentDidMount() {
     //used when in a tab nav
     this.pullPacks();
-    this.pullInApp();
+    //this.pullInApp();
   }
 
   ionViewWillEnter() {
     this.pullPacks();
+    //if (!this.state.isInAppLoaded) {
     this.pullInApp();
+    //}
   }
 
   ionViewWillLeave() {}
@@ -127,7 +131,6 @@ class StoreContainer extends React.Component<props, state> {
         return resp.json();
       })
       .then((json) => {
-        console.log(json);
         if (json.length > 0) {
           const items = json;
           const regArray: Array<any> = [];
@@ -135,9 +138,12 @@ class StoreContainer extends React.Component<props, state> {
             regArray.push(this.registerAppStoreProduct(item.ID));
           });
           Promise.all(regArray).then((resp) => {
-            this.setState({ allCoinList: InAppPurchase2.products }, () => {
-              //this.renderCoinsList();
-            });
+            this.setState(
+              { allCoinList: InAppPurchase2.products, isInAppLoaded: true },
+              () => {
+                //this.renderCoinsList();
+              }
+            );
           });
         }
       })
