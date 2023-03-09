@@ -97,8 +97,12 @@ class StoreContainer extends React.Component<props, state> {
   ionViewWillEnter() {
     this.pullPacks();
     //if (!this.state.isInAppLoaded) {
-    this.pullInApp();
+    //this.pullInApp();
     //}
+  }
+
+  componentWillMount() {
+    this.pullInApp();
   }
 
   ionViewWillLeave() {}

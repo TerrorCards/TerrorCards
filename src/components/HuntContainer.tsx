@@ -27,6 +27,8 @@ import {
   IonPopover,
   withIonLifeCycle,
   IonAlert,
+  IonSearchbar,
+  IonInput,
 } from "@ionic/react";
 import "./HuntContainer.css";
 import { settingsOutline, closeCircleOutline } from "ionicons/icons";
@@ -55,6 +57,7 @@ interface state {
   otherDamMsg: string;
   battleIsRunning: boolean;
   showWinnerAlert: boolean;
+  playerSearch: string;
 }
 
 class HuntContainer extends React.Component<props, state> {
@@ -79,6 +82,7 @@ class HuntContainer extends React.Component<props, state> {
       battleIsRunning: false,
       playerList: [],
       showWinnerAlert: false,
+      playerSearch: "",
     };
   }
 
@@ -152,7 +156,11 @@ class HuntContainer extends React.Component<props, state> {
   };
 
   pullBattleList = () => {
-    callServer("battlePlayerList", "", this.props.user.ID)
+    let options = {};
+    if (this.state.playerSearch !== "") {
+      options = { search: this.state.playerSearch };
+    }
+    callServer("battlePlayerList", options, this.props.user.ID)
       ?.then((resp) => {
         return resp.json();
       })
@@ -195,6 +203,18 @@ class HuntContainer extends React.Component<props, state> {
 
   renderPlayerList = () => {
     let items: Array<any> = [];
+    items.push(
+      <IonSearchbar
+        key="searchBar"
+        value={this.state.playerSearch}
+        onIonChange={(e: any) => {
+          this.setState({ playerSearch: e.detail.value }, () => {
+            this.pullBattleList();
+          });
+        }}
+        placeholder="Search Player"
+      ></IonSearchbar>
+    );
     this.state.playerList.forEach((p: any, i: any) => {
       items.push(
         <IonCard key={i}>
@@ -588,6 +608,7 @@ class HuntContainer extends React.Component<props, state> {
   };
 
   playBattleResults = (pParam: any, result: any) => {
+    let battleLog = "<div>Battle Log</div>";
     for (let index = 0; index < pParam.length; ) {
       const value = pParam[index];
       let txtResult = value.player + " hurt " + value.damage;
@@ -597,12 +618,13 @@ class HuntContainer extends React.Component<props, state> {
       } else {
         test2.otherDamMsg = txtResult;
       }
+      battleLog = battleLog + "<div>" + txtResult + "</div>";
       this.setState(
         { yourDamMsg: test2.yourDamMsg, otherDamMsg: test2.otherDamMsg },
         () => {
           if (index + 1 == pParam.length) {
             let resultMsg = this.battleWinner + " is the winner!";
-            console.log(result[0]);
+            //console.log(result[0]);
             if (
               result[0].Reward !== "" ||
               typeof result[0].Reward !== "undefined"
@@ -614,6 +636,8 @@ class HuntContainer extends React.Component<props, state> {
                 result[0].Reward +
                 "' width='50'></img></div>";
             }
+            resultMsg = resultMsg + battleLog;
+
             this.setState({
               battleResults: resultMsg,
               showWinnerAlert: true,
