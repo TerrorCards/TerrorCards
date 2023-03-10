@@ -350,7 +350,7 @@ class GalleryContainer extends React.Component<props, state> {
                   height: "100px",
                   objectFit: "contain",
                 }}
-                src={"https://ipfs.io/ipfs/" + imgSrc}
+                src={"https://atomichub-ipfs.com/ipfs/" + imgSrc}
               ></IonImg>
               {
                 <IonBadge class="message-badge-left">

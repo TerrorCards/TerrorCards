@@ -34,6 +34,7 @@ import {
   IonButtons,
   IonToolbar,
   IonTitle,
+  IonText,
   withIonLifeCycle,
 } from "@ionic/react";
 import { settingsOutline, aperture } from "ionicons/icons";
@@ -138,12 +139,15 @@ class ProfileContainer extends React.Component<props, state> {
             <IonGrid>
               <IonRow>
                 <IonCol>
-                  {j.Name} ({j.Rating})
+                  <IonText color="dark">
+                    {j.Name} ({j.Rating})
+                  </IonText>
                 </IonCol>
               </IonRow>
               <IonRow>
                 <IonCol>
-                  <IonIcon icon={aperture} color="dark" /> {j.Credit}
+                  <IonIcon icon={aperture} color="dark" />
+                  <IonText color="dark"> {j.Credit}</IonText>
                 </IonCol>
               </IonRow>
             </IonGrid>
