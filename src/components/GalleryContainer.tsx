@@ -495,7 +495,10 @@ class GalleryContainer extends React.Component<props, state> {
           />
         </IonPopover>
 
-        <IonModal isOpen={this.state.showDetails}>
+        <IonModal
+          isOpen={this.state.showDetails}
+          className={"modal-size-override"}
+        >
           <IonGrid>
             <IonRow>
               <IonCol>

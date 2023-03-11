@@ -413,7 +413,10 @@ class StoreContainer extends React.Component<props, state> {
 
         <IonList>{this.state.packItems}</IonList>
 
-        <IonModal isOpen={this.state.showCards}>
+        <IonModal
+          isOpen={this.state.showCards}
+          className={"modal-size-override"}
+        >
           <IonButton fill="clear"></IonButton>
           <IonContent>{this.state.cardsResult}</IonContent>
           <IonButton

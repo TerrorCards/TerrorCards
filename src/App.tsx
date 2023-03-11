@@ -49,7 +49,6 @@ import SignInContainer from "./components/SignInContainer";
 import HuntContainer from "./components/HuntContainer";
 import TradeSetup from "./components/TradeSetup";
 import ProfileManagerContainer from "./components/ProfileManagerContainer";
-import GalleryMenu from "./components/GalleryMenu";
 import { callServer } from "./components/ajaxcalls";
 
 /* Core CSS required for Ionic components to work properly */
@@ -442,7 +441,10 @@ class App extends React.Component<props, state> {
             </IonFabList>
           </IonFab>
 
-          <IonModal isOpen={this.state.showTradeSetupModel}>
+          <IonModal
+            isOpen={this.state.showTradeSetupModel}
+            className={"modal-size-override"}
+          >
             <TradeSetup
               otherUser={this.state.tradeUser}
               user={this.state.user}
@@ -450,7 +452,10 @@ class App extends React.Component<props, state> {
             />
           </IonModal>
 
-          <IonModal isOpen={this.state.showProfileManageModel}>
+          <IonModal
+            isOpen={this.state.showProfileManageModel}
+            className={"modal-size-override"}
+          >
             <ProfileManagerContainer
               user={this.state.user}
               closePanel={this.showProfileModal}
@@ -458,14 +463,20 @@ class App extends React.Component<props, state> {
             />
           </IonModal>
 
-          <IonModal isOpen={this.state.showFactorySetupModel}>
+          <IonModal
+            isOpen={this.state.showFactorySetupModel}
+            className={"modal-size-override"}
+          >
             <FactoryContainer
               user={this.state.user}
               closePanel={this.showFactoryModal}
             />
           </IonModal>
 
-          <IonModal isOpen={this.state.showHuntModel}>
+          <IonModal
+            isOpen={this.state.showHuntModel}
+            className={"modal-size-override"}
+          >
             <HuntContainer
               user={this.state.user}
               closePanel={this.showHuntModal}
