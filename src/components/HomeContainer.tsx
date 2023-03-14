@@ -51,11 +51,11 @@ import {
   bookmark,
   newspaper,
   chatbubble,
-  statsChart,
+  statsChartOutline,
   settings,
 } from "ionicons/icons";
 import "./HomeContainer.css";
-import ProfileContainer from "../components/ProfileContainer";
+import StatsContainer from "./StatsContainer";
 import NewsContainer from "./NewsContainer";
 import TradeSetup from "./TradeSetup";
 import { callServer } from "./ajaxcalls";
@@ -103,7 +103,7 @@ class HomeContainer extends React.Component<props, state> {
       showError: false,
       event: null,
       newBannerState: [],
-      viewState: "Post",
+      viewState: "Stats",
       showTradeSetupModel: false,
       tradePartner: "",
       txtMessage: "",
@@ -339,6 +339,10 @@ class HomeContainer extends React.Component<props, state> {
         this.setState({ viewState: "News" });
         break;
       }
+      case "Stats": {
+        this.setState({ viewState: "Stats" });
+        break;
+      }
       default:
         break;
     }
@@ -372,6 +376,19 @@ class HomeContainer extends React.Component<props, state> {
 
         <IonGrid>
           <IonRow>
+            <IonCol>
+              <IonButton
+                color={this.state.viewState === "Stats" ? "danger" : "dark"}
+                expand="full"
+                size="small"
+                onClick={() => {
+                  this.showPanel("Stats");
+                }}
+              >
+                <IonIcon slot="start" icon={statsChartOutline} color="light" />{" "}
+                Stats
+              </IonButton>
+            </IonCol>
             <IonCol>
               <IonButton
                 color={this.state.viewState === "Post" ? "danger" : "dark"}
@@ -432,8 +449,8 @@ class HomeContainer extends React.Component<props, state> {
             style={{
               height:
                 this.state.msg.length > 0
-                  ? this.viewHeight(1.5)
-                  : this.viewHeight(1.25),
+                  ? this.viewHeight(1.75)
+                  : this.viewHeight(1.5),
               overflowY: "auto",
               backgroundColor: "#333",
             }}
@@ -470,6 +487,17 @@ class HomeContainer extends React.Component<props, state> {
             }}
           >
             <NewsContainer name="news"></NewsContainer>
+          </div>
+        )}
+        {this.state.viewState === "Stats" && (
+          <div
+            style={{
+              height: this.viewHeight(1.1),
+              overflowY: "auto",
+              backgroundColor: "#333",
+            }}
+          >
+            <StatsContainer user={this.props.user}></StatsContainer>
           </div>
         )}
 

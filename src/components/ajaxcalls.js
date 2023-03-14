@@ -775,6 +775,7 @@ export function callServer(pTask, pData, pUserId) {
       formData.append("uUserId", pUserId);
       formData.append("uAction", "select");
       formData.append("uContent", jsonstr);
+      /*
       let test = fetch(serverpath + "friends.php", {
         method: "POST",
         headers: {
@@ -782,6 +783,16 @@ export function callServer(pTask, pData, pUserId) {
         },
         body: formData,
       });
+      */
+      let test = fetch(
+        serverpath +
+          "friends.php?" +
+          new URLSearchParams({
+            uUserId: pUserId,
+            uContent: jsonstr,
+            uAction: "select",
+          })
+      );
       return test;
       break;
     }
@@ -791,6 +802,7 @@ export function callServer(pTask, pData, pUserId) {
       formData.append("uUserId", pUserId);
       formData.append("uAction", "search");
       formData.append("uContent", jsonstr);
+      /*
       let test = fetch(serverpath + "friends.php", {
         method: "POST",
         headers: {
@@ -798,6 +810,16 @@ export function callServer(pTask, pData, pUserId) {
         },
         body: formData,
       });
+      */
+      let test = fetch(
+        serverpath +
+          "friends.php?" +
+          new URLSearchParams({
+            uUserId: pUserId,
+            uContent: jsonstr,
+            uAction: "search",
+          })
+      );
       return test;
       break;
     }
@@ -807,6 +829,7 @@ export function callServer(pTask, pData, pUserId) {
       formData.append("uUserId", pUserId);
       formData.append("uAction", "select");
       formData.append("uContent", jsonstr);
+      /*
       let test = fetch(serverpath + "playerBlock.php", {
         method: "POST",
         headers: {
@@ -814,6 +837,16 @@ export function callServer(pTask, pData, pUserId) {
         },
         body: formData,
       });
+      */
+      let test = fetch(
+        serverpath +
+          "playerBlock.php?" +
+          new URLSearchParams({
+            uUserId: pUserId,
+            uContent: jsonstr,
+            uAction: "seselectarch",
+          })
+      );
       return test;
       break;
     }
@@ -1172,6 +1205,82 @@ export function callServer(pTask, pData, pUserId) {
       return test;
       break;
     }
+    case "stat_getCardTemplates": {
+      var jsonstr = prepData(pData);
+      let formData = new FormData();
+      formData.append("uUserId", pUserId);
+      formData.append("uContent", jsonstr);
+      /*
+          let test = fetch(serverpath + "inAppList.php", {
+            method: 'POST',
+            headers: {
+              "Content-Type": 'multipart/form-data'
+            },
+            body: formData
+          });
+          */
+      let test = fetch(
+        serverpath +
+          "card_templates.php?" +
+          new URLSearchParams({
+            uUserId: pUserId,
+            uContent: jsonstr,
+          })
+      );
+      return test;
+      break;
+    }
+    case "state_getCardCounts": {
+      var jsonstr = prepData(pData);
+      let formData = new FormData();
+      formData.append("uUserId", pUserId);
+      formData.append("uContent", jsonstr);
+      /*
+          let test = fetch(serverpath + "inAppList.php", {
+            method: 'POST',
+            headers: {
+              "Content-Type": 'multipart/form-data'
+            },
+            body: formData
+          });
+          */
+      let test = fetch(
+        serverpath +
+          "stats_card_in_system.php?" +
+          new URLSearchParams({
+            uUserId: pUserId,
+            uContent: jsonstr,
+          })
+      );
+      return test;
+      break;
+    }
+    case "stat_latestCards": {
+      var jsonstr = prepData(pData);
+      let formData = new FormData();
+      formData.append("uUserId", pUserId);
+      formData.append("uContent", jsonstr);
+      /*
+          let test = fetch(serverpath + "inAppList.php", {
+            method: 'POST',
+            headers: {
+              "Content-Type": 'multipart/form-data'
+            },
+            body: formData
+          });
+          */
+      let test = fetch(
+        serverpath +
+          "stats_latest_cards.php?" +
+          new URLSearchParams({
+            uUserId: pUserId,
+            uContent: jsonstr,
+          })
+      );
+      return test;
+      break;
+    }
+
     default:
       break;
   }
