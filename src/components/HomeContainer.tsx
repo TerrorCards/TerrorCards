@@ -497,7 +497,10 @@ class HomeContainer extends React.Component<props, state> {
               backgroundColor: "#333",
             }}
           >
-            <StatsContainer user={this.props.user}></StatsContainer>
+            <StatsContainer
+              user={this.props.user}
+              tradeSetup={this.sendTradeCallback}
+            ></StatsContainer>
           </div>
         )}
 

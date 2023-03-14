@@ -43,6 +43,7 @@ import { callServer } from "./ajaxcalls";
 
 interface props {
   user: any;
+  tradeSetup: any;
 }
 
 interface state {
@@ -82,7 +83,6 @@ class StatsContainer extends React.Component<props, state> {
   }
 
   componentDidMount() {
-    //this.pullProfile();
     this.pullTemplates();
     this.pullCardCounts();
     this.pullLatestCards();
@@ -241,14 +241,29 @@ class StatsContainer extends React.Component<props, state> {
     justUser.forEach((card: any, i: number) => {
       userList.push(
         <IonCol key={i}>
-          <img src={card.CardImage} width="50"></img>
+          <img src={card.CardImage} width="80%"></img>
+          <br></br>
+          <IonText color="dark"> </IonText>
         </IonCol>
       );
     });
     justSystem.forEach((card: any, i: number) => {
       systemList.push(
-        <IonCol key={i}>
-          <img src={card.CardImage} width="50"></img>
+        <IonCol
+          key={i}
+          onClick={() => {
+            if (card.CardOwner !== this.props.user.ID) {
+              this.props.tradeSetup(card.CardOwner);
+            }
+          }}
+        >
+          <img src={card.CardImage} width="80%"></img>
+          <br></br>
+          <IonText color="dark">
+            {card.CardOwner.length > 8
+              ? card.CardOwner.substring(0, 6) + "..."
+              : card.CardOwner}
+          </IonText>
         </IonCol>
       );
     });
@@ -262,7 +277,9 @@ class StatsContainer extends React.Component<props, state> {
                   Latest Cards
                 </IonButton>{" "}
                 <IonButton
-                  fill="clear"
+                  color={
+                    this.state.lastCollectedFlag === "yours" ? "danger" : "dark"
+                  }
                   size="small"
                   onClick={() => {
                     this.setState({ lastCollectedFlag: "yours" });
@@ -271,7 +288,11 @@ class StatsContainer extends React.Component<props, state> {
                   Yours
                 </IonButton>{" "}
                 <IonButton
-                  fill="clear"
+                  color={
+                    this.state.lastCollectedFlag === "system"
+                      ? "danger"
+                      : "dark"
+                  }
                   size="small"
                   onClick={() => {
                     this.setState({ lastCollectedFlag: "system" });
