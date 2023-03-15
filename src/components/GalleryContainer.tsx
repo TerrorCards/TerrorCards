@@ -29,9 +29,15 @@ import {
   IonSlides,
   IonSlide,
   IonBadge,
+  IonText,
   IonPopover,
 } from "@ionic/react";
-import { copyOutline, flashOutline, settingsOutline } from "ionicons/icons";
+import {
+  copyOutline,
+  flashOutline,
+  settingsOutline,
+  constructOutline,
+} from "ionicons/icons";
 import "./GalleryContainer.css";
 import GalleryMenu from "./GalleryMenu";
 import { callServer } from "./ajaxcalls";
@@ -164,20 +170,13 @@ class GalleryContainer extends React.Component<props, state> {
   showCardetails = (card: any, front: boolean) => {
     //Recent trades: {result[0].recentTrades} <br></br>(past 48 hrs)
     this.pullCardDetails(this.props.user.ID, card).then((result: any) => {
+      console.log(result);
       let currImg = card.Image;
       if (!front) {
         currImg = card.Image.replace(/front/g, "back");
       }
       const details = (
         <IonGrid>
-          <IonRow>
-            <IonCol>Card Count: {result[0].count}</IonCol>
-            <IonCol>You Own: {card.Count !== null ? card.Count : 0}</IonCol>
-          </IonRow>
-          <IonRow>
-            <IonCol>Set: {card.SetName.replace(/_/g, " ")}</IonCol>
-            <IonCol>Sold Out: {result[0].cardSoldOut}</IonCol>
-          </IonRow>
           <IonRow>
             <IonCol>
               <IonImg
@@ -186,6 +185,26 @@ class GalleryContainer extends React.Component<props, state> {
                   this.showCardetails(card, !front);
                 }}
               ></IonImg>
+            </IonCol>
+          </IonRow>
+          <IonRow>
+            <IonCol>
+              <IonText color="dark">Card Count: {result[0].count}</IonText>
+            </IonCol>
+            <IonCol>
+              <IonText color="dark">
+                You Own: {card.Count !== null ? card.Count : 0}
+              </IonText>
+            </IonCol>
+          </IonRow>
+          <IonRow>
+            <IonCol>
+              <IonText color="dark">
+                Set: {card.SetName.replace(/_/g, " ")}
+              </IonText>
+            </IonCol>
+            <IonCol>
+              <IonText color="dark">Sold Out: {result[0].cardSoldOut}</IonText>
             </IonCol>
           </IonRow>
         </IonGrid>
@@ -205,7 +224,7 @@ class GalleryContainer extends React.Component<props, state> {
       this.props.user.ID
     )
       ?.then((resp) => {
-        console.log(resp);
+        //console.log(resp);
         return resp.json();
       })
       .then((json) => {
@@ -231,7 +250,7 @@ class GalleryContainer extends React.Component<props, state> {
   pullCardDetails = (user: string, card: any) => {
     return new Promise((resolve: any, reject: any) => {
       console.log(card);
-      callServer("cardDetail", { number: card.ID, year: card.Year }, user)
+      callServer("cardDetail", { number: card.Number, year: card.Year }, user)
         ?.then((resp) => {
           return resp.json();
         })
@@ -255,7 +274,7 @@ class GalleryContainer extends React.Component<props, state> {
     this.state.chunkedList.map((ch: any, i: number) => {
       const item: Array<any> = [];
       ch.map((c: any, z: number) => {
-        console.log(c);
+        //console.log(c);
         let imgSrc = c.Image;
         let message = c.Active == "0" ? "Sold Out" : "";
         if (this.props.galleryProps.layoutCount > 2) {

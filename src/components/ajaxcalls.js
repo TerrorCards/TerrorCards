@@ -1280,6 +1280,31 @@ export function callServer(pTask, pData, pUserId) {
       return test;
       break;
     }
+    case "stat_loginCheck": {
+      var jsonstr = prepData(pData);
+      let formData = new FormData();
+      formData.append("uUserId", pUserId);
+      formData.append("uContent", jsonstr);
+      /*
+          let test = fetch(serverpath + "inAppList.php", {
+            method: 'POST',
+            headers: {
+              "Content-Type": 'multipart/form-data'
+            },
+            body: formData
+          });
+          */
+      let test = fetch(
+        serverpath +
+          "stats_login_check.php?" +
+          new URLSearchParams({
+            uUserId: pUserId,
+            uContent: jsonstr,
+          })
+      );
+      return test;
+      break;
+    }
 
     default:
       break;

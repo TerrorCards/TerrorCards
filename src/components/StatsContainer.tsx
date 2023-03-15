@@ -54,6 +54,7 @@ interface state {
   lastCollected: Array<any>;
   lastCollectedFlag: string;
   daysToDailyBoost: number;
+  pandoraExpires: any;
 }
 
 class StatsContainer extends React.Component<props, state> {
@@ -79,10 +80,12 @@ class StatsContainer extends React.Component<props, state> {
       lastCollected: [],
       lastCollectedFlag: "yours",
       daysToDailyBoost: 0,
+      pandoraExpires: null,
     };
   }
 
   componentDidMount() {
+    this.pullLoginCheck();
     this.pullTemplates();
     this.pullCardCounts();
     this.pullLatestCards();
@@ -114,6 +117,30 @@ class StatsContainer extends React.Component<props, state> {
   };
 
   //BEGIN BANNER CODE
+  pullLoginCheck() {
+    callServer("stat_loginCheck", "", this.props.user.ID)
+      ?.then((resp) => {
+        console.log(resp);
+        return resp.json();
+      })
+      .then((json) => {
+        if (json) {
+          const dayToBoost = 7 - parseInt(json.DailyStreak);
+          let pandoraEnds = null;
+          if (json.PandoraExpires !== null) {
+            pandoraEnds = json.PandoraExpires;
+          }
+          this.setState({
+            daysToDailyBoost: dayToBoost,
+            pandoraExpires: pandoraEnds,
+          });
+        }
+      })
+      .catch((err: any) => {
+        console.log(err);
+      });
+  }
+
   pullCardCounts() {
     callServer("state_getCardCounts", "", this.props.user.ID)
       ?.then((resp) => {
@@ -311,30 +338,38 @@ class StatsContainer extends React.Component<props, state> {
     );
   }
 
-  renderTradeStats() {
+  renderBoostCheck() {
     return (
       <IonCard>
-        <IonCardContent>
-          <IonItem>
-            <IonBadge slot="end" color="warning">
-              11
-            </IonBadge>
-            <IonLabel>Pending</IonLabel>
-          </IonItem>
-          <IonItem>
-            <IonBadge slot="end" color="success">
-              15
-            </IonBadge>
-            <IonLabel>Accepted</IonLabel>
-          </IonItem>
-          <IonItem>
-            <IonBadge slot="end" color="danger">
-              {" "}
-              8
-            </IonBadge>
-            <IonLabel>Cancelled</IonLabel>
-          </IonItem>
-        </IonCardContent>
+        <IonCardHeader>
+          <IonCardTitle class="ion-text-center">
+            <IonText color="dark">
+              {this.state.daysToDailyBoost}
+              <div style={{ height: 5 }}></div>
+            </IonText>
+          </IonCardTitle>
+          <IonCardSubtitle class="ion-text-center">
+            <IonText color="dark">Days Till Credit Boost</IonText>
+          </IonCardSubtitle>
+        </IonCardHeader>
+
+        <IonCardContent></IonCardContent>
+      </IonCard>
+    );
+  }
+  renderPandoraAccess() {
+    return (
+      <IonCard>
+        <IonCardHeader>
+          <IonCardTitle class="ion-text-center">
+            <IonText color="dark">{this.state.pandoraExpires}</IonText>
+          </IonCardTitle>
+          <IonCardSubtitle class="ion-text-center">
+            <IonText color="dark">Pandora Expires</IonText>
+          </IonCardSubtitle>
+        </IonCardHeader>
+
+        <IonCardContent></IonCardContent>
       </IonCard>
     );
   }
@@ -354,10 +389,15 @@ class StatsContainer extends React.Component<props, state> {
             <IonCol>{this.renderSystemLatestCards()}</IonCol>
           </IonRow>
           <IonRow>
-            <IonCol>Trades (last 48 hours system wide)</IonCol>
+            <IonCol>Information</IonCol>
           </IonRow>
           <IonRow>
-            <IonCol>{this.renderTradeStats()}</IonCol>
+            <IonCol>{this.renderBoostCheck()}</IonCol>
+            <IonCol>
+              {this.state.pandoraExpires !== null
+                ? this.renderPandoraAccess()
+                : ""}
+            </IonCol>
           </IonRow>
         </IonGrid>
       </IonContent>
