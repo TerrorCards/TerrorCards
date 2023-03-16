@@ -202,7 +202,7 @@ class HomeContainer extends React.Component<props, state> {
   };
 
   addFriend = (user: any) => {
-    callServer("addFriend", user, this.props.user.ID)
+    callServer("addFriend", { friend: user }, this.props.user.ID)
       ?.then((resp) => {
         return resp.json();
       })
@@ -291,11 +291,6 @@ class HomeContainer extends React.Component<props, state> {
               }}
             >
               Trade
-            </IonItemOption>
-          </IonItemOptions>
-          <IonItemOptions side="end">
-            <IonItemOption color="danger" onClick={() => {}}>
-              Delete
             </IonItemOption>
           </IonItemOptions>
         </IonItemSliding>

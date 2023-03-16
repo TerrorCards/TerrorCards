@@ -844,7 +844,7 @@ export function callServer(pTask, pData, pUserId) {
           new URLSearchParams({
             uUserId: pUserId,
             uContent: jsonstr,
-            uAction: "seselectarch",
+            uAction: "select",
           })
       );
       return test;
@@ -883,6 +883,7 @@ export function callServer(pTask, pData, pUserId) {
       formData.append("uUserId", pUserId);
       formData.append("uAction", "delete");
       formData.append("uContent", jsonstr);
+      /*
       let test = fetch(serverpath + "friends.php", {
         method: "POST",
         headers: {
@@ -890,6 +891,16 @@ export function callServer(pTask, pData, pUserId) {
         },
         body: formData,
       });
+      */
+      let test = fetch(
+        serverpath +
+          "friends.php?" +
+          new URLSearchParams({
+            uUserId: pUserId,
+            uAction: "delete",
+            uContent: jsonstr,
+          })
+      );
       return test;
       break;
     }
@@ -926,6 +937,7 @@ export function callServer(pTask, pData, pUserId) {
       formData.append("uUserId", pUserId);
       formData.append("uAction", "delete");
       formData.append("uContent", jsonstr);
+      /*
       let test = fetch(serverpath + "playerBlock.php", {
         method: "POST",
         headers: {
@@ -933,6 +945,16 @@ export function callServer(pTask, pData, pUserId) {
         },
         body: formData,
       });
+      */
+      let test = fetch(
+        serverpath +
+          "playerBlock.php?" +
+          new URLSearchParams({
+            uUserId: pUserId,
+            uContent: jsonstr,
+            uAction: "delete",
+          })
+      );
       return test;
       break;
     }

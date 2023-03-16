@@ -327,6 +327,7 @@ class App extends React.Component<props, state> {
                   user={this.state.user}
                   profileCallback={this.fnUpdateUserInfo}
                   lastRefreshed={this.state.refreshTime}
+                  tradeCallback={this.showTradeModal}
                 />
                 <HomeContainer
                   name="home"
@@ -339,6 +340,7 @@ class App extends React.Component<props, state> {
                   user={this.state.user}
                   profileCallback={this.fnUpdateUserInfo}
                   lastRefreshed={this.state.refreshTime}
+                  tradeCallback={this.showTradeModal}
                 />
                 <GalleryContainer
                   galleryProps={this.state.galleryDigitalSettings}
@@ -353,6 +355,7 @@ class App extends React.Component<props, state> {
                   user={this.state.user}
                   profileCallback={this.fnUpdateUserInfo}
                   lastRefreshed={this.state.refreshTime}
+                  tradeCallback={this.showTradeModal}
                 />
                 <StoreContainer
                   storeProps={""}
@@ -365,6 +368,7 @@ class App extends React.Component<props, state> {
                   user={this.state.user}
                   profileCallback={this.fnUpdateUserInfo}
                   lastRefreshed={this.state.refreshTime}
+                  tradeCallback={this.showTradeModal}
                 />
                 <TradeContainer user={this.state.user} />
               </Route>
@@ -373,6 +377,7 @@ class App extends React.Component<props, state> {
                   user={this.state.user}
                   profileCallback={this.fnUpdateUserInfo}
                   lastRefreshed={this.state.refreshTime}
+                  tradeCallback={this.showTradeModal}
                 />
                 <HomeContainer
                   name="home"

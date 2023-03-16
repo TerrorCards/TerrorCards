@@ -392,8 +392,8 @@ class StatsContainer extends React.Component<props, state> {
             <IonCol>Information</IonCol>
           </IonRow>
           <IonRow>
-            <IonCol>{this.renderBoostCheck()}</IonCol>
-            <IonCol>
+            <IonCol color="dark">{this.renderBoostCheck()}</IonCol>
+            <IonCol color="dark">
               {this.state.pandoraExpires !== null
                 ? this.renderPandoraAccess()
                 : ""}

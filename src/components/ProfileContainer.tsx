@@ -37,13 +37,20 @@ import {
   IonText,
   withIonLifeCycle,
 } from "@ionic/react";
-import { settingsOutline, aperture, settings } from "ionicons/icons";
+import {
+  settingsOutline,
+  aperture,
+  settings,
+  repeat,
+  closeCircle,
+} from "ionicons/icons";
 import { callServer } from "./ajaxcalls";
 
 interface props {
   user: any;
   profileCallback: any;
   lastRefreshed: any;
+  tradeCallback: any;
 }
 
 interface state {
@@ -70,7 +77,7 @@ class ProfileContainer extends React.Component<props, state> {
       speed: 400,
       friendsList: [],
       blockList: [],
-      showFriendsList: false,
+      showFriendsList: true,
       showBlockList: false,
       showPopover: false,
       event: null,
@@ -137,7 +144,7 @@ class ProfileContainer extends React.Component<props, state> {
         return resp.json();
       })
       .then((json) => {
-        //console.log(json);
+        console.log(json);
         if (json) {
           this.setState({ friendsList: json });
         }
@@ -162,6 +169,39 @@ class ProfileContainer extends React.Component<props, state> {
         console.log(err);
       });
   }
+
+  removeUser(user: string, type: string) {
+    let request = "";
+    let params = {};
+    if (type === "friend") {
+      request = "deleteFriend";
+      params = { friend: user };
+    } else {
+      request = "removeBlockPlayer";
+      params = { block: user };
+    }
+    callServer(request, params, this.props.user.ID)
+      ?.then((resp) => {
+        return resp.json();
+      })
+      .then((json) => {
+        //console.log(json);
+        if (json) {
+          if (type === "friend") {
+            this.pullFriendsList();
+          } else {
+            this.pullBlockList();
+          }
+        }
+      })
+      .catch((err: any) => {
+        console.log(err);
+      });
+  }
+
+  sendTradeCallback = (tradePartner: any) => {
+    this.props.tradeCallback(tradePartner);
+  };
 
   renderProfileItem(j: any) {
     return (
@@ -200,8 +240,9 @@ class ProfileContainer extends React.Component<props, state> {
             <IonIcon
               icon={settings}
               color="dark"
-              onClick={() => {
-                this.setState({ showPopover: true });
+              onClick={(e: any) => {
+                e.persist();
+                this.setState({ showPopover: true, event: e });
               }}
             />
           </IonCol>
@@ -226,26 +267,50 @@ class ProfileContainer extends React.Component<props, state> {
             })
           }
         >
-          <IonList>
-            <IonItem>
-              <IonLabel
-                onClick={() => {
-                  this.setState({ showFriendsList: true });
-                }}
-              >
-                Friends List
-              </IonLabel>
-            </IonItem>
-            <IonItem>
-              <IonLabel
-                onClick={() => {
-                  this.setState({ showBlockList: true });
-                }}
-              >
-                Block List
-              </IonLabel>
-            </IonItem>
-          </IonList>
+          <IonContent>
+            <IonGrid>
+              <IonRow>
+                <IonCol>
+                  <IonLabel
+                    onClick={() => {
+                      this.pullFriendsList();
+                      this.setState({
+                        showFriendsList: true,
+                        showBlockList: false,
+                      });
+                    }}
+                  >
+                    Friends List
+                  </IonLabel>
+                </IonCol>
+              </IonRow>
+              <IonRow>
+                <IonCol>
+                  {this.state.showFriendsList ? this.renderFriendsList() : ""}
+                </IonCol>
+              </IonRow>
+              <IonRow>
+                <IonCol>
+                  <IonLabel
+                    onClick={() => {
+                      this.pullBlockList();
+                      this.setState({
+                        showBlockList: true,
+                        showFriendsList: false,
+                      });
+                    }}
+                  >
+                    Block List
+                  </IonLabel>
+                </IonCol>
+              </IonRow>
+              <IonRow>
+                <IonCol>
+                  {this.state.showBlockList ? this.renderBlockList() : ""}
+                </IonCol>
+              </IonRow>
+            </IonGrid>
+          </IonContent>
         </IonPopover>
       </React.Fragment>
     );
@@ -256,10 +321,49 @@ class ProfileContainer extends React.Component<props, state> {
     this.state.friendsList.forEach((friend: any) => {
       fList.push(
         <IonItem>
+          <IonButton
+            fill="clear"
+            onClick={() => {
+              this.sendTradeCallback(friend.Friend);
+            }}
+          >
+            <IonIcon slot="icon-only" icon={repeat} color="dark" />
+          </IonButton>
           <IonAvatar>
             <IonImg src={friend.Image} />
           </IonAvatar>
-          <IonLabel>{friend.Friend}</IonLabel>
+          <IonLabel> {friend.Friend}</IonLabel>
+          <IonButton
+            fill="clear"
+            onClick={() => {
+              this.removeUser(friend.Friend, "friend");
+            }}
+          >
+            <IonIcon slot="icon-only" icon={closeCircle} color="dark" />
+          </IonButton>
+        </IonItem>
+      );
+    });
+    return fList;
+  }
+
+  renderBlockList() {
+    const fList: any = [];
+    this.state.blockList.forEach((block: any) => {
+      fList.push(
+        <IonItem>
+          <IonAvatar>
+            <IonImg src={block.Image} />
+          </IonAvatar>
+          <IonLabel> {block.Block}</IonLabel>
+          <IonButton
+            fill="clear"
+            onClick={() => {
+              this.removeUser(block.Block, "block");
+            }}
+          >
+            <IonIcon slot="icon-only" icon={closeCircle} color="dark" />
+          </IonButton>
         </IonItem>
       );
     });
