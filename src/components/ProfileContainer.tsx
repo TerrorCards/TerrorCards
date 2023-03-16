@@ -43,6 +43,7 @@ import {
   settings,
   repeat,
   closeCircle,
+  appsOutline,
 } from "ionicons/icons";
 import { callServer } from "./ajaxcalls";
 
@@ -238,7 +239,7 @@ class ProfileContainer extends React.Component<props, state> {
           </IonCol>
           <IonCol size="auto">
             <IonIcon
-              icon={settings}
+              icon={appsOutline}
               color="dark"
               onClick={(e: any) => {
                 e.persist();

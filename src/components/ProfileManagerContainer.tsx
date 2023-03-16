@@ -17,6 +17,7 @@ interface props {
     profileCallback: any;
     closePanel: any;
     signOut:any;
+    deviceInfo:any;
 }
 
 interface state {
@@ -31,10 +32,13 @@ interface state {
     currDescription: string;
     currContactUs: string;
     currUserName: string;
+    currPromo: string;
     requestType: string;
     status: boolean;
     confirmDeleteAlert: boolean;
     needToRegister: boolean;
+    showPromoAlert: boolean;
+    promoMsg: string;
 };
 
 class ProfileManagerContainer extends React.Component<props, state> {
@@ -53,10 +57,13 @@ class ProfileManagerContainer extends React.Component<props, state> {
             currDescription: "",
             currContactUs: "",
             currUserName:"",
+            currPromo:"",
             requestType: "",
             status: false,
             confirmDeleteAlert: false,
-            needToRegister: false
+            needToRegister: false,
+            showPromoAlert: false,
+            promoMsg: ""
         }
     }
 
@@ -259,7 +266,7 @@ class ProfileManagerContainer extends React.Component<props, state> {
     }
 
     registerAccount() {
-        callServer("registerUser", {user: this.state.currUserName, device:"999888777", email:this.state.currEmail, password:this.state.currPassword}, this.props.user.ID)?.then((resp) => { return resp.json(); })
+        callServer("registerUser", {user: this.state.currUserName, device:this.props.deviceInfo.uuid, email:this.state.currEmail, password:this.state.currPassword}, this.props.user.ID)?.then((resp) => { return resp.json(); })
         .then((json) => {
             if (json) {
                 if(json.Response === "Fail") {
@@ -282,8 +289,34 @@ class ProfileManagerContainer extends React.Component<props, state> {
         }); 
     }
 
+    checkPromo() {
+        callServer("processPromo", {promo: this.state.currPromo}, this.props.user.ID)?.then((resp) => { return resp.json(); })
+        .then((json) => {
+            if (json) {
+                this.setState({showPromoAlert:true, promoMsg: json[0].Message})
+            }
+        })
+        .catch((err: any) => {
+            console.log(err);
+        }); 
+    }
+
     sectionContent() {
-        return (<IonCol></IonCol>)
+        return (<IonCol>
+            <IonLabel>Promo Code</IonLabel>
+            <IonItem fill="solid">
+                        <IonInput value={this.state.currPromo} placeholder="Promo code" 
+                        onIonChange={(e) => {
+                            this.setState({currPromo: e.detail.value!})
+                        }}
+                        onIonBlur={(e) => {
+                                if(this.state.currPromo !== "") {
+                                    this.checkPromo()
+                                }                                   
+                        }}
+                        ></IonInput> 
+            </IonItem>           
+        </IonCol>)
     }
 
     render() {
@@ -308,7 +341,7 @@ class ProfileManagerContainer extends React.Component<props, state> {
                 <IonContent>
                 <IonGrid id="list">
                 <IonRow>
-                    <IonCol key={"email"}>
+                    <IonCol key={"email"} >
                         <IonLabel position="stacked">User name
                         {(this.state.requestType === "userName")?
                                 (this.state.status)?
@@ -317,10 +350,12 @@ class ProfileManagerContainer extends React.Component<props, state> {
                             :null 
                         }                             
                         </IonLabel>
-                        <IonInput value={this.state.currUserName} placeholder="Your user name" onIonChange={(e) => {
+                        <IonItem fill="solid">
+                        <IonInput color="dark" value={this.state.currUserName} placeholder="Your user name" onIonChange={(e) => {
                             this.setState({currUserName: e.detail.value!})
                         }}
                         ></IonInput>
+                        </IonItem>
                     </IonCol>
                 </IonRow>                        
                 <IonRow>
@@ -333,10 +368,12 @@ class ProfileManagerContainer extends React.Component<props, state> {
                             :null 
                         }                             
                         </IonLabel>
+                        <IonItem fill="solid">
                         <IonInput value={this.state.currEmail} placeholder="Your contact email" onIonChange={(e) => {
                             this.setState({currEmail: e.detail.value!})
                         }}
                         ></IonInput>
+                        </IonItem>
                     </IonCol>
                 </IonRow>
                 <IonRow>
@@ -349,9 +386,11 @@ class ProfileManagerContainer extends React.Component<props, state> {
                             :null 
                         } 
                         </IonLabel>
-                        <IonInput type="password" value={this.state.currPassword} placeholder="Enter a name password"  onIonChange={(e) => {
+                        <IonItem fill="solid">
+                        <IonInput type="password" value={this.state.currPassword} placeholder="Enter a password"  onIonChange={(e) => {
                             this.setState({currPassword: e.detail.value!})
                         }}></IonInput>
+                        </IonItem>
                     </IonCol>
                 </IonRow>  
                 <IonRow>
@@ -382,6 +421,7 @@ class ProfileManagerContainer extends React.Component<props, state> {
                                 :null 
                             }                                  
                             </IonLabel>
+                            <IonItem fill="solid">
                             <IonTextarea value={this.state.currDescription} placeholder="About yourself" onIonChange={(e) => {
                                 this.setState({currDescription: e.detail.value!})
                             }}
@@ -390,6 +430,7 @@ class ProfileManagerContainer extends React.Component<props, state> {
                                     this.setDescription()
                                 }                                    
                             }}></IonTextarea>
+                            </IonItem>
                         </IonCol>                            
                     </IonRow>
                     <IonRow>
@@ -402,18 +443,18 @@ class ProfileManagerContainer extends React.Component<props, state> {
                                 :null 
                             }                                
                             </IonLabel>
-                            <IonInput value={this.state.currEmail} placeholder="Your contact email" onIonChange={(e) => {
-                                this.setState({currEmail: e.detail.value!})
-                            }}
-                            onIonBlur={(e) => {
-                                if(this.state.currEmail !== this.state.info.Email) {
-                                    this.setEmail()
-                                }
-                            }}
-                            ></IonInput>
+                            <IonItem fill="solid">
+                                <IonInput size={50} value={this.state.currEmail} placeholder="Your contact email" onIonChange={(e) => {
+                                    this.setState({currEmail: e.detail.value!})
+                                }}
+                                onIonBlur={(e) => {
+                                    if(this.state.currEmail !== this.state.info.Email) {
+                                        this.setEmail()
+                                    }
+                                }}
+                                ></IonInput>
+                            </IonItem>
                         </IonCol>
-                    </IonRow>
-                    <IonRow>
                         <IonCol key={"password"}>
                             <IonLabel position="stacked">Password
                             {(this.state.requestType === "password")?
@@ -423,7 +464,8 @@ class ProfileManagerContainer extends React.Component<props, state> {
                                 :null 
                             }                                    
                             </IonLabel>
-                            <IonInput type="password" value={this.state.currPassword} placeholder="Enter a name password"  onIonChange={(e) => {
+                            <IonItem fill="solid">
+                            <IonInput type="password" value={this.state.currPassword} placeholder="Enter a new password"  onIonChange={(e) => {
                                 this.setState({currPassword: e.detail.value!})
                             }}
                             onIonBlur={(e) => {
@@ -431,7 +473,8 @@ class ProfileManagerContainer extends React.Component<props, state> {
                                     this.setPassword()
                                 }                                    
                             }}></IonInput>
-                        </IonCol>
+                            </IonItem>
+                        </IonCol>                        
                     </IonRow>  
                     <IonRow>
                         <IonCol key={"wallet"}>
@@ -443,6 +486,7 @@ class ProfileManagerContainer extends React.Component<props, state> {
                                 :null 
                             }                                 
                             </IonLabel>
+                            <IonItem fill="solid">
                             <IonInput type="text" value={this.state.currWallet} placeholder="Enter your wallet"  onIonChange={(e) => {
                                 this.setState({currWallet: e.detail.value!})
                             }}
@@ -451,8 +495,13 @@ class ProfileManagerContainer extends React.Component<props, state> {
                                     this.setWallet()
                                 }                                    
                             }}></IonInput>
+                            </IonItem>
                         </IonCol>
-                    </IonRow>  
+                        {this.sectionContent()}
+                    </IonRow> 
+                    <IonRow>
+                        <IonCol><br></br><br></br></IonCol>
+                    </IonRow> 
                     <IonRow>
                         <IonCol key={"ContactUs"}>
                             <IonLabel position="stacked">Contact Us
@@ -463,6 +512,7 @@ class ProfileManagerContainer extends React.Component<props, state> {
                                 :null 
                             }                                  
                             </IonLabel>
+                            <IonItem fill="solid">
                             <IonTextarea value={this.state.currContactUs} placeholder="Your message" onIonChange={(e) => {
                                 this.setState({currContactUs: e.detail.value!})
                             }}
@@ -472,13 +522,11 @@ class ProfileManagerContainer extends React.Component<props, state> {
                                 }                                    
                             }}
                             ></IonTextarea>
+                            </IonItem>
                         </IonCol>                                                       
                     </IonRow>                                            
                 </IonGrid>
                     <IonGrid id="list">
-                    <IonRow>
-                        {this.sectionContent()}
-                    </IonRow>
                     <IonRow>
                         <IonCol key={"custom"}>{''}</IonCol>
                     </IonRow>                                                                        
@@ -495,7 +543,7 @@ class ProfileManagerContainer extends React.Component<props, state> {
                                 message={'By removing your account, you will lose all your cards'}
                                 buttons={[
                                     {
-                                      text: 'Cancel',
+                                      text: 'No',
                                       role: 'cancel',
                                       cssClass: 'secondary',
                                       handler: blah => {
@@ -503,7 +551,7 @@ class ProfileManagerContainer extends React.Component<props, state> {
                                       }
                                     },
                                     {
-                                      text: 'Okay',
+                                      text: 'Yes',
                                       handler: () => {
                                         this.requestDelete()
                                       }
@@ -515,6 +563,26 @@ class ProfileManagerContainer extends React.Component<props, state> {
                 </IonGrid>
                 </IonContent>               
                 }
+
+         <IonAlert
+          isOpen={this.state.showPromoAlert}
+          onDidDismiss={() => {
+              this.setState({showPromoAlert:false, promoMsg: ""});
+          }}
+          cssClass="my-custom-class"
+          header={"Promo"}
+          message={this.state.promoMsg}
+          buttons={[
+            {
+              text: "Ok",
+              role: "cancel",
+              cssClass: "secondary",
+              handler: (blah: any) => {
+                this.setState({showPromoAlert:false, promoMsg: ""});
+              },
+            }
+          ]}
+        />
             </IonPage>
         );
     }

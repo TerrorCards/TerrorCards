@@ -1227,6 +1227,31 @@ export function callServer(pTask, pData, pUserId) {
       return test;
       break;
     }
+    case "processPromo": {
+      var jsonstr = prepData(pData);
+      let formData = new FormData();
+      formData.append("uUserId", pUserId);
+      formData.append("uContent", jsonstr);
+      /*
+          let test = fetch(serverpath + "inAppList.php", {
+            method: 'POST',
+            headers: {
+              "Content-Type": 'multipart/form-data'
+            },
+            body: formData
+          });
+          */
+      let test = fetch(
+        serverpath +
+          "promoCode.php?" +
+          new URLSearchParams({
+            uUserId: pUserId,
+            uContent: jsonstr,
+          })
+      );
+      return test;
+      break;
+    }
     case "stat_getCardTemplates": {
       var jsonstr = prepData(pData);
       let formData = new FormData();
