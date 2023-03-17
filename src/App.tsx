@@ -51,8 +51,6 @@ import TradeSetup from "./components/TradeSetup";
 import ProfileManagerContainer from "./components/ProfileManagerContainer";
 import { callServer } from "./components/ajaxcalls";
 
-import { Device } from "@capacitor/device";
-
 /* Core CSS required for Ionic components to work properly */
 import "@ionic/react/css/core.css";
 
@@ -141,18 +139,10 @@ class App extends React.Component<props, state> {
     };
   }
 
-  deviceInfo: any = null;
   tradesExist = false;
 
   componentDidMount() {
     console.log("componet did mount event fired");
-    Device.getInfo().then((info: any) => {
-      this.deviceInfo = info;
-      Device.getId().then((id: any) => {
-        this.deviceInfo.uuid = id.uuid;
-        //console.log(this.deviceInfo);
-      });
-    });
     this.getUserStorage();
   }
 
@@ -164,7 +154,7 @@ class App extends React.Component<props, state> {
       })
       .then((json) => {
         if (json) {
-          //console.log(json);
+          console.log(json);
           if (json == "Yes") {
             this.tradesExist = true;
             //this.setState({ hasTrades: true });
@@ -475,7 +465,6 @@ class App extends React.Component<props, state> {
               user={this.state.user}
               closePanel={this.showProfileModal}
               signOut={this.removeUserFromStore}
-              deviceInfo={this.deviceInfo}
             />
           </IonModal>
 

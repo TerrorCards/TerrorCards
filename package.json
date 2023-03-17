@@ -1,14 +1,12 @@
 {
   "name": "TerrorCards",
-  "version": "2.0.0",
+  "version": "0.0.1",
   "private": true,
   "dependencies": {
-    "@awesome-cordova-plugins/core": "^6.3.0",
-    "@awesome-cordova-plugins/in-app-purchase-2": "^6.3.0",
-    "@capacitor/android": "^4.0.0",
-    "@capacitor/core": "^4.0.0",
-    "@capacitor/device": "^4.1.0",
-    "@capacitor/ios": "^4.0.0",
+    "@awesome-cordova-plugins/in-app-purchase-2": "^5.46.0",
+    "@capacitor/android": "^2.4.6",
+    "@capacitor/core": "^2.4.6",
+    "@capacitor/ios": "^2.4.6",
     "@ionic-native/device": "^5.36.0",
     "@ionic/react": "^6.5.0",
     "@ionic/react-router": "^6.5.0",
@@ -22,7 +20,8 @@
     "@types/react-dom": "^16.9.10",
     "@types/react-router": "^5.1.11",
     "@types/react-router-dom": "^5.1.7",
-    "cordova-plugin-purchase": "^13.3.5",
+    "cordova-plugin-device": "^2.0.3",
+    "cordova-plugin-purchase": "^11.0.0",
     "ionicons": "^5.4.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
@@ -69,7 +68,7 @@
     ]
   },
   "devDependencies": {
-    "@capacitor/cli": "^4.0.0"
+    "@capacitor/cli": "^2.4.6"
   },
   "description": "An Ionic project"
 }

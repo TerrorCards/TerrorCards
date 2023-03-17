@@ -17,7 +17,6 @@ interface props {
     profileCallback: any;
     closePanel: any;
     signOut:any;
-    deviceInfo:any;
 }
 
 interface state {
@@ -266,7 +265,7 @@ class ProfileManagerContainer extends React.Component<props, state> {
     }
 
     registerAccount() {
-        callServer("registerUser", {user: this.state.currUserName, device:this.props.deviceInfo.uuid, email:this.state.currEmail, password:this.state.currPassword}, this.props.user.ID)?.then((resp) => { return resp.json(); })
+        callServer("registerUser", {user: this.state.currUserName, device:"999888777", email:this.state.currEmail, password:this.state.currPassword}, this.props.user.ID)?.then((resp) => { return resp.json(); })
         .then((json) => {
             if (json) {
                 if(json.Response === "Fail") {
