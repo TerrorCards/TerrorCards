@@ -12,6 +12,8 @@ import {
 import { checkmark, close, closeCircleOutline } from 'ionicons/icons';
 import { callServer } from './ajaxcalls';
 
+import { Camera, CameraOptions } from '@awesome-cordova-plugins/camera';
+
 interface props {
     user: any;
     profileCallback: any;
@@ -66,6 +68,14 @@ class ProfileManagerContainer extends React.Component<props, state> {
             promoMsg: ""
         }
     }
+
+    camera = Camera;
+    options: CameraOptions = {
+        quality: 75,
+        destinationType: this.camera.DestinationType.DATA_URL,
+        encodingType: this.camera.EncodingType.JPEG,
+        mediaType: this.camera.MediaType.PICTURE
+      }
 
     componentDidMount() {
         this.pullProfile();
@@ -319,6 +329,17 @@ class ProfileManagerContainer extends React.Component<props, state> {
         </IonCol>)
     }
 
+    callCamera() {
+        this.camera.getPicture(this.options).then((imageData) => {
+            // imageData is either a base64 encoded string or a file URI
+            // If it's base64 (DATA_URL):
+            let base64Image = 'data:image/jpeg;base64,' + imageData;
+            this.setState({currEmail: base64Image});
+           }, (err) => {
+            // Handle error
+           });        
+    }
+
     render() {
         return (
             <IonPage>
@@ -410,7 +431,9 @@ class ProfileManagerContainer extends React.Component<props, state> {
                     <IonRow>
                         <IonCol key={"avatar"}>
                             <IonLabel position="stacked">Tap on image to update</IonLabel>
-                            <IonImg style={{ width: "100px", height: "100px" }} src={this.state.info.Image}></IonImg>
+                                <IonImg style={{ width: "100px", height: "100px" }} src={this.state.info.Image}  onClick={() => {
+                                this.callCamera()                                
+                            }}></IonImg>
                         </IonCol>
                         <IonCol key={"bio"}>
                             <IonLabel position="stacked">Small bio for others to see

@@ -96,9 +96,9 @@ const store = new Storage();
 store.create();
 let menuContent: any = "";
 
-setupIonicReact({
-  mode: "ios",
-});
+//setupIonicReact({
+//  mode: "ios",
+//});
 
 class App extends React.Component<props, state> {
   constructor(props: any) {
@@ -151,7 +151,22 @@ class App extends React.Component<props, state> {
     console.log("componet did mount event fired");
     this.deviceInfo.uuid = Device.uuid;
     this.deviceInfo.platform = Device.platform;
+    if (this.deviceInfo.platform === "ios") {
+      setupIonicReact({ mode: "ios" });
+    } else {
+      setupIonicReact({ mode: "md" });
+    }
     this.getUserStorage();
+  }
+
+  componentWillMount() {
+    this.deviceInfo.uuid = Device.uuid;
+    this.deviceInfo.platform = Device.platform;
+    if (this.deviceInfo.platform === "ios") {
+      setupIonicReact({ mode: "ios" });
+    } else {
+      setupIonicReact({ mode: "md" });
+    }
   }
 
   componentDidUpdate(prevProps: any) {
