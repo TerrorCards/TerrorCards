@@ -17,6 +17,7 @@ interface props {
     profileCallback: any;
     closePanel: any;
     signOut:any;
+    deviceInfo:any;
 }
 
 interface state {
@@ -421,7 +422,7 @@ class ProfileManagerContainer extends React.Component<props, state> {
                             }                                  
                             </IonLabel>
                             <IonItem fill="solid">
-                            <IonTextarea value={this.state.currDescription} placeholder="About yourself" onIonChange={(e) => {
+                            <IonTextarea value={this.props.deviceInfo.platform} placeholder="About yourself" onIonChange={(e) => {
                                 this.setState({currDescription: e.detail.value!})
                             }}
                             onIonBlur={(e) => {

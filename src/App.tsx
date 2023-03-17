@@ -51,6 +51,8 @@ import TradeSetup from "./components/TradeSetup";
 import ProfileManagerContainer from "./components/ProfileManagerContainer";
 import { callServer } from "./components/ajaxcalls";
 
+import { Device } from "@awesome-cordova-plugins/device";
+
 /* Core CSS required for Ionic components to work properly */
 import "@ionic/react/css/core.css";
 
@@ -95,7 +97,7 @@ store.create();
 let menuContent: any = "";
 
 setupIonicReact({
-  mode: "md",
+  mode: "ios",
 });
 
 class App extends React.Component<props, state> {
@@ -139,10 +141,16 @@ class App extends React.Component<props, state> {
     };
   }
 
+  deviceInfo: any = {
+    uuid: null,
+    platform: null,
+  };
   tradesExist = false;
 
   componentDidMount() {
     console.log("componet did mount event fired");
+    this.deviceInfo.uuid = Device.uuid;
+    this.deviceInfo.platform = Device.platform;
     this.getUserStorage();
   }
 
@@ -465,6 +473,7 @@ class App extends React.Component<props, state> {
               user={this.state.user}
               closePanel={this.showProfileModal}
               signOut={this.removeUserFromStore}
+              deviceInfo={this.deviceInfo}
             />
           </IonModal>
 
