@@ -1,0 +1,32 @@
+.trade-button-add {
+  --color: black;
+  position: absolute;
+  bottom: 0px;
+  right: 0px;
+}
+
+.trade-button-remove {
+  position: absolute;
+  bottom: 0px;
+  left: 0px;
+}
+
+.contact-popover .popover-content {
+  width: 95% !important;
+}
+
+.quantity-badge {
+  background-color: white;
+  color: black;
+  position: absolute;
+  top: 0px;
+  border-radius: 5%;
+}
+
+.quantity-owned-badge {
+  background-color: red;
+  color: white;
+  position: absolute;
+  left: 0px;
+  border-radius: 5%;
+}
