@@ -1,7 +1,7 @@
 export const serverpath = "https://gisgames.com/CardTemplateWork/";
 
 export function prepData(pData) {
-  jsonstr = {};
+  let jsonstr = {};
   if (pData !== null) {
     jsonstr = JSON.stringify(pData);
   } else {
