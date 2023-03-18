@@ -1,4 +1,4 @@
-import { Redirect, Route } from "react-router-dom";
+import { Route } from "react-router-dom";
 import { Storage } from "@ionic/storage";
 import {
   setupIonicReact,
@@ -13,30 +13,23 @@ import {
   IonFab,
   IonFabButton,
   IonFabList,
-  IonHeader,
   IonContent,
-  IonItem,
-  IonPopover,
   IonModal,
   IonGrid,
   IonCol,
   IonRow,
   IonAlert,
 } from "@ionic/react";
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { IonReactRouter } from "@ionic/react-router";
 import {
-  ellipse,
   cart,
   home,
   flask,
-  trophy,
-  square,
   skull,
   repeat,
   images,
   person,
-  settings,
   ribbon,
 } from "ionicons/icons";
 import HomeContainer from "./components/HomeContainer";

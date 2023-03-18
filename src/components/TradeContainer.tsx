@@ -1,29 +1,18 @@
 import React from "react";
 import {
   IonContent,
-  IonHeader,
-  IonPage,
-  IonTitle,
-  IonToolbar,
   IonSegment,
   IonSegmentButton,
   IonLabel,
-  IonList,
   IonItem,
   IonCardHeader,
   IonCard,
-  IonCardSubtitle,
   IonCardTitle,
-  IonCardContent,
   IonModal,
   IonButton,
-  IonSlides,
-  IonSlide,
-  IonImg,
   IonGrid,
   IonRow,
   IonCol,
-  IonAvatar,
   IonTextarea,
   IonAlert,
   IonPopover,
@@ -33,15 +22,7 @@ import {
 } from "@ionic/react";
 import "./TradeContainer.css";
 import { callServer } from "./ajaxcalls";
-import {
-  ellipse,
-  square,
-  triangle,
-  informationCircle,
-  closeCircleOutline,
-  settingsOutline,
-  filter,
-} from "ionicons/icons";
+import { informationCircle } from "ionicons/icons";
 
 interface props {
   user: any;

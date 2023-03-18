@@ -1,12 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import {
-    IonSlides, IonSlide, IonContent, IonHeader, IonCol, IonRow, IonGrid, IonCard, IonCardHeader, IonCardSubtitle,
-    IonCardTitle, IonCardContent, IonItem, IonIcon, IonLabel, IonButton, IonList, isPlatform, IonChip, IonAvatar, IonImg, IonRefresher,
-    IonRefresherContent, IonSearchbar, IonPopover, IonItemSliding, IonItemOptions, IonItemOption, IonTextarea, IonModal,
-    IonMenuButton,
-    IonButtons, IonSelect, IonSelectOption, 
+    IonContent, IonHeader, IonCol, IonRow, IonGrid,
+    IonItem, IonIcon, IonLabel, IonButton, IonImg, 
+    IonTextarea,
     IonToolbar, IonInput,
-    IonTitle, IonPage, IonAlert,
+    IonPage, IonAlert,
     withIonLifeCycle
 } from '@ionic/react';
 import { checkmark, close, closeCircleOutline } from 'ionicons/icons';

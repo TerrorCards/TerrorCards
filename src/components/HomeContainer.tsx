@@ -1,46 +1,31 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import {
   withIonLifeCycle,
   IonSlides,
   IonSlide,
   IonContent,
-  IonHeader,
   IonCol,
   IonRow,
   IonGrid,
   IonCard,
-  IonCardHeader,
-  IonCardSubtitle,
-  IonCardTitle,
   IonCardContent,
   IonItem,
   IonIcon,
   IonLabel,
   IonButton,
   IonList,
-  isPlatform,
-  IonChip,
   IonAvatar,
   IonImg,
-  IonRefresher,
-  IonRefresherContent,
   IonSearchbar,
   IonPopover,
   IonItemSliding,
   IonItemOptions,
   IonItemOption,
   IonTextarea,
-  IonModal,
   IonLoading,
-  IonMenuButton,
-  IonButtons,
-  IonToolbar,
-  IonTitle,
-  IonPage,
   IonAlert,
 } from "@ionic/react";
 import {
-  star,
   listCircle,
   create,
   refresh,
@@ -48,16 +33,13 @@ import {
   personAdd,
   flag,
   closeCircle,
-  bookmark,
   newspaper,
   chatbubble,
   statsChartOutline,
-  settings,
 } from "ionicons/icons";
 import "./HomeContainer.css";
 import StatsContainer from "./StatsContainer";
 import NewsContainer from "./NewsContainer";
-import TradeSetup from "./TradeSetup";
 import { callServer } from "./ajaxcalls";
 
 interface props {
@@ -487,7 +469,7 @@ class HomeContainer extends React.Component<props, state> {
         {this.state.viewState === "Stats" && (
           <div
             style={{
-              height: this.viewHeight(1.1),
+              height: this.viewHeight(1.75),
               overflowY: "auto",
               backgroundColor: "#333",
             }}

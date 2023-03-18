@@ -1,50 +1,20 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import {
-  IonSlides,
-  IonSlide,
   IonContent,
-  IonHeader,
   IonCol,
   IonRow,
   IonGrid,
-  IonCard,
-  IonCardHeader,
-  IonCardSubtitle,
-  IonCardTitle,
-  IonCardContent,
   IonItem,
   IonIcon,
   IonLabel,
   IonButton,
-  IonList,
-  isPlatform,
-  IonChip,
   IonAvatar,
   IonImg,
-  IonRefresher,
-  IonRefresherContent,
-  IonSearchbar,
   IonPopover,
-  IonItemSliding,
-  IonItemOptions,
-  IonItemOption,
-  IonTextarea,
-  IonModal,
-  IonMenuButton,
-  IonButtons,
-  IonToolbar,
-  IonTitle,
   IonText,
   withIonLifeCycle,
 } from "@ionic/react";
-import {
-  settingsOutline,
-  aperture,
-  settings,
-  repeat,
-  closeCircle,
-  appsOutline,
-} from "ionicons/icons";
+import { aperture, repeat, closeCircle, appsOutline } from "ionicons/icons";
 import { callServer } from "./ajaxcalls";
 
 interface props {

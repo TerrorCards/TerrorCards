@@ -3,27 +3,16 @@ import {
   IonContent,
   IonHeader,
   IonPage,
-  IonTitle,
   IonToolbar,
   IonSegment,
   IonSegmentButton,
   IonLabel,
-  IonList,
   IonItem,
-  IonCardHeader,
-  IonCard,
-  IonCardSubtitle,
-  IonCardTitle,
-  IonCardContent,
-  IonModal,
   IonButton,
-  IonSlides,
-  IonSlide,
   IonImg,
   IonGrid,
   IonRow,
   IonCol,
-  IonAvatar,
   IonTextarea,
   IonAlert,
   IonPopover,
@@ -35,13 +24,9 @@ import "./TradeSetup.css";
 import GalleryMenu from "./GalleryMenu";
 import { callServer } from "./ajaxcalls";
 import {
-  ellipse,
-  square,
-  triangle,
   informationCircle,
   closeCircleOutline,
   settingsOutline,
-  filter,
 } from "ionicons/icons";
 
 interface props {

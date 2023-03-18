@@ -3,35 +3,24 @@ import {
   IonContent,
   IonHeader,
   IonPage,
-  IonTitle,
   IonToolbar,
-  IonSegment,
-  IonSegmentButton,
   IonLabel,
   IonList,
   IonItem,
-  IonCardHeader,
   IonCard,
-  IonCardSubtitle,
-  IonCardTitle,
   IonCardContent,
-  IonModal,
   IonButton,
-  IonSlides,
-  IonSlide,
   IonImg,
   IonGrid,
   IonRow,
   IonCol,
   IonIcon,
-  IonPopover,
   withIonLifeCycle,
   IonAlert,
   IonSearchbar,
-  IonInput,
 } from "@ionic/react";
 import "./HuntContainer.css";
-import { settingsOutline, closeCircleOutline } from "ionicons/icons";
+import { closeCircleOutline } from "ionicons/icons";
 import { callServer } from "./ajaxcalls";
 
 interface props {

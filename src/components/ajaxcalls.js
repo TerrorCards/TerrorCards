@@ -1,24 +1,28 @@
 export const serverpath = "https://gisgames.com/CardTemplateWork/";
 
 export function prepData(pData) {
+  jsonstr = {};
   if (pData !== null) {
-    var jsonstr = JSON.stringify(pData);
+    jsonstr = JSON.stringify(pData);
   } else {
-    var jsonstr = JSON.stringify({});
+    jsonstr = JSON.stringify({});
   }
   return jsonstr;
 }
 
 export function callServer(pTask, pData, pUserId) {
+  let jsonstr = {};
+  let formData = null;
+  let test = null;
   switch (pTask) {
     case "cards": {
-      var jsonstr = prepData(pData);
-      let formData = new FormData();
+      jsonstr = prepData(pData);
+      formData = new FormData();
       formData.append("uUserId", pUserId);
       formData.append("uType", "Base");
       formData.append("uContent", jsonstr);
       /*
-            let test = fetch(serverpath + "cards_players.php", {
+            test = fetch(serverpath + "cards_players.php", {
               method: 'POST',
               headers: {
                 "Content-Type": 'multipart/form-data'
@@ -27,7 +31,7 @@ export function callServer(pTask, pData, pUserId) {
             });
             */
 
-      let test = fetch(
+      test = fetch(
         serverpath +
           "cards_players.php?" +
           new URLSearchParams({
@@ -41,11 +45,11 @@ export function callServer(pTask, pData, pUserId) {
       break;
     }
     case "sets": {
-      var jsonstr = prepData(pData);
-      let formData = new FormData();
+      jsonstr = prepData(pData);
+      formData = new FormData();
       formData.append("uUserId", pUserId);
       formData.append("uContent", jsonstr);
-      let test = fetch(
+      test = fetch(
         serverpath +
           "card_sets.php?" +
           new URLSearchParams({
@@ -57,12 +61,12 @@ export function callServer(pTask, pData, pUserId) {
       break;
     }
     case "cardCount": {
-      var jsonstr = prepData(pData);
-      let formData = new FormData();
+      jsonstr = prepData(pData);
+      formData = new FormData();
       formData.append("uUserId", pUserId);
       formData.append("uContent", jsonstr);
       /*
-          let test = fetch(serverpath + "cards_count.php", {
+          test = fetch(serverpath + "cards_count.php", {
             method: 'POST',
             headers: {
               "Content-Type": 'multipart/form-data'
@@ -70,7 +74,7 @@ export function callServer(pTask, pData, pUserId) {
             body: formData
           });
           */
-      let test = fetch(
+      test = fetch(
         serverpath +
           "cards_count.php?" +
           new URLSearchParams({
@@ -82,12 +86,12 @@ export function callServer(pTask, pData, pUserId) {
       break;
     }
     case "cardDetail": {
-      var jsonstr = prepData(pData);
-      let formData = new FormData();
+      jsonstr = prepData(pData);
+      formData = new FormData();
       formData.append("uUserId", pUserId);
       formData.append("uContent", jsonstr);
       /*
-          let test = fetch(serverpath + "cards_count.php", {
+          test = fetch(serverpath + "cards_count.php", {
             method: 'POST',
             headers: {
               "Content-Type": 'multipart/form-data'
@@ -95,7 +99,7 @@ export function callServer(pTask, pData, pUserId) {
             body: formData
           });
           */
-      let test = fetch(
+      test = fetch(
         serverpath +
           "cards_detail.php?" +
           new URLSearchParams({
@@ -107,14 +111,14 @@ export function callServer(pTask, pData, pUserId) {
       break;
     }
     case "userInfo": {
-      var jsonstr = prepData(pData);
-      let formData = new FormData();
+      jsonstr = prepData(pData);
+      formData = new FormData();
       formData.append("uUserId", pUserId);
       formData.append("uAction", "userInfo");
       formData.append("uContent1", "test");
       let data2 = { uUserId: pUserId, uAction: "userInfo", uContent1: "test" };
       /*
-            let test = fetch(serverpath + "profile.php", {
+            test = fetch(serverpath + "profile.php", {
               method: 'GET',
               mode: 'cors', // no-cors, *cors, same-origin
               headers: new Headers({
@@ -126,7 +130,7 @@ export function callServer(pTask, pData, pUserId) {
               body: JSON.stringify(data2)
             });
             */
-      let test = fetch(
+      test = fetch(
         serverpath +
           "profile.php?" +
           new URLSearchParams({
@@ -137,7 +141,7 @@ export function callServer(pTask, pData, pUserId) {
       return test;
       break;
       /*
-            let test = fetch(serverpath + "profile.php", {
+            test = fetch(serverpath + "profile.php", {
               method: 'GET',
               mode: 'cors', // no-cors, *cors, same-origin
               headers: new Headers({
@@ -156,12 +160,12 @@ export function callServer(pTask, pData, pUserId) {
       //'Access-Control-Request-Headers': 'Content-Type'
     }
     case "messagesFull": {
-      var jsonstr = prepData(pData);
-      let formData = new FormData();
+      jsonstr = prepData(pData);
+      formData = new FormData();
       formData.append("uUserId", pUserId);
       formData.append("uContent", pData);
       /*
-            let test = fetch(serverpath + "messages.php", {
+            test = fetch(serverpath + "messages.php", {
               method: 'POST',
               headers: {
                 "Content-Type": 'multipart/form-data'
@@ -169,7 +173,7 @@ export function callServer(pTask, pData, pUserId) {
               body: formData
             });
             */
-      let test = fetch(
+      test = fetch(
         serverpath +
           "messages.php?" +
           new URLSearchParams({
@@ -181,12 +185,12 @@ export function callServer(pTask, pData, pUserId) {
       break;
     }
     case "appendBoardMessages": {
-      var jsonstr = prepData(pData);
-      let formData = new FormData();
+      jsonstr = prepData(pData);
+      formData = new FormData();
       formData.append("uUserId", pUserId);
       formData.append("uContent", jsonstr);
       /*
-            let test = fetch(serverpath + "messagesPost.php", {
+            test = fetch(serverpath + "messagesPost.php", {
               method: 'POST',
               headers: {
                 "Content-Type": 'multipart/form-data'
@@ -194,7 +198,7 @@ export function callServer(pTask, pData, pUserId) {
               body: formData
             });
             */
-      let test = fetch(
+      test = fetch(
         serverpath +
           "messagesPost.php?" +
           new URLSearchParams({
@@ -206,13 +210,13 @@ export function callServer(pTask, pData, pUserId) {
       break;
     }
     case "packs": {
-      var jsonstr = prepData(pData);
-      let formData = new FormData();
+      jsonstr = prepData(pData);
+      formData = new FormData();
       formData.append("uUserId", pUserId);
       formData.append("uType", "Base");
       formData.append("uContent", pData.count);
       /*
-            let test = fetch(serverpath + "packs.php", {
+            test = fetch(serverpath + "packs.php", {
               method: 'POST',
               headers: {
                 "Content-Type": 'multipart/form-data'
@@ -220,7 +224,7 @@ export function callServer(pTask, pData, pUserId) {
               body: formData
             });
             */
-      let test = fetch(
+      test = fetch(
         serverpath +
           "packs.php?" +
           new URLSearchParams({
@@ -233,13 +237,13 @@ export function callServer(pTask, pData, pUserId) {
       break;
     }
     case "packsOrder": {
-      var jsonstr = prepData(pData);
-      let formData = new FormData();
+      jsonstr = prepData(pData);
+      formData = new FormData();
       formData.append("uUserId", pUserId);
       formData.append("uContent", jsonstr);
       formData.append("uAction", "BuyPack");
       /*
-            let test = fetch(serverpath + "packs_Result.php", {
+            test = fetch(serverpath + "packs_Result.php", {
               method: 'POST',
               headers: {
                 "Content-Type": 'multipart/form-data'
@@ -247,7 +251,7 @@ export function callServer(pTask, pData, pUserId) {
               body: formData
             });
             */
-      let test = fetch(
+      test = fetch(
         serverpath +
           "packs_Result.php?" +
           new URLSearchParams({
@@ -260,13 +264,13 @@ export function callServer(pTask, pData, pUserId) {
       break;
     }
     case "showTrades": {
-      var jsonstr = prepData(pData);
-      let formData = new FormData();
+      jsonstr = prepData(pData);
+      formData = new FormData();
       formData.append("uUserId", pUserId);
       formData.append("uContent1", jsonstr);
       formData.append("uAction", "showTrades");
       /*
-            let test = fetch(serverpath + "tradeList.php", {
+            test = fetch(serverpath + "tradeList.php", {
               method: 'POST',
               headers: {
                 "Content-Type": 'multipart/form-data'
@@ -274,7 +278,7 @@ export function callServer(pTask, pData, pUserId) {
               body: formData
             });
             */
-      let test = fetch(
+      test = fetch(
         serverpath +
           "tradeList.php?" +
           new URLSearchParams({
@@ -287,13 +291,13 @@ export function callServer(pTask, pData, pUserId) {
       break;
     }
     case "tradeSetup": {
-      var jsonstr = prepData(pData);
-      let formData = new FormData();
+      jsonstr = prepData(pData);
+      formData = new FormData();
       formData.append("uUserId", pUserId);
       formData.append("uType", "All");
       formData.append("uContent", jsonstr);
       /*
-            let test = fetch(serverpath + "tradeCardList.php", {
+            test = fetch(serverpath + "tradeCardList.php", {
               method: 'POST',
               headers: {
                 "Content-Type": 'multipart/form-data'
@@ -302,7 +306,7 @@ export function callServer(pTask, pData, pUserId) {
             });
             */
 
-      let test = fetch(
+      test = fetch(
         serverpath +
           "tradeCardList.php?" +
           new URLSearchParams({
@@ -318,14 +322,14 @@ export function callServer(pTask, pData, pUserId) {
     case "saveTrade": {
       let c1 = prepData(pData.uContent1);
       let c2 = prepData(pData.uContent2);
-      let formData = new FormData();
+      formData = new FormData();
       formData.append("uUserId", pUserId);
       formData.append("uContent1", c1);
       formData.append("uContent2", c2);
       formData.append("uMsg", pData.msg);
       formData.append("uAction", "saveTrade");
       /*           
-            let test = fetch(serverpath + "trade.php", {
+            test = fetch(serverpath + "trade.php", {
               method: 'POST',
               headers: {
                 "Content-Type": 'multipart/form-data'
@@ -333,7 +337,7 @@ export function callServer(pTask, pData, pUserId) {
               body: formData
             });
             */
-      let test = fetch(
+      test = fetch(
         serverpath +
           "trade.php?" +
           new URLSearchParams({
@@ -348,13 +352,13 @@ export function callServer(pTask, pData, pUserId) {
       break;
     }
     case "executeTrade": {
-      let formData = new FormData();
+      formData = new FormData();
       formData.append("uUserId", pUserId);
       formData.append("uContent1", pData);
       formData.append("uContent2", "");
       formData.append("uAction", "executeTrade");
       /*           
-            let test = fetch(serverpath + "trade.php", {
+            test = fetch(serverpath + "trade.php", {
               method: 'POST',
               headers: {
                 "Content-Type": 'multipart/form-data'
@@ -362,7 +366,7 @@ export function callServer(pTask, pData, pUserId) {
               body: formData
             });
             */
-      let test = fetch(
+      test = fetch(
         serverpath +
           "trade.php?" +
           new URLSearchParams({
@@ -376,13 +380,13 @@ export function callServer(pTask, pData, pUserId) {
       break;
     }
     case "cancelTrade": {
-      let formData = new FormData();
+      formData = new FormData();
       formData.append("uUserId", pUserId);
       formData.append("uContent1", pData);
       formData.append("uContent2", "");
       formData.append("uAction", "cancelTrade");
       /*           
-            let test = fetch(serverpath + "trade.php", {
+            test = fetch(serverpath + "trade.php", {
               method: 'POST',
               headers: {
                 "Content-Type": 'multipart/form-data'
@@ -390,7 +394,7 @@ export function callServer(pTask, pData, pUserId) {
               body: formData
             });
             */
-      let test = fetch(
+      test = fetch(
         serverpath +
           "trade.php?" +
           new URLSearchParams({
@@ -404,12 +408,12 @@ export function callServer(pTask, pData, pUserId) {
       break;
     }
     case "requestTradeMessages": {
-      var jsonstr = prepData(pData);
-      let formData = new FormData();
+      jsonstr = prepData(pData);
+      formData = new FormData();
       formData.append("uUserId", pUserId);
       formData.append("uTradeID", pData);
       /*
-            let test = fetch(serverpath + "tradeMessages.php", {
+            test = fetch(serverpath + "tradeMessages.php", {
               method: 'POST',
               headers: {
                 "Content-Type": 'multipart/form-data'
@@ -417,7 +421,7 @@ export function callServer(pTask, pData, pUserId) {
               body: formData
             });
             */
-      let test = fetch(
+      test = fetch(
         serverpath +
           "tradeMessages.php?" +
           new URLSearchParams({
@@ -429,12 +433,12 @@ export function callServer(pTask, pData, pUserId) {
       break;
     }
     case "appendTradeMessages": {
-      var jsonstr = prepData(pData);
-      let formData = new FormData();
+      jsonstr = prepData(pData);
+      formData = new FormData();
       formData.append("uUserId", pUserId);
       formData.append("uContent1", jsonstr);
       /*           
-            let test = fetch(serverpath + "tradeAppendMessage.php", {
+            test = fetch(serverpath + "tradeAppendMessage.php", {
               method: 'POST',
               headers: {
                 "Content-Type": 'multipart/form-data'
@@ -442,7 +446,7 @@ export function callServer(pTask, pData, pUserId) {
               body: formData
             });
             */
-      let test = fetch(
+      test = fetch(
         serverpath +
           "tradeAppendMessage.php?" +
           new URLSearchParams({
@@ -454,12 +458,12 @@ export function callServer(pTask, pData, pUserId) {
       break;
     }
     case "hasTrades": {
-      var jsonstr = prepData(pData);
-      let formData = new FormData();
+      jsonstr = prepData(pData);
+      formData = new FormData();
       formData.append("uUserId", pUserId);
       formData.append("uContent", jsonstr);
       /*
-            let test = fetch(serverpath + "tradeCardList.php", {
+            test = fetch(serverpath + "tradeCardList.php", {
               method: 'POST',
               headers: {
                 "Content-Type": 'multipart/form-data'
@@ -468,7 +472,7 @@ export function callServer(pTask, pData, pUserId) {
             });
             */
 
-      let test = fetch(
+      test = fetch(
         serverpath +
           "trade_exists.php?" +
           new URLSearchParams({
@@ -481,12 +485,12 @@ export function callServer(pTask, pData, pUserId) {
       break;
     }
     case "pullFactoryList": {
-      //var jsonstr = prepData(pData);
-      let formData = new FormData();
+      //jsonstr = prepData(pData);
+      formData = new FormData();
       formData.append("uUserId", pUserId);
       formData.append("uContent", pData);
       /*
-            let test = fetch(serverpath + "meld_pull_list.php", {
+            test = fetch(serverpath + "meld_pull_list.php", {
               method: 'POST',
               headers: {
                 "Content-Type": 'multipart/form-data'
@@ -494,7 +498,7 @@ export function callServer(pTask, pData, pUserId) {
               body: formData
             });
             */
-      let test = fetch(
+      test = fetch(
         serverpath +
           "meld_pull_list.php?" +
           new URLSearchParams({
@@ -506,12 +510,12 @@ export function callServer(pTask, pData, pUserId) {
       break;
     }
     case "meldFactoryItem": {
-      var jsonstr = prepData(pData);
-      let formData = new FormData();
+      jsonstr = prepData(pData);
+      formData = new FormData();
       formData.append("uUserId", pUserId);
       formData.append("uContent", jsonstr);
       /*
-            let test = fetch(serverpath + "meldCreateResult.php", {
+            test = fetch(serverpath + "meldCreateResult.php", {
               method: 'POST',
               headers: {
                 "Content-Type": 'multipart/form-data'
@@ -519,7 +523,7 @@ export function callServer(pTask, pData, pUserId) {
               body: formData
             });
             */
-      let test = fetch(
+      test = fetch(
         serverpath +
           "meldCreateResult.php?" +
           new URLSearchParams({
@@ -531,11 +535,11 @@ export function callServer(pTask, pData, pUserId) {
       break;
     }
     case "fetchNews": {
-      var jsonstr = prepData(pData);
-      let formData = new FormData();
+      jsonstr = prepData(pData);
+      formData = new FormData();
       formData.append("uUserId", pUserId);
       formData.append("uContent", jsonstr);
-      let test = fetch(serverpath + "news.php", {
+      test = fetch(serverpath + "news.php", {
         method: "POST",
         headers: {
           "Content-Type": "multipart/form-data",
@@ -546,11 +550,11 @@ export function callServer(pTask, pData, pUserId) {
       break;
     }
     case "fetchNewsBanner": {
-      var jsonstr = prepData(pData);
-      let formData = new FormData();
+      jsonstr = prepData(pData);
+      formData = new FormData();
       formData.append("uUserId", pUserId);
       formData.append("uContent", jsonstr);
-      let test = fetch(serverpath + "newsBanner.php", {
+      test = fetch(serverpath + "newsBanner.php", {
         method: "POST",
         headers: {
           "Content-Type": "multipart/form-data",
@@ -561,13 +565,13 @@ export function callServer(pTask, pData, pUserId) {
       break;
     }
     case "loginCheck": {
-      //var jsonstr = prepData(pData);
-      let formData = new FormData();
+      //jsonstr = prepData(pData);
+      formData = new FormData();
       formData.append("uUserId", pUserId);
       formData.append("uAction", "checkLogin");
       formData.append("uPassword", pData);
       /*
-            let test = fetch(serverpath + "checkLogin.php", {
+            test = fetch(serverpath + "checkLogin.php", {
               method: 'POST',
               headers: {
                 "Content-Type": 'multipart/form-data'
@@ -575,7 +579,7 @@ export function callServer(pTask, pData, pUserId) {
               body: formData
             });
             */
-      let test = fetch(
+      test = fetch(
         serverpath +
           "checkLogin.php?" +
           new URLSearchParams({
@@ -589,13 +593,13 @@ export function callServer(pTask, pData, pUserId) {
       break;
     }
     case "forgotPassword": {
-      var jsonstr = prepData(pData);
-      let formData = new FormData();
+      jsonstr = prepData(pData);
+      formData = new FormData();
       formData.append("uUserId", pUserId);
       formData.append("uAction", "recoverPassword");
       formData.append("uContent", jsonstr);
       /*
-              let test = fetch(serverpath + "forgetPassword.php", {
+              test = fetch(serverpath + "forgetPassword.php", {
                 method: 'POST',
                 headers: {
                   "Content-Type": 'multipart/form-data'
@@ -603,7 +607,7 @@ export function callServer(pTask, pData, pUserId) {
                 body: formData
               });
               */
-      let test = fetch(
+      test = fetch(
         serverpath +
           "forgetPassword.php?" +
           new URLSearchParams({
@@ -616,13 +620,13 @@ export function callServer(pTask, pData, pUserId) {
       break;
     }
     case "defaultAccount": {
-      var jsonstr = prepData(pData);
-      let formData = new FormData();
+      jsonstr = prepData(pData);
+      formData = new FormData();
       formData.append("uUserId", pUserId);
       formData.append("uAction", "defaultAccount");
       formData.append("uContent", jsonstr);
       /*
-              let test = fetch(serverpath + "create_profile.php", {
+              test = fetch(serverpath + "create_profile.php", {
                 method: 'POST',
                 headers: {
                   "Content-Type": 'multipart/form-data'
@@ -630,7 +634,7 @@ export function callServer(pTask, pData, pUserId) {
                 body: formData
               });
               */
-      let test = fetch(
+      test = fetch(
         serverpath +
           "create_profile.php?" +
           new URLSearchParams({
@@ -643,13 +647,13 @@ export function callServer(pTask, pData, pUserId) {
       break;
     }
     case "registerUser": {
-      var jsonstr = prepData(pData);
-      let formData = new FormData();
+      jsonstr = prepData(pData);
+      formData = new FormData();
       formData.append("uUserId", pUserId);
       formData.append("uAction", "register");
       formData.append("uContent", jsonstr);
       /*
-              let test = fetch(serverpath + "register.php", {
+              test = fetch(serverpath + "register.php", {
                 method: 'POST',
                 headers: {
                   "Content-Type": 'multipart/form-data'
@@ -657,7 +661,7 @@ export function callServer(pTask, pData, pUserId) {
                 body: formData
               });
               */
-      let test = fetch(
+      test = fetch(
         serverpath +
           "register.php?" +
           new URLSearchParams({
@@ -670,12 +674,12 @@ export function callServer(pTask, pData, pUserId) {
       break;
     }
     case "checkEmailExist": {
-      var jsonstr = prepData(pData);
-      let formData = new FormData();
+      jsonstr = prepData(pData);
+      formData = new FormData();
       formData.append("uUserId", pUserId);
       formData.append("uContent", jsonstr);
       /*
-          let test = fetch(serverpath + "register.php", {
+          test = fetch(serverpath + "register.php", {
             method: 'POST',
             headers: {
               "Content-Type": 'multipart/form-data'
@@ -683,7 +687,7 @@ export function callServer(pTask, pData, pUserId) {
             body: formData
           });
           */
-      let test = fetch(
+      test = fetch(
         serverpath +
           "checkEmailExist.php?" +
           new URLSearchParams({
@@ -695,12 +699,12 @@ export function callServer(pTask, pData, pUserId) {
       break;
     }
     case "changePassword": {
-      var jsonstr = prepData(pData);
-      let formData = new FormData();
+      jsonstr = prepData(pData);
+      formData = new FormData();
       formData.append("uUserId", pUserId);
       formData.append("uContent", jsonstr);
       /*
-          let test = fetch(serverpath + "register.php", {
+          test = fetch(serverpath + "register.php", {
             method: 'POST',
             headers: {
               "Content-Type": 'multipart/form-data'
@@ -708,7 +712,7 @@ export function callServer(pTask, pData, pUserId) {
             body: formData
           });
           */
-      let test = fetch(
+      test = fetch(
         serverpath +
           "changePassword.php?" +
           new URLSearchParams({
@@ -720,12 +724,12 @@ export function callServer(pTask, pData, pUserId) {
       break;
     }
     case "changeWallet": {
-      var jsonstr = prepData(pData);
-      let formData = new FormData();
+      jsonstr = prepData(pData);
+      formData = new FormData();
       formData.append("uUserId", pUserId);
       formData.append("uContent", jsonstr);
       /*
-          let test = fetch(serverpath + "register.php", {
+          test = fetch(serverpath + "register.php", {
             method: 'POST',
             headers: {
               "Content-Type": 'multipart/form-data'
@@ -733,7 +737,7 @@ export function callServer(pTask, pData, pUserId) {
             body: formData
           });
           */
-      let test = fetch(
+      test = fetch(
         serverpath +
           "changeWallet.php?" +
           new URLSearchParams({
@@ -745,12 +749,12 @@ export function callServer(pTask, pData, pUserId) {
       break;
     }
     case "changeDescription": {
-      var jsonstr = prepData(pData);
-      let formData = new FormData();
+      jsonstr = prepData(pData);
+      formData = new FormData();
       formData.append("uUserId", pUserId);
       formData.append("uContent", jsonstr);
       /*
-          let test = fetch(serverpath + "register.php", {
+          test = fetch(serverpath + "register.php", {
             method: 'POST',
             headers: {
               "Content-Type": 'multipart/form-data'
@@ -758,7 +762,7 @@ export function callServer(pTask, pData, pUserId) {
             body: formData
           });
           */
-      let test = fetch(
+      test = fetch(
         serverpath +
           "changeDescription.php?" +
           new URLSearchParams({
@@ -770,13 +774,13 @@ export function callServer(pTask, pData, pUserId) {
       break;
     }
     case "pullFriendsList": {
-      var jsonstr = prepData(pData);
-      let formData = new FormData();
+      jsonstr = prepData(pData);
+      formData = new FormData();
       formData.append("uUserId", pUserId);
       formData.append("uAction", "select");
       formData.append("uContent", jsonstr);
       /*
-      let test = fetch(serverpath + "friends.php", {
+      test = fetch(serverpath + "friends.php", {
         method: "POST",
         headers: {
           "Content-Type": "multipart/form-data",
@@ -784,7 +788,7 @@ export function callServer(pTask, pData, pUserId) {
         body: formData,
       });
       */
-      let test = fetch(
+      test = fetch(
         serverpath +
           "friends.php?" +
           new URLSearchParams({
@@ -797,13 +801,13 @@ export function callServer(pTask, pData, pUserId) {
       break;
     }
     case "pullSearchList": {
-      var jsonstr = prepData(pData);
-      let formData = new FormData();
+      jsonstr = prepData(pData);
+      formData = new FormData();
       formData.append("uUserId", pUserId);
       formData.append("uAction", "search");
       formData.append("uContent", jsonstr);
       /*
-      let test = fetch(serverpath + "friends.php", {
+      test = fetch(serverpath + "friends.php", {
         method: "POST",
         headers: {
           "Content-Type": "multipart/form-data",
@@ -811,7 +815,7 @@ export function callServer(pTask, pData, pUserId) {
         body: formData,
       });
       */
-      let test = fetch(
+      test = fetch(
         serverpath +
           "friends.php?" +
           new URLSearchParams({
@@ -824,13 +828,13 @@ export function callServer(pTask, pData, pUserId) {
       break;
     }
     case "pullBlockList": {
-      var jsonstr = prepData(pData);
-      let formData = new FormData();
+      jsonstr = prepData(pData);
+      formData = new FormData();
       formData.append("uUserId", pUserId);
       formData.append("uAction", "select");
       formData.append("uContent", jsonstr);
       /*
-      let test = fetch(serverpath + "playerBlock.php", {
+      test = fetch(serverpath + "playerBlock.php", {
         method: "POST",
         headers: {
           "Content-Type": "multipart/form-data",
@@ -838,7 +842,7 @@ export function callServer(pTask, pData, pUserId) {
         body: formData,
       });
       */
-      let test = fetch(
+      test = fetch(
         serverpath +
           "playerBlock.php?" +
           new URLSearchParams({
@@ -851,13 +855,13 @@ export function callServer(pTask, pData, pUserId) {
       break;
     }
     case "addFriend": {
-      var jsonstr = prepData(pData);
-      let formData = new FormData();
+      jsonstr = prepData(pData);
+      formData = new FormData();
       formData.append("uUserId", pUserId);
       formData.append("uAction", "insert");
       formData.append("uContent", jsonstr);
       /*
-          let test = fetch(serverpath + "friends.php", {
+          test = fetch(serverpath + "friends.php", {
             method: 'POST',
             headers: {
               "Content-Type": 'multipart/form-data'
@@ -865,7 +869,7 @@ export function callServer(pTask, pData, pUserId) {
             body: formData
           });
           */
-      let test = fetch(
+      test = fetch(
         serverpath +
           "friends.php?" +
           new URLSearchParams({
@@ -878,13 +882,13 @@ export function callServer(pTask, pData, pUserId) {
       break;
     }
     case "deleteFriend": {
-      var jsonstr = prepData(pData);
-      let formData = new FormData();
+      jsonstr = prepData(pData);
+      formData = new FormData();
       formData.append("uUserId", pUserId);
       formData.append("uAction", "delete");
       formData.append("uContent", jsonstr);
       /*
-      let test = fetch(serverpath + "friends.php", {
+      test = fetch(serverpath + "friends.php", {
         method: "POST",
         headers: {
           "Content-Type": "multipart/form-data",
@@ -892,7 +896,7 @@ export function callServer(pTask, pData, pUserId) {
         body: formData,
       });
       */
-      let test = fetch(
+      test = fetch(
         serverpath +
           "friends.php?" +
           new URLSearchParams({
@@ -905,13 +909,13 @@ export function callServer(pTask, pData, pUserId) {
       break;
     }
     case "insertBlockPlayer": {
-      var jsonstr = prepData(pData);
-      let formData = new FormData();
+      jsonstr = prepData(pData);
+      formData = new FormData();
       formData.append("uUserId", pUserId);
       formData.append("uAction", "insert");
       formData.append("uContent", jsonstr);
       /*
-          let test = fetch(serverpath + "playerBlock.php", {
+          test = fetch(serverpath + "playerBlock.php", {
             method: 'POST',
             headers: {
               "Content-Type": 'multipart/form-data'
@@ -919,7 +923,7 @@ export function callServer(pTask, pData, pUserId) {
             body: formData
           });
           */
-      let test = fetch(
+      test = fetch(
         serverpath +
           "playerBlock.php?" +
           new URLSearchParams({
@@ -932,13 +936,13 @@ export function callServer(pTask, pData, pUserId) {
       break;
     }
     case "removeBlockPlayer": {
-      var jsonstr = prepData(pData);
-      let formData = new FormData();
+      jsonstr = prepData(pData);
+      formData = new FormData();
       formData.append("uUserId", pUserId);
       formData.append("uAction", "delete");
       formData.append("uContent", jsonstr);
       /*
-      let test = fetch(serverpath + "playerBlock.php", {
+      test = fetch(serverpath + "playerBlock.php", {
         method: "POST",
         headers: {
           "Content-Type": "multipart/form-data",
@@ -946,7 +950,7 @@ export function callServer(pTask, pData, pUserId) {
         body: formData,
       });
       */
-      let test = fetch(
+      test = fetch(
         serverpath +
           "playerBlock.php?" +
           new URLSearchParams({
@@ -959,12 +963,12 @@ export function callServer(pTask, pData, pUserId) {
       break;
     }
     case "flagComment": {
-      var jsonstr = prepData(pData);
-      let formData = new FormData();
+      jsonstr = prepData(pData);
+      formData = new FormData();
       formData.append("uUserId", pUserId);
       formData.append("uContent", jsonstr);
       /*
-          let test = fetch(serverpath + "flagContent.php", {
+          test = fetch(serverpath + "flagContent.php", {
             method: 'POST',
             headers: {
               "Content-Type": 'multipart/form-data'
@@ -972,7 +976,7 @@ export function callServer(pTask, pData, pUserId) {
             body: formData
           });
           */
-      let test = fetch(
+      test = fetch(
         serverpath +
           "flagContent.php?" +
           new URLSearchParams({
@@ -984,12 +988,12 @@ export function callServer(pTask, pData, pUserId) {
       break;
     }
     case "updateUserPic": {
-      var jsonstr = prepData(pData);
-      let formData = new FormData();
+      jsonstr = prepData(pData);
+      formData = new FormData();
       formData.append("uUserId", pUserId);
       formData.append("uAction", "update");
       formData.append("uContent", jsonstr);
-      let test = fetch(serverpath + "updateUserPic.php", {
+      test = fetch(serverpath + "updateUserPic.php", {
         method: "POST",
         headers: {
           "Content-Type": "multipart/form-data",
@@ -1000,14 +1004,14 @@ export function callServer(pTask, pData, pUserId) {
       break;
     }
     case "battleYourStats": {
-      var jsonstr = prepData(pData);
-      let formData = new FormData();
+      jsonstr = prepData(pData);
+      formData = new FormData();
       formData.append("uUserId", pUserId);
       formData.append("uAction", "setup");
       formData.append("uContent", jsonstr);
       formData.append("uType", "");
       /*
-          let test = fetch(serverpath + "battle/battle_players_list.php", {
+          test = fetch(serverpath + "battle/battle_players_list.php", {
             method: 'POST',
             headers: {
               "Content-Type": 'multipart/form-data'
@@ -1017,7 +1021,7 @@ export function callServer(pTask, pData, pUserId) {
           return test;
           break;
           */
-      let test = fetch(
+      test = fetch(
         serverpath +
           "battle/battle_your_stats.php?" +
           new URLSearchParams({
@@ -1032,14 +1036,14 @@ export function callServer(pTask, pData, pUserId) {
     }
 
     case "battlePlayerList": {
-      var jsonstr = prepData(pData);
-      let formData = new FormData();
+      jsonstr = prepData(pData);
+      formData = new FormData();
       formData.append("uUserId", pUserId);
       formData.append("uAction", "setup");
       formData.append("uContent", jsonstr);
       formData.append("uType", "");
       /*
-          let test = fetch(serverpath + "battle/battle_players_list.php", {
+          test = fetch(serverpath + "battle/battle_players_list.php", {
             method: 'POST',
             headers: {
               "Content-Type": 'multipart/form-data'
@@ -1049,7 +1053,7 @@ export function callServer(pTask, pData, pUserId) {
           return test;
           break;
           */
-      let test = fetch(
+      test = fetch(
         serverpath +
           "battle/battle_players_list.php?" +
           new URLSearchParams({
@@ -1063,14 +1067,14 @@ export function callServer(pTask, pData, pUserId) {
       break;
     }
     case "battleSetup": {
-      var jsonstr = prepData(pData);
-      let formData = new FormData();
+      jsonstr = prepData(pData);
+      formData = new FormData();
       formData.append("uUserId", pUserId);
       formData.append("uAction", "setup");
       formData.append("uContent", jsonstr);
       formData.append("uType", "");
       /*
-          let test = fetch(serverpath + "battle/battle_players.php", {
+          test = fetch(serverpath + "battle/battle_players.php", {
             method: 'POST',
             headers: {
               "Content-Type": 'multipart/form-data'
@@ -1080,7 +1084,7 @@ export function callServer(pTask, pData, pUserId) {
           return test;
           break;
           */
-      let test = fetch(
+      test = fetch(
         serverpath +
           "battle/battle_players.php?" +
           new URLSearchParams({
@@ -1094,14 +1098,14 @@ export function callServer(pTask, pData, pUserId) {
       break;
     }
     case "battleResult": {
-      var jsonstr = prepData(pData);
-      let formData = new FormData();
+      jsonstr = prepData(pData);
+      formData = new FormData();
       formData.append("uUserId", pUserId);
       formData.append("uAction", "setup");
       formData.append("uContent", jsonstr);
       formData.append("uType", "");
       /*
-      let test = fetch(serverpath + "battle/battle_result.php", {
+      test = fetch(serverpath + "battle/battle_result.php", {
         method: "POST",
         headers: {
           "Content-Type": "multipart/form-data",
@@ -1109,7 +1113,7 @@ export function callServer(pTask, pData, pUserId) {
         body: formData,
       });
       */
-      let test = fetch(
+      test = fetch(
         serverpath +
           "battle/battle_result.php?" +
           new URLSearchParams({
@@ -1124,13 +1128,13 @@ export function callServer(pTask, pData, pUserId) {
       break;
     }
     case "loadInAppItems": {
-      var jsonstr = prepData(pData);
-      let formData = new FormData();
+      jsonstr = prepData(pData);
+      formData = new FormData();
       formData.append("uUserId", pUserId);
       formData.append("uAction", "select");
       formData.append("uContent", jsonstr);
       /*
-          let test = fetch(serverpath + "inAppList.php", {
+          test = fetch(serverpath + "inAppList.php", {
             method: 'POST',
             headers: {
               "Content-Type": 'multipart/form-data'
@@ -1138,7 +1142,7 @@ export function callServer(pTask, pData, pUserId) {
             body: formData
           });
           */
-      let test = fetch(
+      test = fetch(
         serverpath +
           "inAppList.php?" +
           new URLSearchParams({
@@ -1152,13 +1156,13 @@ export function callServer(pTask, pData, pUserId) {
       break;
     }
     case "contactUs": {
-      var jsonstr = prepData(pData);
-      let formData = new FormData();
+      jsonstr = prepData(pData);
+      formData = new FormData();
       formData.append("uUserId", pUserId);
       formData.append("uAction", "email");
       formData.append("uContent", jsonstr);
       /*
-          let test = fetch(serverpath + "inAppList.php", {
+          test = fetch(serverpath + "inAppList.php", {
             method: 'POST',
             headers: {
               "Content-Type": 'multipart/form-data'
@@ -1166,7 +1170,7 @@ export function callServer(pTask, pData, pUserId) {
             body: formData
           });
           */
-      let test = fetch(
+      test = fetch(
         serverpath +
           "contactUs.php?" +
           new URLSearchParams({
@@ -1179,10 +1183,10 @@ export function callServer(pTask, pData, pUserId) {
       break;
     }
     case "deleteAccount": {
-      let formData = new FormData();
+      formData = new FormData();
       formData.append("uUserId", pUserId);
       /*
-          let test = fetch(serverpath + "inAppList.php", {
+          test = fetch(serverpath + "inAppList.php", {
             method: 'POST',
             headers: {
               "Content-Type": 'multipart/form-data'
@@ -1190,7 +1194,7 @@ export function callServer(pTask, pData, pUserId) {
             body: formData
           });
           */
-      let test = fetch(
+      test = fetch(
         serverpath +
           "deleteAccount.php?" +
           new URLSearchParams({
@@ -1201,13 +1205,13 @@ export function callServer(pTask, pData, pUserId) {
       break;
     }
     case "updateCredit": {
-      var jsonstr = prepData(pData);
-      let formData = new FormData();
+      jsonstr = prepData(pData);
+      formData = new FormData();
       formData.append("uUserId", pUserId);
       formData.append("uContent", jsonstr);
       formData.append("uAction", "update");
       /*
-          let test = fetch(serverpath + "inAppList.php", {
+          test = fetch(serverpath + "inAppList.php", {
             method: 'POST',
             headers: {
               "Content-Type": 'multipart/form-data'
@@ -1215,7 +1219,7 @@ export function callServer(pTask, pData, pUserId) {
             body: formData
           });
           */
-      let test = fetch(
+      test = fetch(
         serverpath +
           "updateUserCredit.php?" +
           new URLSearchParams({
@@ -1228,12 +1232,12 @@ export function callServer(pTask, pData, pUserId) {
       break;
     }
     case "processPromo": {
-      var jsonstr = prepData(pData);
-      let formData = new FormData();
+      jsonstr = prepData(pData);
+      formData = new FormData();
       formData.append("uUserId", pUserId);
       formData.append("uContent", jsonstr);
       /*
-          let test = fetch(serverpath + "inAppList.php", {
+          test = fetch(serverpath + "inAppList.php", {
             method: 'POST',
             headers: {
               "Content-Type": 'multipart/form-data'
@@ -1241,7 +1245,7 @@ export function callServer(pTask, pData, pUserId) {
             body: formData
           });
           */
-      let test = fetch(
+      test = fetch(
         serverpath +
           "promoCode.php?" +
           new URLSearchParams({
@@ -1253,12 +1257,12 @@ export function callServer(pTask, pData, pUserId) {
       break;
     }
     case "stat_getCardTemplates": {
-      var jsonstr = prepData(pData);
-      let formData = new FormData();
+      jsonstr = prepData(pData);
+      formData = new FormData();
       formData.append("uUserId", pUserId);
       formData.append("uContent", jsonstr);
       /*
-          let test = fetch(serverpath + "inAppList.php", {
+          test = fetch(serverpath + "inAppList.php", {
             method: 'POST',
             headers: {
               "Content-Type": 'multipart/form-data'
@@ -1266,7 +1270,7 @@ export function callServer(pTask, pData, pUserId) {
             body: formData
           });
           */
-      let test = fetch(
+      test = fetch(
         serverpath +
           "card_templates.php?" +
           new URLSearchParams({
@@ -1278,12 +1282,12 @@ export function callServer(pTask, pData, pUserId) {
       break;
     }
     case "state_getCardCounts": {
-      var jsonstr = prepData(pData);
-      let formData = new FormData();
+      jsonstr = prepData(pData);
+      formData = new FormData();
       formData.append("uUserId", pUserId);
       formData.append("uContent", jsonstr);
       /*
-          let test = fetch(serverpath + "inAppList.php", {
+          test = fetch(serverpath + "inAppList.php", {
             method: 'POST',
             headers: {
               "Content-Type": 'multipart/form-data'
@@ -1291,7 +1295,7 @@ export function callServer(pTask, pData, pUserId) {
             body: formData
           });
           */
-      let test = fetch(
+      test = fetch(
         serverpath +
           "stats_card_in_system.php?" +
           new URLSearchParams({
@@ -1303,12 +1307,12 @@ export function callServer(pTask, pData, pUserId) {
       break;
     }
     case "stat_latestCards": {
-      var jsonstr = prepData(pData);
-      let formData = new FormData();
+      jsonstr = prepData(pData);
+      formData = new FormData();
       formData.append("uUserId", pUserId);
       formData.append("uContent", jsonstr);
       /*
-          let test = fetch(serverpath + "inAppList.php", {
+          test = fetch(serverpath + "inAppList.php", {
             method: 'POST',
             headers: {
               "Content-Type": 'multipart/form-data'
@@ -1316,7 +1320,7 @@ export function callServer(pTask, pData, pUserId) {
             body: formData
           });
           */
-      let test = fetch(
+      test = fetch(
         serverpath +
           "stats_latest_cards.php?" +
           new URLSearchParams({
@@ -1328,12 +1332,12 @@ export function callServer(pTask, pData, pUserId) {
       break;
     }
     case "stat_loginCheck": {
-      var jsonstr = prepData(pData);
-      let formData = new FormData();
+      jsonstr = prepData(pData);
+      formData = new FormData();
       formData.append("uUserId", pUserId);
       formData.append("uContent", jsonstr);
       /*
-          let test = fetch(serverpath + "inAppList.php", {
+          test = fetch(serverpath + "inAppList.php", {
             method: 'POST',
             headers: {
               "Content-Type": 'multipart/form-data'
@@ -1341,7 +1345,7 @@ export function callServer(pTask, pData, pUserId) {
             body: formData
           });
           */
-      let test = fetch(
+      test = fetch(
         serverpath +
           "stats_login_check.php?" +
           new URLSearchParams({
@@ -1356,149 +1360,4 @@ export function callServer(pTask, pData, pUserId) {
     default:
       break;
   }
-}
-
-export function callServer2(pTask, pData, pUserId, pCallback) {
-  /*   
-    else if (pTask === "getCardCount") {
-    	var jsonstr = prepData(pData);
-        $.post( serverpath + "cards_count.php", { uContent: jsonstr, uUserId: pUserId, uAction: "CardCount" })
-          .done(function( result ) {
-          	//console.log(result);
-             var data = jQuery.parseJSON(result);
-             pCallback(data);
-        });      
-    }     
-     
-    //****** account handlers **********
-    else if (pTask === "defaultAccount") {
-    	var jsonstr = prepData(pData);    	   	
-        $.post( serverpath + "create_profile.php", { uContent: jsonstr, uUserId: pUserId, uAction: 'defaultAccount' })
-          .done(function(result) {
-             var data = jQuery.parseJSON(result);
-             pCallback(data);
-        	})
-          .fail(function(xhr, textStatus, errorThrown) {
-    		alert(xhr.responseText);
-    		alert(errorThrown);
-  		});
-              
-    } 
-    else if (pTask === "user") {
-    	var jsonstr = prepData(pData);
-        $.post( serverpath + "create_profile.php", { uContent: jsonstr, uUserId: pUserId, uAction: "getUser" })
-          .done(function( result ) {
-             var data = jQuery.parseJSON(result);
-             pCallback(data);
-        });      
-    } 
-    else if (pTask === "loginCheck") {
-    	var jsonstr = prepData(pData);
-        $.post( serverpath + "checkLogin.php", { uPassword: pData, uUserId: pUserId, uAction: "checkLogin" })
-          .done(function( result ) {
-          	//console.log(result);
-             var data = jQuery.parseJSON(result);
-             pCallback(data);
-        });      
-    } 
-    else if (pTask === "userInfo") {
-    	var jsonstr = prepData(pData);
-        $.post( serverpath + "profile.php", { uPassword: pData, uUserId: pUserId, uAction: "userInfo" })
-          .done(function( result ) {
-          	//console.log(result);
-             var data = jQuery.parseJSON(result);
-             pCallback(data);
-        });      
-    }
-    else if (pTask === "registerUser") {
-    	var jsonstr = prepData(pData);
-        $.post( serverpath + "register.php", { uContent: jsonstr, uUserId: pUserId, uAction: "register" })
-          .done(function( result ) {
-          	//console.log(result);
-             var data = jQuery.parseJSON(result);
-             pCallback(data);
-        });      
-    }    
-    else if (pTask === "updateUserPic") {
-    	var jsonstr = prepData(pData);
-        $.post( serverpath + "updateUserPic.php", { uContent: jsonstr, uUserId: pUserId, uAction: "update" })
-          .done(function( result ) {
-             var data = jQuery.parseJSON(result);
-             pCallback(data);
-        });      
-    }        
-    //******** Message Boards *********
-    
-    //******** Friends Mgmt *********
-  
-    else if (pTask === "insertBlock") {
-    	var jsonstr = prepData(pData);
-        $.post( serverpath + "playerBlock.php", { uContent: jsonstr, uUserId: pUserId, uAction: "insert" })
-          .done(function( result ) {
-          	//console.log(result);
-             var data = jQuery.parseJSON(result);
-             pCallback(data);
-        });      
-    }
-    else if (pTask === "deleteBlock") {
-    	var jsonstr = prepData(pData);
-        $.post( serverpath + "playerBlock.php", { uContent: jsonstr, uUserId: pUserId, uAction: "delete" })
-          .done(function( result ) {
-          	//console.log(result);
-             var data = jQuery.parseJSON(result);
-             pCallback(data);
-        });      
-    }        
-    //******** InApp Mgmt **************
-     else if (pTask === "loadInApp") {
-    	var jsonstr = prepData(pData);
-        $.post( serverpath + "inAppList.php", { uContent: jsonstr, uUserId: pUserId, uAction: "select" })
-          .done(function( result ) {
-          	//console.log(result);
-             var data = jQuery.parseJSON(result);
-             pCallback(data);
-        });      
-    } 
-     else if (pTask === "updateCredit") {
-    	var jsonstr = prepData(pData);
-        $.post( serverpath + "updateUserCredit.php", { uContent: jsonstr, uUserId: pUserId, uAction: "update" })
-          .done(function( result ) {
-          	//console.log(result);
-             var data = jQuery.parseJSON(result);
-             pCallback(data);
-        });      
-    }
-    //******** COntact Us ***********
-     else if (pTask === "contactUS") {
-    	var jsonstr = prepData(pData);
-        $.post( serverpath + "contactUs.php", { uContent: jsonstr, uUserId: pUserId, uAction: "email" })
-          .done(function( result ) {
-          	console.log(result);
-             var data = jQuery.parseJSON(result);
-             pCallback(data);
-        });      
-    } 
-    //******** BATTLE actions ************
-    else if (pTask === "battleResult") { 
-     	var jsonstr = prepData(pData);
-        $.post( serverpath + "battle/battle_result.php", { uContent: jsonstr, uUserId: pUserId, uAction: "setup" })
-          .done(function( result ) {
-             console.log(result);          	
-             var data = jQuery.parseJSON(result);
-             pCallback(data);
-        });   	
-    }
-    else if (pTask === "battleYourStats") { 
-     	var jsonstr = prepData(pData);
-        $.post( serverpath + "battle/battle_your_stats.php", { uContent: jsonstr, uUserId: pUserId, uAction: "setup" })
-          .done(function( result ) {
-          	console.log(result);
-             var data = jQuery.parseJSON(result);
-             pCallback(data);
-        });   	
-    }                                                                 
-    else {
-    	
-    }
-    */
 }

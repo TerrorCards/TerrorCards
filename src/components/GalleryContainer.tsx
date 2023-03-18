@@ -4,40 +4,16 @@ import {
   IonGrid,
   IonRow,
   IonCol,
-  IonInfiniteScroll,
-  IonInfiniteScrollContent,
-  IonList,
   IonModal,
   IonButton,
   IonImg,
-  IonThumbnail,
-  IonButtons,
   IonContent,
-  IonHeader,
-  IonMenuButton,
-  IonFooter,
-  IonPage,
-  IonTitle,
-  IonToolbar,
-  IonFab,
-  IonFabButton,
   IonIcon,
-  IonFabList,
-  IonChip,
-  IonLabel,
-  IonItem,
-  IonSlides,
-  IonSlide,
   IonBadge,
   IonText,
   IonPopover,
 } from "@ionic/react";
-import {
-  copyOutline,
-  flashOutline,
-  settingsOutline,
-  constructOutline,
-} from "ionicons/icons";
+import { copyOutline, flashOutline, settingsOutline } from "ionicons/icons";
 import "./GalleryContainer.css";
 import GalleryMenu from "./GalleryMenu";
 import { callServer } from "./ajaxcalls";

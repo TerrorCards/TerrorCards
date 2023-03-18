@@ -1,9 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import {
-  IonSlides,
-  IonSlide,
   IonContent,
-  IonHeader,
   IonCol,
   IonRow,
   IonGrid,
@@ -12,33 +9,10 @@ import {
   IonCardSubtitle,
   IonCardTitle,
   IonCardContent,
-  IonItem,
-  IonIcon,
-  IonLabel,
   IonButton,
-  IonList,
-  isPlatform,
-  IonChip,
-  IonAvatar,
-  IonImg,
-  IonRefresher,
-  IonRefresherContent,
-  IonSearchbar,
-  IonPopover,
-  IonItemSliding,
-  IonItemOptions,
-  IonItemOption,
-  IonTextarea,
-  IonModal,
-  IonMenuButton,
-  IonButtons,
-  IonToolbar,
-  IonTitle,
   IonText,
-  IonBadge,
   withIonLifeCycle,
 } from "@ionic/react";
-import { settingsOutline, aperture, settings } from "ionicons/icons";
 import { callServer } from "./ajaxcalls";
 
 interface props {

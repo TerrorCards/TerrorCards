@@ -1,48 +1,13 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import {
   withIonLifeCycle,
   IonItem,
   IonLabel,
-  IonGrid,
-  IonRow,
-  IonCol,
-  IonInfiniteScroll,
-  IonInfiniteScrollContent,
   IonList,
   IonListHeader,
-  IonModal,
-  IonButton,
-  IonImg,
-  IonThumbnail,
-  IonButtons,
-  IonContent,
-  IonHeader,
-  IonMenuButton,
-  IonFooter,
-  IonPage,
-  IonTitle,
-  IonToolbar,
-  IonFab,
-  IonFabButton,
-  IonIcon,
-  IonFabList,
-  IonInput,
   IonSelect,
   IonSelectOption,
 } from "@ionic/react";
-import {
-  add,
-  settings,
-  share,
-  person,
-  arrowForwardCircle,
-  arrowBackCircle,
-  arrowUpCircle,
-  layers,
-  calendar,
-  grid,
-  logoTwitter,
-} from "ionicons/icons";
 import "./GalleryMenu.css";
 import { callServer } from "./ajaxcalls";
 

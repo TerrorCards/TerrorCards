@@ -2,24 +2,16 @@ import React from "react";
 import {
   IonAlert,
   IonContent,
-  IonHeader,
-  IonPage,
-  IonTitle,
-  IonToolbar,
   IonSegment,
   IonSegmentButton,
   IonLabel,
   IonList,
-  IonItem,
   IonCardHeader,
   IonCard,
   IonCardSubtitle,
-  IonCardTitle,
   IonCardContent,
   IonModal,
   IonButton,
-  IonSlides,
-  IonSlide,
   IonImg,
   IonGrid,
   IonRow,
@@ -29,8 +21,6 @@ import {
 import "./StoreContainer.css";
 import { callServer } from "./ajaxcalls";
 import { InAppPurchase2 } from "@awesome-cordova-plugins/in-app-purchase-2";
-import { isPlatform, getPlatforms } from "@ionic/react";
-import { promises } from "fs";
 
 interface props {
   storeProps: any;
