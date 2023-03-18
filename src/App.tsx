@@ -88,9 +88,7 @@ interface state {
 const store = new Storage();
 store.create();
 
-//setupIonicReact({
-//  mode: "ios",
-//});
+setupIonicReact({ mode: "ios" });
 
 class App extends React.Component<props, state> {
   constructor(props: any) {
@@ -141,15 +139,6 @@ class App extends React.Component<props, state> {
 
   componentDidMount() {
     console.log("componet did mount event fired");
-    /*
-    this.deviceInfo.uuid = Device.uuid;
-    this.deviceInfo.platform = Device.platform;
-    if (this.deviceInfo.platform === "ios") {
-      setupIonicReact({ mode: "ios" });
-    } else {
-      setupIonicReact({ mode: "md" });
-    }
-    */
     this.getUserStorage();
   }
 
@@ -158,11 +147,6 @@ class App extends React.Component<props, state> {
       this.deviceInfo.platform = d.platform;
       Device.getId().then((i: any) => {
         this.deviceInfo.uuid = i.uuid;
-        if (this.deviceInfo.platform === "ios") {
-          setupIonicReact({ mode: "ios" });
-        } else {
-          setupIonicReact({ mode: "ios" });
-        }
       });
     });
     /*

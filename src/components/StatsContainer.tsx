@@ -258,11 +258,11 @@ class StatsContainer extends React.Component<props, state> {
             }
           }}
         >
-          <img src={card.CardImage} width="80%" alt=""></img>
+          <img src={card.CardImage} width="75%" alt=""></img>
           <br></br>
           <IonText color="dark">
-            {card.CardOwner.length > 8
-              ? card.CardOwner.substring(0, 6) + "..."
+            {card.CardOwner.length > 7
+              ? card.CardOwner.substring(0, 5) + "..."
               : card.CardOwner}
           </IonText>
         </IonCol>

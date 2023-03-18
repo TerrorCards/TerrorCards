@@ -276,7 +276,7 @@ class ProfileManagerContainer extends React.Component<props, state> {
     }
 
     registerAccount() {
-        callServer("registerUser", {user: this.state.currUserName, device:"999888777", email:this.state.currEmail, password:this.state.currPassword}, this.props.user.ID)?.then((resp) => { return resp.json(); })
+        callServer("registerUser", {user: this.state.currUserName, device:this.props.deviceInfo.uuid, email:this.state.currEmail, password:this.state.currPassword}, this.props.user.ID)?.then((resp) => { return resp.json(); })
         .then((json) => {
             if (json) {
                 if(json.Response === "Fail") {
@@ -331,18 +331,30 @@ class ProfileManagerContainer extends React.Component<props, state> {
 
     callCamera = async () => {
         const image = await Camera.getPhoto({
-          quality: 90,
-          allowEditing: true,
-          resultType: CameraResultType.Uri
+          quality: 75,
+          allowEditing: false,
+          resultType: CameraResultType.Base64
         });
       
         // image.webPath will contain a path that can be set as an image src.
         // You can access the original file using image.path, which can be
         // passed to the Filesystem API to read the raw data of the image,
         // if desired (or pass resultType: CameraResultType.Base64 to getPhoto)
-        const imageUrl = image.webPath;
-        this.setState({currEmail: imageUrl!});
+        const imageUrl = image.base64String;
+        this.processNewPic(imageUrl);
       }
+
+      processNewPic(pic:any) {
+        callServer("updateUserPic", {newImage: pic}, this.props.user.ID)?.then((resp) => { return resp.json(); })
+        .then((json) => {
+            if (json) {
+                console.log(json)
+            }
+        })
+        .catch((err: any) => {
+            console.log(err);
+        }); 
+    }
 
     render() {
         return (
@@ -449,7 +461,7 @@ class ProfileManagerContainer extends React.Component<props, state> {
                             }                                  
                             </IonLabel>
                             <IonItem fill="solid">
-                            <IonTextarea value={this.props.deviceInfo.platform} placeholder="About yourself" onIonChange={(e) => {
+                            <IonTextarea value={this.state.currDescription} placeholder="About yourself" onIonChange={(e) => {
                                 this.setState({currDescription: e.detail.value!})
                             }}
                             onIonBlur={(e) => {
