@@ -1,0 +1,8 @@
+{
+  "appId": "com.gisgames.terrorcards",
+  "appName": "TerrorCards",
+  "bundledWebRuntime": false,
+  "npmClient": "npm",
+  "webDir": "build",
+  "cordova": {}
+}
