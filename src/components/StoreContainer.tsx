@@ -81,7 +81,7 @@ class StoreContainer extends React.Component<props, state> {
   componentDidMount() {
     //used when in a tab nav
     this.pullPacks();
-    //this.pullInApp();
+    this.pullInApp();
   }
 
   ionViewWillEnter() {
@@ -92,7 +92,7 @@ class StoreContainer extends React.Component<props, state> {
   }
 
   componentWillMount() {
-    this.pullInApp();
+    //this.pullInApp();
   }
 
   ionViewWillLeave() {}
