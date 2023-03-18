@@ -242,7 +242,6 @@ class HuntContainer extends React.Component<props, state> {
   };
 
   renderItems = () => {
-    let items: Array<any> = [];
     let you = this.state.battleParams[0];
     let other = this.state.battleParams[1];
     //console.log(this.state.battleResults);
@@ -448,7 +447,7 @@ class HuntContainer extends React.Component<props, state> {
     var gArrResults = [];
     while (i <= rounds) {
       //setTimeout(function(i,rounds) {
-      if (i == 1) {
+      if (i === 1) {
         //determine who goes first
         whoseTurn = this.firstAttackBattle();
       }
@@ -458,11 +457,11 @@ class HuntContainer extends React.Component<props, state> {
         this.battleEndGame(gArrResults);
         break;
       }
-      if (i == rounds) {
+      if (i === rounds) {
         this.battleEndGame(gArrResults);
         break;
       }
-      if (whoseTurn == "you") {
+      if (whoseTurn === "you") {
         whoseTurn = "target";
       } else {
         whoseTurn = "you";
@@ -475,7 +474,7 @@ class HuntContainer extends React.Component<props, state> {
   firstAttackBattle = () => {
     var ran_num = Math.floor(Math.random() * 10) + 1;
     var oddEven = ran_num % 2;
-    if (oddEven == 1) {
+    if (oddEven === 1) {
       return "you";
     } else {
       return "target";
@@ -485,16 +484,17 @@ class HuntContainer extends React.Component<props, state> {
   playBattleRound = (pParam: any) => {
     var attack = 0;
     var defense = 0;
+    let difference = 0;
     this.gBattleUser = { ...this.state.battleParams[0] };
     this.gBattleTarget = { ...this.state.battleParams[1] };
-    if (pParam.turn == "you") {
+    if (pParam.turn === "you") {
       //your attack
       attack = Math.floor(Math.random() * this.gBattleUser.AttackMax) + 1;
       //target defense
       defense = Math.floor(
         (Math.floor(Math.random() * this.gBattleTarget.DefenseMax) + 1) / 2
       );
-      var difference = attack - defense;
+      difference = attack - defense;
       if (difference > 0) {
         this.gBattleTarget.LifeMax = this.gBattleTarget.LifeMax - difference;
         //$("#targetLifeVal").text(this.gBattleTarget.Life);
@@ -520,7 +520,7 @@ class HuntContainer extends React.Component<props, state> {
       defense = Math.floor(
         (Math.floor(Math.random() * this.gBattleUser.DefenseMax) + 1) / 2
       );
-      var difference = attack - defense;
+      difference = attack - defense;
       if (difference > 0) {
         this.gBattleUser.LifeMax = this.gBattleUser.LifeMax - difference;
         //$("#myLifeVal").text(this.gBattleUser.Life);
@@ -543,7 +543,7 @@ class HuntContainer extends React.Component<props, state> {
   };
 
   battleEndGame = (params: any) => {
-    if (this.battleWinner == "") {
+    if (this.battleWinner === "") {
       if (this.gBattleUser.Life >= this.gBattleTarget.Life) {
         this.battleWinner = this.gBattleUser.ID;
         this.battleLoser = this.gBattleTarget.ID;
@@ -610,8 +610,9 @@ class HuntContainer extends React.Component<props, state> {
       battleLog = battleLog + "<div>" + txtResult + "</div>";
       this.setState(
         { yourDamMsg: test2.yourDamMsg, otherDamMsg: test2.otherDamMsg },
+        // eslint-disable-next-line
         () => {
-          if (index + 1 == pParam.length) {
+          if (index + 1 === pParam.length) {
             let resultMsg = this.battleWinner + " is the winner!";
             //console.log(result[0]);
             if (
@@ -625,6 +626,7 @@ class HuntContainer extends React.Component<props, state> {
                 result[0].Reward +
                 "' width='50'></img></div>";
             }
+            // eslint-disable-next-line
             resultMsg = resultMsg + battleLog;
 
             this.setState({
@@ -636,38 +638,6 @@ class HuntContainer extends React.Component<props, state> {
         }
       );
     }
-
-    /*
-    $.each(gArrResults, function (index, value) {
-      var test = setTimeout(function() {
-        if(value.player == gUser.ID) {
-          if(value.lifeLeft <= 0) {
-            $("#myLifeVal").text("0");	
-          } else {
-            $("#myLifeVal").text(value.lifeLeft);					
-          }		
-        } else {
-          if(value.lifeLeft <= 0) {
-            $("#targetLifeVal").text("0");	
-          } else {
-            $("#targetLifeVal").text(value.lifeLeft);	
-          }	
-        }
-        $("#divBattleID").text(value.player);	
-        $("#divBattleDamage").text("hurt " + value.damage);
-        
-        if((index+1) == gArrResults.length) {
-          $("#divBattleID").text(gBattleWinner);
-          $("#divBattleDamage").text("is the winner!");
-          if(pParam[0].Reward !== "") {
-            $("#divBattleReward").css("display", "block");
-            $("#battleRewardImg").attr("src", pParam[0].Reward);	
-          }
-          $("#btnBattleList").attr("disabled", false);				
-        }		
-      },2000 * index);
-    });
-    */
   };
 }
 

@@ -242,7 +242,7 @@ class StatsContainer extends React.Component<props, state> {
     justUser.forEach((card: any, i: number) => {
       userList.push(
         <IonCol key={i}>
-          <img src={card.CardImage} width="80%"></img>
+          <img src={card.CardImage} width="80%" alt=""></img>
           <br></br>
           <IonText color="dark"> </IonText>
         </IonCol>
@@ -258,7 +258,7 @@ class StatsContainer extends React.Component<props, state> {
             }
           }}
         >
-          <img src={card.CardImage} width="80%"></img>
+          <img src={card.CardImage} width="80%" alt=""></img>
           <br></br>
           <IonText color="dark">
             {card.CardOwner.length > 8

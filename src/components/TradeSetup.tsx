@@ -136,7 +136,7 @@ class TradeSetup extends React.Component<props, state> {
 
   changeTradeTab = (tab: string) => {
     this.setState({ step: tab }, () => {
-      if (tab === "you" || tab == "other") {
+      if (tab === "you" || tab === "other") {
         this.generateImageSelectionList();
       }
     });
@@ -197,7 +197,7 @@ class TradeSetup extends React.Component<props, state> {
     if (this.state.tradeCardsList.length > 0) {
       let yourList: Array<any> = [];
       let otherList: Array<any> = [];
-      this.state.tradeCardsList.map((cl: any) => {
+      this.state.tradeCardsList.forEach((cl: any) => {
         if (cl.UserID === this.props.user.ID) {
           yourList.push(cl.ID + "_" + cl.Card_Year + "_" + cl.Count);
         } else {
@@ -538,17 +538,17 @@ class TradeSetup extends React.Component<props, state> {
       personList = this.state.otherChunkList;
     }
     const list: Array<any> = [];
-    personList.map((ch: any, i: number) => {
+    personList.forEach((ch: any, i: number) => {
       const item: Array<any> = [];
-      ch.map((c: any, z: number) => {
+      ch.forEach((c: any, z: number) => {
         let imgSrc = c.Image;
-        let message = c.Active == "0" ? "Sold Out" : "";
+        let message = c.Active === "0" ? "Sold Out" : "";
         const cardWidth = 100 / this.state.layoutState.layoutCount - 1;
         if (this.state.layoutState.layoutCount > 2) {
           imgSrc = imgSrc.replace("full", "thumbs");
         }
         if (this.state.layoutState.layoutCount > 3) {
-          if (message == "Sold Out") {
+          if (message === "Sold Out") {
             message = "S.O.";
           }
         }
@@ -625,7 +625,7 @@ class TradeSetup extends React.Component<props, state> {
     let local = [...this.state.tradeCardsList];
     if (local.length > 0) {
       let found = false;
-      local.map((lc: any) => {
+      local.forEach((lc: any) => {
         if (lc.ID === card.ID) {
           found = true;
           lc.Count = lc.Count + 1;
@@ -663,8 +663,8 @@ class TradeSetup extends React.Component<props, state> {
       playerList = [...this.state.otherChunkList];
     }
     if (playerList !== null) {
-      playerList.map((pl: any) => {
-        pl.map((p: any) => {
+      playerList.forEach((pl: any) => {
+        pl.forEach((p: any) => {
           if (card.ID === p.ID) {
             p.Count = p.Count - 1;
           }
@@ -696,7 +696,7 @@ class TradeSetup extends React.Component<props, state> {
     let found = -1;
     if (local.length > 0) {
       //if it's over 1, just decrease, otherwise, remove it
-      local.map((lc: any, i: number) => {
+      local.forEach((lc: any, i: number) => {
         if (lc.ID === card.ID) {
           if (lc.Count > 1) {
             lc.Count = lc.Count - 1;
@@ -716,8 +716,8 @@ class TradeSetup extends React.Component<props, state> {
         playerList = [...this.state.otherChunkList];
       }
       if (playerList !== null) {
-        playerList.map((pl: any) => {
-          pl.map((p: any) => {
+        playerList.forEach((pl: any) => {
+          pl.forEach((p: any) => {
             if (card.ID === p.ID) {
               p.Count = p.Count + 1;
             }
@@ -797,7 +797,7 @@ class TradeSetup extends React.Component<props, state> {
         if (filtered[i]) {
           itemsList.push(
             <IonCol class="ion-text-center" key={i}>
-              <img src={filtered[i].Image} />
+              <img src={filtered[i].Image} alt="" />
               <IonButton
                 className="trade-button-remove"
                 size="small"
@@ -816,7 +816,7 @@ class TradeSetup extends React.Component<props, state> {
         } else {
           itemsList.push(
             <IonCol class="ion-text-center" key={i}>
-              <img src="assets/img/waitSmall.png" />
+              <img src="assets/img/waitSmall.png" alt="" />
             </IonCol>
           );
         }
@@ -825,7 +825,7 @@ class TradeSetup extends React.Component<props, state> {
       for (let i = 0; i < 5; i++) {
         itemsList.push(
           <IonCol class="ion-text-center" key={i}>
-            <img src="assets/img/waitSmall.png" />
+            <img src="assets/img/waitSmall.png" alt="" />
           </IonCol>
         );
       }
@@ -850,7 +850,7 @@ class TradeSetup extends React.Component<props, state> {
           if (filtered[i]) {
             itemsList.push(
               <IonCol class="ion-text-center" key={i}>
-                <img src={filtered[i].Image} style={{ width: 75 }} />
+                <img src={filtered[i].Image} style={{ width: 75 }} alt="" />
                 <IonButton
                   className="trade-button-remove"
                   size="small"
@@ -878,7 +878,7 @@ class TradeSetup extends React.Component<props, state> {
   };
 
   showCardetails = (card: any) => {
-    const details = (
+    return (
       <IonGrid>
         <IonRow>
           <IonCol>
@@ -887,7 +887,7 @@ class TradeSetup extends React.Component<props, state> {
         </IonRow>
         <IonRow>
           <IonCol>
-            <img src={card.Image} width="100%" />
+            <img src={card.Image} width="100%" alt="" />
           </IonCol>
         </IonRow>
         <IonRow>
@@ -912,9 +912,9 @@ class TradeSetup extends React.Component<props, state> {
           return lc.UserID === player;
         });
         if (filtered.length > 0) {
-          localPlayerList.map((pl: any) => {
-            pl.map((p: any) => {
-              filtered.map((f: any) => {
+          localPlayerList.forEach((pl: any) => {
+            pl.forEach((p: any) => {
+              filtered.forEach((f: any) => {
                 if (f.ID === p.ID) {
                   p.Count = p.Count - f.Count;
                 }

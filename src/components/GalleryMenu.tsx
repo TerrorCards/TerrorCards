@@ -206,7 +206,7 @@ class GalleryMenu extends React.Component<props, state> {
         {"All"}
       </IonSelectOption>
     );
-    data.map((d: any, i: number) => {
+    data.forEach((d: any, i: number) => {
       if (d.Year === this.props.layoutProps.year) {
         const cleanName = d.SetName.replace(/_/g, " ");
         if (d.SetName === this.props.layoutProps.set) {
@@ -229,7 +229,7 @@ class GalleryMenu extends React.Component<props, state> {
 
   setRenderViews = () => {
     const availableView: any = [];
-    this.viewOptions.map((d: any, i: number) => {
+    this.viewOptions.forEach((d: any, i: number) => {
       if (this.props.layoutProps.viewOptions === "all") {
         availableView.push(
           <IonSelectOption key={i} value={d}>

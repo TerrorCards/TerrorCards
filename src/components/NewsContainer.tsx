@@ -1,24 +1,54 @@
-import React, { useState, useEffect } from "react";
-import { IonContent, IonCard, IonCardContent } from "@ionic/react";
+import React from "react";
+import {
+  IonContent,
+  IonCard,
+  IonCardContent,
+  withIonLifeCycle,
+} from "@ionic/react";
 import { callServer } from "./ajaxcalls";
 
-interface ContainerProps {
+interface props {
   name: string;
 }
 
-const slideOpts = {
-  initialSlide: 0,
-  speed: 400,
-};
+interface state {
+  newsState: any;
+}
 
-const viewHeight = window.innerHeight / 1.5;
+class NewsContainer extends React.Component<props, state> {
+  constructor(props: any) {
+    super(props);
 
-const NewsContainer: React.FC<ContainerProps> = ({ name }) => {
-  const [searchState, updateSearch] = useState({ value: "" });
-  const [newsState, setNews] = useState([] as any);
+    this.state = {
+      newsState: [],
+    };
+  }
+
+  componentDidMount() {
+    this.pullNews();
+    console.log("ionViewDidEnter event fired");
+  }
+
+  componentDidUpdate(prevProps: any) {}
+
+  ionViewWillEnter() {
+    console.log("ionViewWillEnter event fired");
+  }
+
+  ionViewWillLeave() {
+    console.log("ionViewWillLeave event fired");
+  }
+
+  ionViewDidEnter() {
+    console.log("ionViewDidEnter event fired");
+  }
+
+  ionViewDidLeave() {
+    console.log("ionViewDidLeave event fired");
+  }
 
   //BEGIN BANNER CODE
-  function pullNews() {
+  pullNews() {
     callServer("fetchNews", "", "TerrorCards")
       ?.then((resp) => {
         return resp.json();
@@ -27,10 +57,10 @@ const NewsContainer: React.FC<ContainerProps> = ({ name }) => {
         console.log(json);
         if (json.length > 0) {
           let msgList: Array<any> = [];
-          json.map((j: any, i: number) => {
-            msgList.push(renderNewsItem(j, i));
+          json.forEach((j: any, i: number) => {
+            msgList.push(this.renderNewsItem(j, i));
           });
-          setNews(msgList);
+          this.setState({ newsState: msgList });
         }
       })
       .catch((err: any) => {
@@ -38,7 +68,7 @@ const NewsContainer: React.FC<ContainerProps> = ({ name }) => {
       });
   }
 
-  function renderNewsItem(j: any, i: number) {
+  renderNewsItem(j: any, i: number) {
     return (
       <IonCard key={i}>
         <IonCardContent>
@@ -49,16 +79,13 @@ const NewsContainer: React.FC<ContainerProps> = ({ name }) => {
     );
   }
 
-  //END MESSAGE FUNCTIONS
+  render() {
+    return (
+      <IonContent style={{ backgroundColor: "#333" }}>
+        {this.state.newsState}
+      </IonContent>
+    );
+  }
+}
 
-  useEffect(() => {
-    // executed only once
-    pullNews();
-  }, []);
-
-  return (
-    <IonContent style={{ backgroundColor: "#333" }}>{newsState}</IonContent>
-  );
-};
-
-export default NewsContainer;
+export default withIonLifeCycle(NewsContainer);

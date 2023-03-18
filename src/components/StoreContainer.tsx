@@ -162,7 +162,7 @@ class StoreContainer extends React.Component<props, state> {
   renderItems = (filtered: any, allList: any) => {
     let items: Array<any> = [];
     if (filtered.length > 0) {
-      filtered.map((p: any) => {
+      filtered.forEach((p: any) => {
         const packOddsPack = parseInt(p.Ratio) > 1 ? " Packs" : " Pack";
         let packMsg = "";
         if (parseInt(p.Ratio) === 1) {
@@ -243,7 +243,7 @@ class StoreContainer extends React.Component<props, state> {
   renderCoinsList = () => {
     let items: Array<any> = [];
     if (this.state.allCoinList.length > 0) {
-      this.state.allCoinList.map((p: any) => {
+      this.state.allCoinList.forEach((p: any) => {
         items.push(
           <IonCard key={p.title}>
             <IonCardHeader>
@@ -353,7 +353,7 @@ class StoreContainer extends React.Component<props, state> {
   renderCards = (cards: any) => {
     let items: Array<any> = [];
     if (cards.length > 0) {
-      cards.map((c: any, i: number) => {
+      cards.forEach((c: any, i: number) => {
         items.push(
           <IonCard key={i}>
             <IonCardContent>

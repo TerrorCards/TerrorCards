@@ -247,17 +247,17 @@ class GalleryContainer extends React.Component<props, state> {
 
   imgList = () => {
     const list: Array<any> = [];
-    this.state.chunkedList.map((ch: any, i: number) => {
+    this.state.chunkedList.forEach((ch: any, i: number) => {
       const item: Array<any> = [];
-      ch.map((c: any, z: number) => {
+      ch.forEach((c: any, z: number) => {
         //console.log(c);
         let imgSrc = c.Image;
-        let message = c.Active == "0" ? "Sold Out" : "";
+        let message = c.Active === "0" ? "Sold Out" : "";
         if (this.props.galleryProps.layoutCount > 2) {
           imgSrc = imgSrc.replace("full", "thumbs");
         }
         if (this.props.galleryProps.layoutCount > 3) {
-          if (message == "Sold Out") {
+          if (message === "Sold Out") {
             message = "S.O.";
           }
         }
@@ -332,9 +332,9 @@ class GalleryContainer extends React.Component<props, state> {
   nftList = () => {
     const list: Array<any> = [];
     let item: Array<any> = [];
-    this.state.chunkedList.map((nl: any, a: number) => {
+    this.state.chunkedList.forEach((nl: any, a: number) => {
       item = [];
-      nl.map((ch: any, i: number) => {
+      nl.forEach((ch: any, i: number) => {
         let imgSrc = ch.data.img;
         if (typeof imgSrc !== "undefined") {
           item.push(

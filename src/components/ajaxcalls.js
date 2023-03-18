@@ -41,7 +41,6 @@ export function callServer(pTask, pData, pUserId) {
           })
       );
 
-      return test;
       break;
     }
     case "sets": {
@@ -57,7 +56,7 @@ export function callServer(pTask, pData, pUserId) {
             uContent: jsonstr,
           })
       );
-      return test;
+
       break;
     }
     case "cardCount": {
@@ -82,7 +81,7 @@ export function callServer(pTask, pData, pUserId) {
             uContent: jsonstr,
           })
       );
-      return test;
+
       break;
     }
     case "cardDetail": {
@@ -107,7 +106,7 @@ export function callServer(pTask, pData, pUserId) {
             uContent: jsonstr,
           })
       );
-      return test;
+
       break;
     }
     case "userInfo": {
@@ -116,7 +115,6 @@ export function callServer(pTask, pData, pUserId) {
       formData.append("uUserId", pUserId);
       formData.append("uAction", "userInfo");
       formData.append("uContent1", "test");
-      let data2 = { uUserId: pUserId, uAction: "userInfo", uContent1: "test" };
       /*
             test = fetch(serverpath + "profile.php", {
               method: 'GET',
@@ -138,7 +136,7 @@ export function callServer(pTask, pData, pUserId) {
             uContent1: "test",
           })
       );
-      return test;
+
       break;
       /*
             test = fetch(serverpath + "profile.php", {
@@ -181,7 +179,7 @@ export function callServer(pTask, pData, pUserId) {
             uContent: pData,
           })
       );
-      return test;
+
       break;
     }
     case "appendBoardMessages": {
@@ -206,7 +204,7 @@ export function callServer(pTask, pData, pUserId) {
             uContent: jsonstr,
           })
       );
-      return test;
+
       break;
     }
     case "packs": {
@@ -233,7 +231,7 @@ export function callServer(pTask, pData, pUserId) {
             uContent: jsonstr,
           })
       );
-      return test;
+
       break;
     }
     case "packsOrder": {
@@ -260,7 +258,7 @@ export function callServer(pTask, pData, pUserId) {
             uContent: jsonstr,
           })
       );
-      return test;
+
       break;
     }
     case "showTrades": {
@@ -287,7 +285,7 @@ export function callServer(pTask, pData, pUserId) {
             uContent1: jsonstr,
           })
       );
-      return test;
+
       break;
     }
     case "tradeSetup": {
@@ -316,7 +314,6 @@ export function callServer(pTask, pData, pUserId) {
           })
       );
 
-      return test;
       break;
     }
     case "saveTrade": {
@@ -348,7 +345,7 @@ export function callServer(pTask, pData, pUserId) {
             uMsg: pData.msg,
           })
       );
-      return test;
+
       break;
     }
     case "executeTrade": {
@@ -376,7 +373,7 @@ export function callServer(pTask, pData, pUserId) {
             uContent2: "",
           })
       );
-      return test;
+
       break;
     }
     case "cancelTrade": {
@@ -404,7 +401,7 @@ export function callServer(pTask, pData, pUserId) {
             uContent2: "",
           })
       );
-      return test;
+
       break;
     }
     case "requestTradeMessages": {
@@ -429,7 +426,7 @@ export function callServer(pTask, pData, pUserId) {
             uTradeID: pData,
           })
       );
-      return test;
+
       break;
     }
     case "appendTradeMessages": {
@@ -454,7 +451,7 @@ export function callServer(pTask, pData, pUserId) {
             uContent1: jsonstr,
           })
       );
-      return test;
+
       break;
     }
     case "hasTrades": {
@@ -481,7 +478,6 @@ export function callServer(pTask, pData, pUserId) {
           })
       );
 
-      return test;
       break;
     }
     case "pullFactoryList": {
@@ -506,7 +502,7 @@ export function callServer(pTask, pData, pUserId) {
             uContent: pData,
           })
       );
-      return test;
+
       break;
     }
     case "meldFactoryItem": {
@@ -531,7 +527,7 @@ export function callServer(pTask, pData, pUserId) {
             uContent: jsonstr,
           })
       );
-      return test;
+
       break;
     }
     case "fetchNews": {
@@ -546,7 +542,7 @@ export function callServer(pTask, pData, pUserId) {
         },
         body: formData,
       });
-      return test;
+
       break;
     }
     case "fetchNewsBanner": {
@@ -561,7 +557,7 @@ export function callServer(pTask, pData, pUserId) {
         },
         body: formData,
       });
-      return test;
+
       break;
     }
     case "loginCheck": {
@@ -589,7 +585,6 @@ export function callServer(pTask, pData, pUserId) {
           })
       );
 
-      return test;
       break;
     }
     case "forgotPassword": {
@@ -616,7 +611,7 @@ export function callServer(pTask, pData, pUserId) {
             uContent: jsonstr,
           })
       );
-      return test;
+
       break;
     }
     case "defaultAccount": {
@@ -643,7 +638,7 @@ export function callServer(pTask, pData, pUserId) {
             uContent: jsonstr,
           })
       );
-      return test;
+
       break;
     }
     case "registerUser": {
@@ -670,7 +665,7 @@ export function callServer(pTask, pData, pUserId) {
             uAction: "register",
           })
       );
-      return test;
+
       break;
     }
     case "checkEmailExist": {
@@ -695,7 +690,7 @@ export function callServer(pTask, pData, pUserId) {
             uContent: jsonstr,
           })
       );
-      return test;
+
       break;
     }
     case "changePassword": {
@@ -720,7 +715,7 @@ export function callServer(pTask, pData, pUserId) {
             uContent: jsonstr,
           })
       );
-      return test;
+
       break;
     }
     case "changeWallet": {
@@ -745,7 +740,7 @@ export function callServer(pTask, pData, pUserId) {
             uContent: jsonstr,
           })
       );
-      return test;
+
       break;
     }
     case "changeDescription": {
@@ -770,7 +765,7 @@ export function callServer(pTask, pData, pUserId) {
             uContent: jsonstr,
           })
       );
-      return test;
+
       break;
     }
     case "pullFriendsList": {
@@ -797,7 +792,7 @@ export function callServer(pTask, pData, pUserId) {
             uAction: "select",
           })
       );
-      return test;
+
       break;
     }
     case "pullSearchList": {
@@ -824,7 +819,7 @@ export function callServer(pTask, pData, pUserId) {
             uAction: "search",
           })
       );
-      return test;
+
       break;
     }
     case "pullBlockList": {
@@ -851,7 +846,7 @@ export function callServer(pTask, pData, pUserId) {
             uAction: "select",
           })
       );
-      return test;
+
       break;
     }
     case "addFriend": {
@@ -878,7 +873,7 @@ export function callServer(pTask, pData, pUserId) {
             uContent: jsonstr,
           })
       );
-      return test;
+
       break;
     }
     case "deleteFriend": {
@@ -905,7 +900,7 @@ export function callServer(pTask, pData, pUserId) {
             uContent: jsonstr,
           })
       );
-      return test;
+
       break;
     }
     case "insertBlockPlayer": {
@@ -932,7 +927,7 @@ export function callServer(pTask, pData, pUserId) {
             uAction: "insert",
           })
       );
-      return test;
+
       break;
     }
     case "removeBlockPlayer": {
@@ -959,7 +954,7 @@ export function callServer(pTask, pData, pUserId) {
             uAction: "delete",
           })
       );
-      return test;
+
       break;
     }
     case "flagComment": {
@@ -984,7 +979,7 @@ export function callServer(pTask, pData, pUserId) {
             uContent: jsonstr,
           })
       );
-      return test;
+
       break;
     }
     case "updateUserPic": {
@@ -1000,7 +995,7 @@ export function callServer(pTask, pData, pUserId) {
         },
         body: formData,
       });
-      return test;
+
       break;
     }
     case "battleYourStats": {
@@ -1018,7 +1013,7 @@ export function callServer(pTask, pData, pUserId) {
             },
             body: formData
           });
-          return test;
+          
           break;
           */
       test = fetch(
@@ -1031,7 +1026,7 @@ export function callServer(pTask, pData, pUserId) {
             uType: "",
           })
       );
-      return test;
+
       break;
     }
 
@@ -1050,7 +1045,7 @@ export function callServer(pTask, pData, pUserId) {
             },
             body: formData
           });
-          return test;
+          
           break;
           */
       test = fetch(
@@ -1063,7 +1058,7 @@ export function callServer(pTask, pData, pUserId) {
             uType: "",
           })
       );
-      return test;
+
       break;
     }
     case "battleSetup": {
@@ -1081,7 +1076,7 @@ export function callServer(pTask, pData, pUserId) {
             },
             body: formData
           });
-          return test;
+          
           break;
           */
       test = fetch(
@@ -1094,7 +1089,7 @@ export function callServer(pTask, pData, pUserId) {
             uType: "",
           })
       );
-      return test;
+
       break;
     }
     case "battleResult": {
@@ -1124,7 +1119,6 @@ export function callServer(pTask, pData, pUserId) {
           })
       );
 
-      return test;
       break;
     }
     case "loadInAppItems": {
@@ -1152,7 +1146,6 @@ export function callServer(pTask, pData, pUserId) {
           })
       );
 
-      return test;
       break;
     }
     case "contactUs": {
@@ -1179,7 +1172,7 @@ export function callServer(pTask, pData, pUserId) {
             uContent: jsonstr,
           })
       );
-      return test;
+
       break;
     }
     case "deleteAccount": {
@@ -1201,7 +1194,7 @@ export function callServer(pTask, pData, pUserId) {
             uUserId: pUserId,
           })
       );
-      return test;
+
       break;
     }
     case "updateCredit": {
@@ -1228,7 +1221,7 @@ export function callServer(pTask, pData, pUserId) {
             uAction: "update",
           })
       );
-      return test;
+
       break;
     }
     case "processPromo": {
@@ -1253,7 +1246,7 @@ export function callServer(pTask, pData, pUserId) {
             uContent: jsonstr,
           })
       );
-      return test;
+
       break;
     }
     case "stat_getCardTemplates": {
@@ -1278,7 +1271,7 @@ export function callServer(pTask, pData, pUserId) {
             uContent: jsonstr,
           })
       );
-      return test;
+
       break;
     }
     case "state_getCardCounts": {
@@ -1303,7 +1296,7 @@ export function callServer(pTask, pData, pUserId) {
             uContent: jsonstr,
           })
       );
-      return test;
+
       break;
     }
     case "stat_latestCards": {
@@ -1328,7 +1321,7 @@ export function callServer(pTask, pData, pUserId) {
             uContent: jsonstr,
           })
       );
-      return test;
+
       break;
     }
     case "stat_loginCheck": {
@@ -1353,11 +1346,12 @@ export function callServer(pTask, pData, pUserId) {
             uContent: jsonstr,
           })
       );
-      return test;
+
       break;
     }
 
     default:
       break;
   }
+  return test;
 }

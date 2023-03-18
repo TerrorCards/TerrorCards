@@ -87,7 +87,6 @@ interface state {
 
 const store = new Storage();
 store.create();
-let menuContent: any = "";
 
 //setupIonicReact({
 //  mode: "ios",
@@ -186,7 +185,7 @@ class App extends React.Component<props, state> {
       .then((json) => {
         if (json) {
           console.log(json);
-          if (json == "Yes") {
+          if (json === "Yes") {
             this.tradesExist = true;
             //this.setState({ hasTrades: true });
           } else {
@@ -336,17 +335,6 @@ class App extends React.Component<props, state> {
     }
   };
 
-  /*
-  setTimeout(() => {
-    if(galleryState.year === -1) {
-      const localSettings: any = {...galleryState};
-      setGalleryLayout({layoutCount: localSettings.layoutCount, isInitialize:true ,year:(new Date()).getFullYear(), set:localSettings.set, view:localSettings.view}); 
-    }    
-  },1000);
-  */
-
-  //this.nav.parent.select(tabIndex);
-  //{menuContent = <GalleryMenu layoutAction={this.fnGalleryLayout}  layoutProps={this.state.galleryDigitalSettings} user={this.state.user} />}
   render() {
     return this.state.appReady && this.state.user.ID !== null ? (
       <IonApp>
@@ -558,18 +546,6 @@ class App extends React.Component<props, state> {
       </IonApp>
     );
   }
-
-  /*
-        <IonPopover
-        cssClass='popper-custom-menu-size'
-        isOpen={this.state.showPopover}
-        onDidDismiss={() => this.setState({ showPopover: false, event: undefined })}
-      >
-        {menuContent}
-      </IonPopover>
-*/
-
-  //<IonFabButton color="dark"><IonIcon icon={trophy} /></IonFabButton>
 }
 
 export default withIonLifeCycle(App);

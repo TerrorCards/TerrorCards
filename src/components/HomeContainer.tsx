@@ -149,7 +149,7 @@ class HomeContainer extends React.Component<props, state> {
         console.log(json);
         if (json.length > 0) {
           let msgList: Array<any> = [];
-          json.map((j: any, i: number) => {
+          json.forEach((j: any, i: number) => {
             msgList.push(this.renderMsgItem(j, i));
           });
           this.setState({ msg: msgList, controlList: json, showError: false });
@@ -289,13 +289,13 @@ class HomeContainer extends React.Component<props, state> {
         return cl.Text.indexOf(value) > 0;
       });
       let msgItem: any = [];
-      filtered.map((j: any, i: number) => {
+      filtered.forEach((j: any, i: number) => {
         msgItem.push(this.renderMsgItem(j, i));
       });
       this.setState({ msg: msgItem });
     } else {
       let msgItem: any = [];
-      this.state.controlList.map((j: any, i: number) => {
+      this.state.controlList.forEach((j: any, i: number) => {
         msgItem.push(this.renderMsgItem(j, i));
       });
       this.setState({ msg: msgItem });
@@ -340,13 +340,25 @@ class HomeContainer extends React.Component<props, state> {
         {this.state.newBannerState.length > 0 && (
           <IonSlides pager={true} options={slideOpts}>
             <IonSlide>
-              <img src={this.state.newBannerState[0].Banner} width="100%" />
+              <img
+                src={this.state.newBannerState[0].Banner}
+                width="100%"
+                alt="banner 1"
+              />
             </IonSlide>
             <IonSlide>
-              <img src={this.state.newBannerState[1].Banner} width="100%" />
+              <img
+                src={this.state.newBannerState[1].Banner}
+                width="100%"
+                alt="banner 2"
+              />
             </IonSlide>
             <IonSlide>
-              <img src={this.state.newBannerState[2].Banner} width="100%" />
+              <img
+                src={this.state.newBannerState[2].Banner}
+                width="100%"
+                alt="banner 3"
+              />
             </IonSlide>
           </IonSlides>
         )}

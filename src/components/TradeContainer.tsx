@@ -262,8 +262,6 @@ class TradeContainer extends React.Component<props, state> {
   };
 
   render() {
-    let content: any = "";
-
     return (
       <IonContent style={{ height: "85%" }}>
         <IonSegment
@@ -400,7 +398,7 @@ class TradeContainer extends React.Component<props, state> {
       let othersItems: Array<any> = [];
       let otherLabel: string = "";
 
-      this.state.filteredTradeList[key].map((card: any) => {
+      this.state.filteredTradeList[key].forEach((card: any) => {
         //console.log(card);
         if (card.UserID === this.props.user.ID) {
           yourItems.push(
@@ -414,6 +412,7 @@ class TradeContainer extends React.Component<props, state> {
                 onClick={() => {
                   this.showCardetails(card);
                 }}
+                alt=""
               />
               {card.Count !== null && card.Count > 1 && (
                 <IonBadge class="quantity-badge">{card.Count}</IonBadge>
@@ -437,6 +436,7 @@ class TradeContainer extends React.Component<props, state> {
                 onClick={() => {
                   this.showCardetails(card);
                 }}
+                alt=""
               />
               {card.Count !== null && card.Count > 1 && (
                 <IonBadge class="quantity-badge">{card.Count}</IonBadge>
@@ -556,7 +556,7 @@ class TradeContainer extends React.Component<props, state> {
     let msgList: Array<any> = [];
     this.pullTradesMessages(this.props.user.ID, ID).then((result: any) => {
       //console.log(result);
-      result.map((res: any, i: number) => {
+      result.forEach((res: any, i: number) => {
         msgList.push(
           <IonRow key={res.ID + "-" + i}>
             <IonCol
@@ -618,7 +618,7 @@ class TradeContainer extends React.Component<props, state> {
           </IonRow>
           <IonRow>
             <IonCol>
-              <img src={card.Image} width="100%" />
+              <img src={card.Image} width="100%" alt="" />
             </IonCol>
           </IonRow>
           <IonRow>

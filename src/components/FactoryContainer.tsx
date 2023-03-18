@@ -206,7 +206,7 @@ class FactoryContainer extends React.Component<props, state> {
   renderCards = (cards: any) => {
     let items: Array<any> = [];
     if (cards.length > 0) {
-      cards.map((c: any, i: number) => {
+      cards.forEach((c: any, i: number) => {
         items.push(<IonImg src={c.Image} key={i} />);
       });
     }
