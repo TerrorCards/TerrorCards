@@ -481,7 +481,7 @@ class HomeContainer extends React.Component<props, state> {
         {this.state.viewState === "Stats" && (
           <div
             style={{
-              height: this.viewHeight(1.75),
+              height: this.viewHeight(1.55),
               overflowY: "auto",
               backgroundColor: "#333",
             }}

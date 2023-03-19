@@ -990,9 +990,7 @@ export function callServer(pTask, pData, pUserId) {
       formData.append("uContent", jsonstr);
       test = fetch(serverpath + "updateUserPic.php", {
         method: "POST",
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
+        mode: "cors",
         body: formData,
       });
 
