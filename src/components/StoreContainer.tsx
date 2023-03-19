@@ -502,6 +502,8 @@ class StoreContainer extends React.Component<props, state> {
         type: InAppPurchase2.CONSUMABLE,
       });
 
+      console.log(InAppPurchase2);
+
       InAppPurchase2.when(productId)
         .approved((p: any) => p.verify())
         .verified((p: any) => {
