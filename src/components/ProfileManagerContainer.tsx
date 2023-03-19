@@ -331,7 +331,7 @@ class ProfileManagerContainer extends React.Component<props, state> {
 
     callCamera = async () => {
         const image = await Camera.getPhoto({
-          quality: 75,
+          quality: 50,
           allowEditing: false,
           resultType: CameraResultType.Base64
         });
@@ -348,7 +348,7 @@ class ProfileManagerContainer extends React.Component<props, state> {
         callServer("updateUserPic", {newImage: pic}, this.props.user.ID)?.then((resp) => { return resp.json(); })
         .then((json) => {
             if (json) {
-                console.log(json)
+                this.pullProfile()
             }
         })
         .catch((err: any) => {

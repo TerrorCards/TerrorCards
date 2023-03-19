@@ -598,6 +598,7 @@ class HuntContainer extends React.Component<props, state> {
 
   playBattleResults = (pParam: any, result: any) => {
     let battleLog = "<div>Battle Log</div>";
+    let resultMsg = "";
     for (let index = 0; index < pParam.length; ) {
       const value = pParam[index];
       let txtResult = value.player + " hurt " + value.damage;
@@ -608,36 +609,28 @@ class HuntContainer extends React.Component<props, state> {
         test2.otherDamMsg = txtResult;
       }
       battleLog = battleLog + "<div>" + txtResult + "</div>";
-      this.setState(
-        { yourDamMsg: test2.yourDamMsg, otherDamMsg: test2.otherDamMsg },
-        // eslint-disable-next-line
-        () => {
-          if (index + 1 === pParam.length) {
-            let resultMsg = this.battleWinner + " is the winner!";
-            //console.log(result[0]);
-            if (
-              result[0].Reward !== "" ||
-              typeof result[0].Reward !== "undefined"
-            ) {
-              resultMsg =
-                "<div>" +
-                this.battleWinner +
-                " is the winner!<br></br><img src='" +
-                result[0].Reward +
-                "' width='50'></img></div>";
-            }
-            // eslint-disable-next-line
-            resultMsg = resultMsg + battleLog;
-
-            this.setState({
-              battleResults: resultMsg,
-              showWinnerAlert: true,
-            });
-          }
-          index = index + 1;
+      if (index + 1 === pParam.length) {
+        resultMsg = this.battleWinner + " is the winner!";
+        //console.log(result[0]);
+        if (
+          result[0].Reward !== "" ||
+          typeof result[0].Reward !== "undefined"
+        ) {
+          resultMsg =
+            "<div>" +
+            this.battleWinner +
+            " is the winner!<br></br><img src='" +
+            result[0].Reward +
+            "' width='50'></img></div>";
         }
-      );
+        resultMsg = resultMsg + battleLog;
+      }
+      index = index + 1;
     }
+    this.setState({
+      battleResults: resultMsg,
+      showWinnerAlert: true,
+    });
   };
 }
 
