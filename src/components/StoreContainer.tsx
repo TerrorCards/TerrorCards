@@ -16,6 +16,8 @@ import {
   IonGrid,
   IonRow,
   IonCol,
+  IonSpinner,
+  IonItem,
   withIonLifeCycle,
 } from "@ionic/react";
 import "./StoreContainer.css";
@@ -44,6 +46,7 @@ interface state {
   showCoinMessage: boolean;
   coinPurchaseMsg: any;
   isInAppLoaded: boolean;
+  isIAPActiveBuy: boolean;
 }
 
 class StoreContainer extends React.Component<props, state> {
@@ -66,6 +69,7 @@ class StoreContainer extends React.Component<props, state> {
       showCoinMessage: false,
       coinPurchaseMsg: null,
       isInAppLoaded: false,
+      isIAPActiveBuy: false,
     };
   }
 
@@ -81,7 +85,7 @@ class StoreContainer extends React.Component<props, state> {
   componentDidMount() {
     //used when in a tab nav
     this.pullPacks();
-    this.pullInApp();
+    //this.pullInApp();
   }
 
   ionViewWillEnter() {
@@ -92,7 +96,7 @@ class StoreContainer extends React.Component<props, state> {
   }
 
   componentWillMount() {
-    //this.pullInApp();
+    this.pullInApp();
   }
 
   ionViewWillLeave() {}
@@ -243,6 +247,14 @@ class StoreContainer extends React.Component<props, state> {
   renderCoinsList = () => {
     let items: Array<any> = [];
     if (this.state.allCoinList.length > 0) {
+      if (this.state.isIAPActiveBuy) {
+        items.push(
+          <IonItem>
+            <IonLabel>Processing, please wait </IonLabel>
+            <IonSpinner></IonSpinner>
+          </IonItem>
+        );
+      }
       this.state.allCoinList.forEach((p: any) => {
         items.push(
           <IonCard key={p.title}>
@@ -270,6 +282,7 @@ class StoreContainer extends React.Component<props, state> {
                               showConfirmPurchase: true,
                               targetItem: p,
                               targetType: "coin",
+                              isIAPActiveBuy: true,
                             });
                             //this.canBuyCoins(p.ID);
                           }}
@@ -502,8 +515,6 @@ class StoreContainer extends React.Component<props, state> {
         type: InAppPurchase2.CONSUMABLE,
       });
 
-      console.log(InAppPurchase2);
-
       InAppPurchase2.when(productId)
         .approved((p: any) => p.verify())
         .verified((p: any) => {
@@ -534,6 +545,7 @@ class StoreContainer extends React.Component<props, state> {
               showCoinMessage: true,
               coinPurchaseMsg:
                 "Thank you. Account updated by " + value + " credit",
+              isIAPActiveBuy: false,
             });
             this.props.callbackPackOpenTimer(Date.now());
           });

@@ -39,6 +39,7 @@ interface state {
     needToRegister: boolean;
     showPromoAlert: boolean;
     promoMsg: string;
+    updatedImg: boolean;
 };
 
 class ProfileManagerContainer extends React.Component<props, state> {
@@ -63,7 +64,8 @@ class ProfileManagerContainer extends React.Component<props, state> {
             confirmDeleteAlert: false,
             needToRegister: false,
             showPromoAlert: false,
-            promoMsg: ""
+            promoMsg: "",
+            updatedImg: false
         }
     }
 
@@ -329,26 +331,31 @@ class ProfileManagerContainer extends React.Component<props, state> {
         </IonCol>)
     }
 
-    callCamera = async () => {
-        const image = await Camera.getPhoto({
-          quality: 50,
-          allowEditing: false,
-          resultType: CameraResultType.Base64
-        });
-      
-        // image.webPath will contain a path that can be set as an image src.
-        // You can access the original file using image.path, which can be
-        // passed to the Filesystem API to read the raw data of the image,
-        // if desired (or pass resultType: CameraResultType.Base64 to getPhoto)
-        const imageUrl = image.base64String;
-        this.processNewPic(imageUrl);
+    callCamera = () => {
+        this.setState({updatedImg: false}, async() => {
+            const image = await Camera.getPhoto({
+                quality: 50,
+                allowEditing: false,
+                resultType: CameraResultType.Base64,
+                width: 100,
+                height: 100
+              });
+            
+              // image.webPath will contain a path that can be set as an image src.
+              // You can access the original file using image.path, which can be
+              // passed to the Filesystem API to read the raw data of the image,
+              // if desired (or pass resultType: CameraResultType.Base64 to getPhoto)
+              const imageUrl = image.base64String;
+              this.processNewPic(imageUrl);
+        })
       }
 
       processNewPic(pic:any) {
         callServer("updateUserPic", {newImage: pic}, this.props.user.ID)?.then((resp) => { return resp.json(); })
         .then((json) => {
             if (json) {
-                this.pullProfile()
+                this.pullProfile();
+                this.setState({updatedImg: true});
             }
         })
         .catch((err: any) => {
@@ -450,6 +457,7 @@ class ProfileManagerContainer extends React.Component<props, state> {
                                 <IonImg style={{ width: "100px", height: "100px" }} src={this.state.info.Image}  onClick={() => {
                                 this.callCamera()                                
                             }}></IonImg>
+                            {this.state.updatedImg ? "Imaged changed, but may take awhile to reflect due to caching." : ""}
                         </IonCol>
                         <IonCol key={"bio"}>
                             <IonLabel position="stacked">Small bio for others to see

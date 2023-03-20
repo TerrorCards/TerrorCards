@@ -143,17 +143,21 @@ class SignInContainer extends React.Component<props, state> {
   renderSignInForm(j: any) {
     return (
       <IonGrid>
-        <IonRow>
-          <IonCol>
-            <IonItem>
-              Welcome to Terror Cards. If you're returning, sign in to access
-              you account. If you're new, getting started is easy, click the
-              link below and start your collection today!
-            </IonItem>
+        <IonRow class="ion-align-items-center">
+          <IonCol class="ion-text-center">
+            <img src="assets/img/banner.jpg" alt="" width="100%" height={75} />
           </IonCol>
         </IonRow>
-        <IonRow>
-          <IonCol>
+        <IonRow class="ion-align-items-center">
+          <IonCol class="ion-text-center">
+            If you're returning, sign in to access you account.
+            <br></br>
+            <br></br>If you're new, getting started is easy, click the link
+            below and start your collection today!
+          </IonCol>
+        </IonRow>
+        <IonRow class="ion-align-items-center">
+          <IonCol class="ion-text-center">
             <IonItem>
               <IonLabel position="stacked">User name</IonLabel>
               <IonInput
@@ -166,8 +170,8 @@ class SignInContainer extends React.Component<props, state> {
             </IonItem>
           </IonCol>
         </IonRow>
-        <IonRow>
-          <IonCol>
+        <IonRow class="ion-align-items-center">
+          <IonCol class="ion-text-center">
             <IonItem>
               <IonLabel position="stacked">Password</IonLabel>
               <IonInput
@@ -181,8 +185,8 @@ class SignInContainer extends React.Component<props, state> {
             </IonItem>
           </IonCol>
         </IonRow>
-        <IonRow>
-          <IonCol>
+        <IonRow class="ion-align-items-center">
+          <IonCol class="ion-text-center">
             <IonButton
               shape="round"
               fill="outline"
@@ -195,8 +199,8 @@ class SignInContainer extends React.Component<props, state> {
             </IonButton>
           </IonCol>
         </IonRow>
-        <IonRow>
-          <IonCol>
+        <IonRow class="ion-align-items-center">
+          <IonCol class="ion-text-center">
             <IonButton
               shape="round"
               fill="clear"
@@ -212,8 +216,8 @@ class SignInContainer extends React.Component<props, state> {
         <IonRow>
           <IonCol></IonCol>
         </IonRow>
-        <IonRow>
-          <IonCol>
+        <IonRow class="ion-align-items-center">
+          <IonCol class="ion-text-center">
             <IonButton
               shape="round"
               fill="clear"
