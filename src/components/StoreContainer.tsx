@@ -534,6 +534,7 @@ class StoreContainer extends React.Component<props, state> {
           } else {
             value = 0;
           }
+          console.log(value);
           callServer("updateCredit", { credit: 1 }, this.props.user.ID)?.then(
             (result: any) => {
               this.setState({
