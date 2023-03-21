@@ -18,6 +18,7 @@ interface props {
     closePanel: any;
     signOut:any;
     deviceInfo:any;
+    signInCallback: any;
 }
 
 interface state {
@@ -40,6 +41,8 @@ interface state {
     showPromoAlert: boolean;
     promoMsg: string;
     updatedImg: boolean;
+    statusInvalidUser: boolean;
+    statusInvalidEmail: boolean;
 };
 
 class ProfileManagerContainer extends React.Component<props, state> {
@@ -65,7 +68,9 @@ class ProfileManagerContainer extends React.Component<props, state> {
             needToRegister: false,
             showPromoAlert: false,
             promoMsg: "",
-            updatedImg: false
+            updatedImg: false,
+            statusInvalidUser: false,
+            statusInvalidEmail: false            
         }
     }
 
@@ -291,6 +296,7 @@ class ProfileManagerContainer extends React.Component<props, state> {
                     }
                 } else {
                     this.setState({requestType: "", status: false, needToRegister: false},() => {
+                        this.props.signInCallback(json);
                         this.pullProfile();
                     });                   
                 }
@@ -299,6 +305,37 @@ class ProfileManagerContainer extends React.Component<props, state> {
         .catch((err: any) => {
             console.log(err);
         }); 
+    }
+
+    checkValueExists(type:any) {
+        let params = {}
+        if (type === "username") {
+            params = {username: this.state.currUserName};
+        } else {
+            params = {email: this.state.currEmail};
+        }
+        callServer("checkValueExist", params, this.props.user.ID)?.then((resp) => { return resp.json(); })
+        .then((json) => {
+            if (json) {
+                if(json.Response === "Success") {
+                    if (type === "username") {
+                        this.setState({statusInvalidUser: false, requestType: "userName"});
+                    } else {
+                        this.setState({statusInvalidEmail: false, requestType: "email"});
+                    }
+                } else {
+                    if (type === "username") {
+                        this.setState({statusInvalidUser: true, requestType: "userName"});
+                    } else {
+                        this.setState({statusInvalidEmail: true, requestType: "email"});
+                    }
+                }
+            }
+        })
+        .catch((err: any) => {
+            console.log(err);
+        });       
+
     }
 
     checkPromo() {
@@ -350,7 +387,7 @@ class ProfileManagerContainer extends React.Component<props, state> {
         })
       }
 
-      processNewPic(pic:any) {
+    processNewPic(pic:any) {
         callServer("updateUserPic", {newImage: pic}, this.props.user.ID)?.then((resp) => { return resp.json(); })
         .then((json) => {
             if (json) {
@@ -388,7 +425,7 @@ class ProfileManagerContainer extends React.Component<props, state> {
                     <IonCol key={"email"} >
                         <IonLabel position="stacked">User name
                         {(this.state.requestType === "userName")?
-                                (this.state.status)?
+                                (!this.state.statusInvalidUser)?
                                 <IonIcon slot="icon-only" icon={checkmark} color="success" size="l" />:
                                 <IonIcon slot="icon-only" icon={close} color="danger" size="l" />   
                             :null 
@@ -398,6 +435,9 @@ class ProfileManagerContainer extends React.Component<props, state> {
                         <IonInput color="dark" value={this.state.currUserName} placeholder="Your user name" onIonChange={(e) => {
                             this.setState({currUserName: e.detail.value!})
                         }}
+                        onIonBlur={(e) => {
+                            this.checkValueExists('username');                                    
+                        }}
                         ></IonInput>
                         </IonItem>
                     </IonCol>
@@ -406,7 +446,7 @@ class ProfileManagerContainer extends React.Component<props, state> {
                     <IonCol key={"email"}>
                         <IonLabel position="stacked">Account email
                         {(this.state.requestType === "email")?
-                                (this.state.status)?
+                                (!this.state.statusInvalidEmail)?
                                 <IonIcon slot="icon-only" icon={checkmark} color="success" size="l" />:
                                 <IonIcon slot="icon-only" icon={close} color="danger" size="l" />   
                             :null 
@@ -416,6 +456,9 @@ class ProfileManagerContainer extends React.Component<props, state> {
                         <IonInput value={this.state.currEmail} placeholder="Your contact email" onIonChange={(e) => {
                             this.setState({currEmail: e.detail.value!})
                         }}
+                        onIonBlur={(e) => {
+                            this.checkValueExists('email');                                    
+                        }}                        
                         ></IonInput>
                         </IonItem>
                     </IonCol>
@@ -440,7 +483,7 @@ class ProfileManagerContainer extends React.Component<props, state> {
                 <IonRow>
                     <IonCol key={"register"}>
                         <IonButton expand="block" onClick={() => {this.registerAccount()}} color={"success"}
-                            disabled={(this.state.currUserName === "" || this.state.currEmail === "" || this.state.currPassword === "") ? true : false}
+                            disabled={(this.state.currUserName === "" || this.state.currEmail === "" || this.state.currPassword === "") ? true : (!this.state.statusInvalidUser && !this.state.statusInvalidEmail) ? false: true}
                         >{"Register account"}</IonButton>
                         <IonLabel position="stacked">By registering your account, you will not lose your cards. Also you will be able to trade, battle, and post to the forum</IonLabel>
                     </IonCol>

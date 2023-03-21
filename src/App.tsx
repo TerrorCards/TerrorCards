@@ -469,6 +469,7 @@ class App extends React.Component<props, state> {
               closePanel={this.showProfileModal}
               signOut={this.removeUserFromStore}
               deviceInfo={this.deviceInfo}
+              signInCallback={this.setUserName}
             />
           </IonModal>
 
@@ -525,6 +526,7 @@ class App extends React.Component<props, state> {
           <SignInContainer
             user={this.state.user}
             signInCallback={this.setUserName}
+            deviceInfo={this.deviceInfo}
           />
         </IonContent>
       </IonApp>

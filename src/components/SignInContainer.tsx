@@ -17,6 +17,7 @@ import { callServer } from "./ajaxcalls";
 interface props {
   signInCallback: any;
   signUpCallback: any;
+  deviceInfo: any;
 }
 
 interface state {
@@ -27,6 +28,7 @@ interface state {
   showForgotPassword: boolean;
   showForgotAlert: boolean;
   showForgotMessage: string;
+  showTerms: boolean;
 }
 
 class SignInContainer extends React.Component<props, state> {
@@ -41,6 +43,7 @@ class SignInContainer extends React.Component<props, state> {
       showForgotPassword: false,
       showForgotAlert: false,
       showForgotMessage: "",
+      showTerms: false,
     };
   }
 
@@ -124,12 +127,12 @@ class SignInContainer extends React.Component<props, state> {
   }
 
   createNewDefaultAccount() {
-    callServer("defaultAccount", { device: "123456" }, "")
+    callServer("defaultAccount", { device: this.props.deviceInfo.uuid }, "")
       ?.then((resp) => {
         return resp.json();
       })
       .then((json) => {
-        console.log(json);
+        //console.log(json);
         if (json) {
           console.log(json);
           this.props.signInCallback(json);
@@ -140,20 +143,26 @@ class SignInContainer extends React.Component<props, state> {
       });
   }
 
+  agreeToTerms() {
+    this.setState({ showTerms: true });
+  }
+
   renderSignInForm(j: any) {
     return (
       <IonGrid>
         <IonRow class="ion-align-items-center">
           <IonCol class="ion-text-center">
-            <img src="assets/img/banner.jpg" alt="" width="100%" height={75} />
+            <img
+              src="http://TerrorCards.com/images/banners/app_banner.jpg"
+              alt=""
+              width="100%"
+              height={75}
+            />
           </IonCol>
         </IonRow>
         <IonRow class="ion-align-items-center">
           <IonCol class="ion-text-center">
             If you're returning, sign in to access you account.
-            <br></br>
-            <br></br>If you're new, getting started is easy, click the link
-            below and start your collection today!
           </IonCol>
         </IonRow>
         <IonRow class="ion-align-items-center">
@@ -218,12 +227,14 @@ class SignInContainer extends React.Component<props, state> {
         </IonRow>
         <IonRow class="ion-align-items-center">
           <IonCol class="ion-text-center">
+            Getting started is easy, click the link below and start your
+            collection today!
             <IonButton
               shape="round"
               fill="clear"
               expand="full"
               onClick={() => {
-                this.createNewDefaultAccount();
+                this.agreeToTerms();
               }}
             >
               New? Create an account now?
@@ -308,6 +319,109 @@ class SignInContainer extends React.Component<props, state> {
           message={this.state.showForgotMessage}
           buttons={["Ok"]}
         />
+        <IonModal isOpen={this.state.showTerms}>
+          <IonContent class="ion-text-center">
+            <div style={{ height: "100%", width: "95%" }}>
+              END USERS LICENSE AGREEMENT
+              <p></p>Please read the following terms and conditions carefully
+              before using this APP. Your use, distribution or installation of
+              this copy of 'TERROR CARDS' indicates your acceptance of this
+              License.
+              <p></p>APP here means Software, image files, all accompanying
+              files, data and materials received with your order of 'TERROR
+              CARDS'. If you do not agree to any of the terms of this License,
+              then do not install, distribute or use the APP. Warrantee covers
+              defects in the software, which prevents successfully installing
+              the software in the buyer's device.
+              <p></p>Warrantee does not cover fitness of purpose, not meeting of
+              expectations or needs in the mind of the buyer. This APP is for
+              personal use only and may be installed and used one APP and one
+              account per device. Its component parts may not be separated for
+              use on more than one computer. All components accompanying the
+              software are copyrighted by PREVIN WONG and may not be taken
+              apart, modified, used or published with other software or means
+              except with the APP software and may not be distributed or copied
+              in any manner. <p></p>This APP, all accompanying files, data and
+              materials, are distributed 'AS IS' and with no warranties of any
+              kind, whether express or implied. The user must assume all risk of
+              using the program. This disclaimer of warranty constitutes an
+              essential part of the agreement. Any liability of PREVIN WONG will
+              be limited exclusively to refund of purchase price. In addition,
+              in no event shall PREVIN WONG, or its principals, shareholders,
+              officers, employees, affiliates, contractors, subsidiaries, or
+              parent organizations, be liable for any incidental, consequential,
+              punitive or any other damages whatsoever relating to the use of
+              APP. <p></p>In addition, in no event does PREVIN WONG authorize
+              you to use this APP in applications or systems where APP's failure
+              to perform can reasonably be expected to result in a physical
+              injury, or in loss of life. Any such use by you is entirely at
+              your own risk, and you agree to hold PREVIN WONG harmless from any
+              claims or losses relating to such unauthorized use. This Agreement
+              constitutes the entire statement of the Agreement between the
+              parties on the subject matter, and merges and supersedes all other
+              or prior understandings, purchase orders, agreements and
+              arrangements. <p></p>This Agreement shall be governed by the laws
+              of United States of America OR STATE. PREVIN WONG the owner of the
+              copyright of this APP, all of its derivatives, title and
+              accompanying materials are the exclusive property of PREVIN WONG.
+              All rights of any kind, which are not expressly granted in this
+              License, are entirely and exclusively reserved to and by PREVIN
+              WONG. You may not rent, lease, transfer, modify, translate,
+              reverse engineer, de-compile, disassemble or create derivative
+              works based on this APP. <p></p>You may not make access to APP
+              available to others in connection with a service bureau,
+              application service provider, or similar business, or use this APP
+              in a business to provide file compression, decompression, or
+              conversion services to others. There are no third party
+              beneficiaries of any promises, obligations or representations made
+              by PREVIN WONG herein. You may not disclose to other persons the
+              data or techniques relating to this APP that you know or should
+              know that it is a trade secret of the [PREVIN WONG] in any manner
+              that will cause damage to PREVIN WONG. This APP and all services
+              provided may be used for lawful purposes only. Transmission,
+              storage, or presentation of any information, data or material in
+              violation of any United States of America, State or City law is
+              strictly prohibited. This includes, but is not limited to:
+              copyrighted material, material we judge to be threatening or
+              obscene, or material protected by trade secret and other statute.
+              You agree to indemnify and hold PREVIN WONG harmless from any
+              claims resulting from the use of this APP, which may damage any
+              other party. This APP contains user-defined content. <p></p>By
+              installing this APP, you agree to not create any content that is
+              objectionable, obscene, and contains nudity. This APP has a zero
+              tolerance for abuse of users towards other users. Failure to do so
+              will result in your account termination.
+            </div>
+          </IonContent>
+          <IonGrid>
+            <IonRow>
+              <IonCol>
+                <IonButton
+                  expand="full"
+                  color="success"
+                  onClick={() => {
+                    this.setState({ showTerms: false }, () => {
+                      this.createNewDefaultAccount();
+                    });
+                  }}
+                >
+                  Accept
+                </IonButton>
+              </IonCol>
+              <IonCol>
+                <IonButton
+                  expand="full"
+                  color="danger"
+                  onClick={() => {
+                    this.setState({ showTerms: false });
+                  }}
+                >
+                  Decline
+                </IonButton>
+              </IonCol>
+            </IonRow>
+          </IonGrid>
+        </IonModal>
       </IonContent>
     );
   }

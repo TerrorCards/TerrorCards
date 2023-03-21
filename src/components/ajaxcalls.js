@@ -668,7 +668,7 @@ export function callServer(pTask, pData, pUserId) {
 
       break;
     }
-    case "checkEmailExist": {
+    case "checkValueExist": {
       jsonstr = prepData(pData);
       formData = new FormData();
       formData.append("uUserId", pUserId);
@@ -684,7 +684,7 @@ export function callServer(pTask, pData, pUserId) {
           */
       test = fetch(
         serverpath +
-          "checkEmailExist.php?" +
+          "checkValueExist.php?" +
           new URLSearchParams({
             uUserId: pUserId,
             uContent: jsonstr,

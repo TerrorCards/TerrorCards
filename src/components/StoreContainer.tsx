@@ -534,21 +534,19 @@ class StoreContainer extends React.Component<props, state> {
           } else {
             value = 0;
           }
-          callServer(
-            "updateCredit",
-            { credit: value },
-            this.props.user.ID
-          )?.then((result: any) => {
-            this.setState({
-              targetItem: null,
-              targetType: null,
-              showCoinMessage: true,
-              coinPurchaseMsg:
-                "Thank you. Account updated by " + value + " credit",
-              isIAPActiveBuy: false,
-            });
-            this.props.callbackPackOpenTimer(Date.now());
-          });
+          callServer("updateCredit", { credit: 1 }, this.props.user.ID)?.then(
+            (result: any) => {
+              this.setState({
+                targetItem: null,
+                targetType: null,
+                showCoinMessage: true,
+                coinPurchaseMsg:
+                  "Thank you. Account updated by " + 1 + " credit",
+                isIAPActiveBuy: false,
+              });
+              this.props.callbackPackOpenTimer(Date.now());
+            }
+          );
 
           p.finish();
         });

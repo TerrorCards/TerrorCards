@@ -816,7 +816,10 @@ class TradeSetup extends React.Component<props, state> {
         } else {
           itemsList.push(
             <IonCol class="ion-text-center" key={i}>
-              <img src="assets/img/waitSmall.png" alt="" />
+              <img
+                src="http://TerrorCards.com/images/banners/waitSmall.png"
+                alt=""
+              />
             </IonCol>
           );
         }
@@ -825,7 +828,10 @@ class TradeSetup extends React.Component<props, state> {
       for (let i = 0; i < 5; i++) {
         itemsList.push(
           <IonCol class="ion-text-center" key={i}>
-            <img src="assets/img/waitSmall.png" alt="" />
+            <img
+              src="http://TerrorCards.com/images/banners/waitSmall.png"
+              alt=""
+            />
           </IonCol>
         );
       }
