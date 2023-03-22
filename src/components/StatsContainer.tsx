@@ -353,7 +353,7 @@ class StatsContainer extends React.Component<props, state> {
       <IonContent>
         <IonGrid>
           <IonRow>
-            <IonCol>Collection</IonCol>
+            <IonCol>Collection (Current Year)</IonCol>
           </IonRow>
           <IonRow>
             <IonCol>{this.renderCurrentYearTemplates()}</IonCol>
