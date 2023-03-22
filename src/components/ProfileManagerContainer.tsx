@@ -85,29 +85,29 @@ class ProfileManagerContainer extends React.Component<props, state> {
 
     componentDidMount() {
         this.pullProfile();
-        console.log('ionViewDidEnter event fired');
+        //console.log('ionViewDidEnter event fired');
     }
 
     componentDidUpdate(prevProps: any) {
         //this.pullProfile(); 
-        //console.log(prevProps);
+        ////console.log(prevProps);
     }
 
     ionViewWillEnter() {
         this.pullProfile();
-        console.log('ionViewWillEnter event fired')
+        //console.log('ionViewWillEnter event fired')
     }
 
     ionViewWillLeave() {
-        console.log('ionViewWillLeave event fired')
+        //console.log('ionViewWillLeave event fired')
     }
 
     ionViewDidEnter() {
-        console.log('ionViewDidEnter event fired')
+        //console.log('ionViewDidEnter event fired')
     }
 
     ionViewDidLeave() {
-        console.log('ionViewDidLeave event fired')
+        //console.log('ionViewDidLeave event fired')
     }
 
     closePanel() {
@@ -123,7 +123,7 @@ class ProfileManagerContainer extends React.Component<props, state> {
     pullProfile() {
         callServer("userInfo", "", this.props.user.ID)?.then((resp) => { return resp.json(); })
             .then((json) => {
-                console.log(json);
+                //console.log(json);
                 if (json) {
                     if(json.Registered === "1") {
                         this.setState({ info: json, 

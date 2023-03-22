@@ -111,7 +111,7 @@ class StoreContainer extends React.Component<props, state> {
         return resp.json();
       })
       .then((json) => {
-        console.log(json);
+        //console.log(json);
         if (json.length > 0) {
           this.setState({ allItemsList: json }, () => {
             this.filterPacks();
@@ -159,7 +159,7 @@ class StoreContainer extends React.Component<props, state> {
         return pl.Discount === "0";
       }
     });
-    console.log(filtered);
+    //console.log(filtered);
     this.renderItems(filtered, allItems);
   };
 
@@ -256,47 +256,49 @@ class StoreContainer extends React.Component<props, state> {
         );
       }
       this.state.allCoinList.forEach((p: any) => {
-        items.push(
-          <IonCard key={p.title}>
-            <IonCardHeader>
-              <IonCardSubtitle>{p.title}</IonCardSubtitle>
-            </IonCardHeader>
-            <IonCardContent>
-              <IonGrid>
-                <IonRow>
-                  <IonCol>
-                    <IonImg src={""} />
-                  </IonCol>
-                  <IonCol>
-                    <div style={{ display: "flex", flexDirection: "column" }}>
-                      <div style={{ display: "flex", flex: 2 }}>
-                        {p.description}
-                      </div>
-                      <div
-                        style={{ display: "flex", justifyItems: "flex-end" }}
-                      >
-                        <IonButton
-                          expand="block"
-                          onClick={() => {
-                            this.setState({
-                              showConfirmPurchase: true,
-                              targetItem: p,
-                              targetType: "coin",
-                              isIAPActiveBuy: true,
-                            });
-                            //this.canBuyCoins(p.ID);
-                          }}
+        if (p.title !== "") {
+          items.push(
+            <IonCard key={p.title}>
+              <IonCardHeader>
+                <IonCardSubtitle>{p.title}</IonCardSubtitle>
+              </IonCardHeader>
+              <IonCardContent>
+                <IonGrid>
+                  <IonRow>
+                    <IonCol>
+                      <IonImg src={""} />
+                    </IonCol>
+                    <IonCol>
+                      <div style={{ display: "flex", flexDirection: "column" }}>
+                        <div style={{ display: "flex", flex: 2 }}>
+                          {p.description}
+                        </div>
+                        <div
+                          style={{ display: "flex", justifyItems: "flex-end" }}
                         >
-                          {p.price} {p.currency}
-                        </IonButton>
+                          <IonButton
+                            expand="block"
+                            onClick={() => {
+                              this.setState({
+                                showConfirmPurchase: true,
+                                targetItem: p,
+                                targetType: "coin",
+                                isIAPActiveBuy: true,
+                              });
+                              //this.canBuyCoins(p.ID);
+                            }}
+                          >
+                            {p.price} {p.currency}
+                          </IonButton>
+                        </div>
                       </div>
-                    </div>
-                  </IonCol>
-                </IonRow>
-              </IonGrid>
-            </IonCardContent>
-          </IonCard>
-        );
+                    </IonCol>
+                  </IonRow>
+                </IonGrid>
+              </IonCardContent>
+            </IonCard>
+          );
+        }
       });
     }
     items.push(
@@ -318,7 +320,9 @@ class StoreContainer extends React.Component<props, state> {
   changeStoreType = (value: string) => {
     this.setState({ storeType: value }, () => {
       if (value === "coins") {
-        this.renderCoinsList();
+        if (this.state.isInAppLoaded) {
+          this.renderCoinsList();
+        }
       } else {
         this.filterPacks();
       }

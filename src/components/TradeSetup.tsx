@@ -98,11 +98,11 @@ class TradeSetup extends React.Component<props, state> {
         }
       );
     });
-    console.log("comp did mount");
+    //console.log("comp did mount");
   }
 
   ionViewWillEnter() {
-    console.log("Ion view will enter");
+    //console.log("Ion view will enter");
   }
 
   ionViewWillLeave() {}
@@ -115,7 +115,7 @@ class TradeSetup extends React.Component<props, state> {
         }
       );
     });
-    console.log("Ion view did enter");
+    //console.log("Ion view did enter");
   }
 
   componentDidUpdate() {
@@ -161,13 +161,13 @@ class TradeSetup extends React.Component<props, state> {
         user
       )
         ?.then((resp) => {
-          console.log(resp);
+          //console.log(resp);
           return resp.json();
         })
         .then((json) => {
           if (json.length > 0) {
             //dataList = json;
-            console.log(json);
+            //console.log(json);
             if (user === this.props.user.ID) {
               const chunk = this.chunkCards(json);
               const chunkWithMatchNumbers = this.matchCountNumbers(chunk, user);
@@ -204,7 +204,7 @@ class TradeSetup extends React.Component<props, state> {
           otherList.push(cl.ID + "_" + cl.Card_Year + "_" + cl.Count);
         }
       });
-      console.log(this.state.tradeMessage);
+      //console.log(this.state.tradeMessage);
       callServer(
         "saveTrade",
         {
@@ -218,12 +218,12 @@ class TradeSetup extends React.Component<props, state> {
         this.props.user.ID
       )
         ?.then((resp) => {
-          console.log(resp);
+          //console.log(resp);
           return resp.json();
         })
         .then((json) => {
           if (json === "Saved") {
-            console.log(json);
+            //console.log(json);
             this.setState({ showAlert: false, alertType: "" }, () => {
               this.setState({
                 showTradeSaveResult: true,
@@ -330,14 +330,14 @@ class TradeSetup extends React.Component<props, state> {
                 role: "cancel",
                 cssClass: "secondary",
                 handler: (blah: any) => {
-                  console.log("Confirm Cancel: blah");
+                  //console.log("Confirm Cancel: blah");
                   this.setState({ showAlert: false, alertType: "" });
                 },
               },
               {
                 text: "Yes",
                 handler: () => {
-                  console.log("Confirm Okay");
+                  //console.log("Confirm Okay");
                   if (this.state.alertType === "submit") {
                     this.sendTradeToServer();
                   } else {

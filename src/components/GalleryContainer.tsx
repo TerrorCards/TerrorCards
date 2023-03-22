@@ -68,7 +68,7 @@ class GalleryContainer extends React.Component<props, state> {
 
   componentDidMount() {
     this.pullCards();
-    console.log("component did mount event fired");
+    //console.log("component did mount event fired");
   }
 
   componentDidUpdate(prevProps: any) {
@@ -85,7 +85,7 @@ class GalleryContainer extends React.Component<props, state> {
       } else {
         this.pullCards();
       }
-      console.log("Props updated");
+      //console.log("Props updated");
     }
     if (
       prevProps.galleryProps.layoutCount !==
@@ -97,11 +97,11 @@ class GalleryContainer extends React.Component<props, state> {
   }
 
   ionViewWillEnter() {
-    console.log("ionViewWillEnter event fired");
+    //console.log("ionViewWillEnter event fired");
   }
 
   ionViewWillLeave() {
-    console.log("ionViewWillLeave event fired");
+    //console.log("ionViewWillLeave event fired");
   }
 
   ionViewDidEnter() {
@@ -110,11 +110,11 @@ class GalleryContainer extends React.Component<props, state> {
     } else {
       this.pullCards();
     }
-    console.log("ionViewDidEnter event fired");
+    //console.log("ionViewDidEnter event fired");
   }
 
   ionViewDidLeave() {
-    console.log("ionViewDidLeave event fired");
+    //console.log("ionViewDidLeave event fired");
   }
 
   //Functions to do chunking of data
@@ -146,7 +146,7 @@ class GalleryContainer extends React.Component<props, state> {
   showCardetails = (card: any, front: boolean) => {
     //Recent trades: {result[0].recentTrades} <br></br>(past 48 hrs)
     this.pullCardDetails(this.props.user.ID, card).then((result: any) => {
-      console.log(result);
+      //console.log(result);
       let currImg = card.Image;
       if (!front) {
         currImg = card.Image.replace(/front/g, "back");
@@ -200,13 +200,13 @@ class GalleryContainer extends React.Component<props, state> {
       this.props.user.ID
     )
       ?.then((resp) => {
-        //console.log(resp);
+        ////console.log(resp);
         return resp.json();
       })
       .then((json) => {
         if (json.length > 0) {
           //dataList = json;
-          //console.log(json);
+          ////console.log(json);
           const chunkedList = this.chunkVersions(json);
           this.setState({ chunkedList: chunkedList, dataList: json }, () => {
             this.imgList();
@@ -225,13 +225,13 @@ class GalleryContainer extends React.Component<props, state> {
 
   pullCardDetails = (user: string, card: any) => {
     return new Promise((resolve: any, reject: any) => {
-      console.log(card);
+      //console.log(card);
       callServer("cardDetail", { number: card.Number, year: card.Year }, user)
         ?.then((resp) => {
           return resp.json();
         })
         .then((json) => {
-          //console.log(json);
+          ////console.log(json);
           if (json) {
             resolve(json);
           } else {
@@ -250,7 +250,7 @@ class GalleryContainer extends React.Component<props, state> {
     this.state.chunkedList.forEach((ch: any, i: number) => {
       const item: Array<any> = [];
       ch.forEach((c: any, z: number) => {
-        //console.log(c);
+        ////console.log(c);
         let imgSrc = c.Image;
         let message = c.Active === "0" ? "Sold Out" : "";
         if (this.props.galleryProps.layoutCount > 2) {
@@ -311,7 +311,7 @@ class GalleryContainer extends React.Component<props, state> {
         return resp.json();
       })
       .then((json) => {
-        console.log(json);
+        //console.log(json);
         if (json.success) {
           const chunkedList = this.chunkVersions(json.data);
           this.setState(
@@ -394,9 +394,9 @@ class GalleryContainer extends React.Component<props, state> {
           return resp.json();
         })
         .then((json) => {
-          //console.log(json);
+          ////console.log(json);
           if (json) {
-            console.log(json);
+            //console.log(json);
             const data = json;
             this.setState({ nftAccount: data.Wallet }, () => {
               this.pullNFTs();

@@ -48,25 +48,25 @@ class SignInContainer extends React.Component<props, state> {
   }
 
   componentDidMount() {
-    console.log("ionViewDidEnter event fired");
+    //console.log("ionViewDidEnter event fired");
   }
 
   componentDidUpdate(prevProps: any) {}
 
   ionViewWillEnter() {
-    console.log("ionViewWillEnter event fired");
+    //console.log("ionViewWillEnter event fired");
   }
 
   ionViewWillLeave() {
-    console.log("ionViewWillLeave event fired");
+    //console.log("ionViewWillLeave event fired");
   }
 
   ionViewDidEnter() {
-    console.log("ionViewDidEnter event fired");
+    //console.log("ionViewDidEnter event fired");
   }
 
   ionViewDidLeave() {
-    console.log("ionViewDidLeave event fired");
+    //console.log("ionViewDidLeave event fired");
   }
 
   //check if user exist
@@ -77,7 +77,7 @@ class SignInContainer extends React.Component<props, state> {
         return resp.json();
       })
       .then((json) => {
-        console.log(json);
+        //console.log(json);
         if (json) {
           //this.props.signInCallback();
           if (json.Response === "Failed") {
@@ -99,7 +99,7 @@ class SignInContainer extends React.Component<props, state> {
         return resp.json();
       })
       .then((json) => {
-        console.log(json);
+        //console.log(json);
         if (json) {
           //this.props.signInCallback();
           if (json.Status === "Success") {
@@ -132,9 +132,9 @@ class SignInContainer extends React.Component<props, state> {
         return resp.json();
       })
       .then((json) => {
-        //console.log(json);
+        ////console.log(json);
         if (json) {
-          console.log(json);
+          //console.log(json);
           this.props.signInCallback(json);
         }
       })

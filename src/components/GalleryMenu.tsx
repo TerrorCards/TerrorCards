@@ -66,7 +66,7 @@ class GalleryMenu extends React.Component<props, state> {
       this.setState({ availableYears: years }, () => {
         this.setRenderViews();
         this.pullSets();
-        console.log("ionViewDidEnter event fired");
+        ////console.log("ionViewDidEnter event fired");
       });
     } else {
       if (this.props.type === "nft") {
@@ -89,12 +89,12 @@ class GalleryMenu extends React.Component<props, state> {
       this.props.user.ID
     )
       ?.then((resp) => {
-        console.log(resp);
+        ////console.log(resp);
         return resp.json();
       })
       .then((json) => {
         if (json.length > 0) {
-          console.log(json);
+          ////console.log(json);
           this.setRenderSets(json);
         }
       })
@@ -125,7 +125,7 @@ class GalleryMenu extends React.Component<props, state> {
         return resp.json();
       })
       .then((json) => {
-        console.log(json);
+        //console.log(json);
         if (json.success) {
           this.setState({ nftTemplateList: json.data }, () => {
             this.renderNFTTemplates();
@@ -151,7 +151,7 @@ class GalleryMenu extends React.Component<props, state> {
         return resp.json();
       })
       .then((json) => {
-        console.log(json);
+        //console.log(json);
         if (json.success) {
           this.setState({ nftSchemaList: json.data }, () => {
             this.renderNFTSchema();

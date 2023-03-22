@@ -72,7 +72,7 @@ class FactoryContainer extends React.Component<props, state> {
         return resp.json();
       })
       .then((json) => {
-        console.log(json);
+        //console.log(json);
         if (json.length > 0) {
           this.renderItems(json);
         }
@@ -92,7 +92,7 @@ class FactoryContainer extends React.Component<props, state> {
         return resp.json();
       })
       .then((json) => {
-        console.log(json);
+        //console.log(json);
         if (json.length > 0) {
           this.setState({ showMeldAlert: false }, () => {
             this.renderCards(json);

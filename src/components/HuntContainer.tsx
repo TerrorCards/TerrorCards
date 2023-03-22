@@ -110,7 +110,7 @@ class HuntContainer extends React.Component<props, state> {
         return resp.json();
       })
       .then((json) => {
-        //console.log(json);
+        ////console.log(json);
         if (json.length > 0) {
           this.setState({ yourStats: json[0] });
         }
@@ -131,7 +131,7 @@ class HuntContainer extends React.Component<props, state> {
           return resp.json();
         })
         .then((json) => {
-          //console.log(json);
+          ////console.log(json);
           if (json.length > 0) {
             this.setState({ battleParams: json }, () => {
               //this.renderItems(json);
@@ -154,7 +154,7 @@ class HuntContainer extends React.Component<props, state> {
         return resp.json();
       })
       .then((json) => {
-        //console.log(json);
+        ////console.log(json);
         if (json.length > 0) {
           this.setState({ playerList: json });
         }
@@ -248,7 +248,7 @@ class HuntContainer extends React.Component<props, state> {
   renderItems = () => {
     let you = this.state.battleParams[0];
     let other = this.state.battleParams[1];
-    //console.log(this.state.battleResults);
+    ////console.log(this.state.battleResults);
     //allList.forEach((p: any) => {
     return (
       <IonCardContent key={you.Player}>
@@ -615,7 +615,7 @@ class HuntContainer extends React.Component<props, state> {
       battleLog = battleLog + "<div>" + txtResult + "</div>";
       if (index + 1 === pParam.length) {
         resultMsg = this.battleWinner + " is the winner!";
-        //console.log(result[0]);
+        ////console.log(result[0]);
         if (
           result[0].Reward !== "" ||
           typeof result[0].Reward !== "undefined"

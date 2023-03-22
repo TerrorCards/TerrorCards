@@ -95,25 +95,25 @@ class HomeContainer extends React.Component<props, state> {
   componentDidMount() {
     this.pullMessages();
     this.pullNewsBanner();
-    console.log("ionViewDidEnter event fired");
+    //console.log("ionViewDidEnter event fired");
   }
 
   componentDidUpdate(prevProps: any) {}
 
   ionViewWillEnter() {
-    console.log("ionViewWillEnter event fired");
+    //console.log("ionViewWillEnter event fired");
   }
 
   ionViewWillLeave() {
-    console.log("ionViewWillLeave event fired");
+    //console.log("ionViewWillLeave event fired");
   }
 
   ionViewDidEnter() {
-    console.log("ionViewDidEnter event fired");
+    //console.log("ionViewDidEnter event fired");
   }
 
   ionViewDidLeave() {
-    console.log("ionViewDidLeave event fired");
+    //console.log("ionViewDidLeave event fired");
   }
 
   viewHeight = (offset: number) => {
@@ -127,7 +127,7 @@ class HomeContainer extends React.Component<props, state> {
         return resp.json();
       })
       .then((json) => {
-        console.log(json);
+        //console.log(json);
         if (json.length > 0) {
           this.setState({ newBannerState: json });
         }
@@ -146,7 +146,7 @@ class HomeContainer extends React.Component<props, state> {
         return resp.json();
       })
       .then((json) => {
-        console.log(json);
+        //console.log(json);
         if (json.length > 0) {
           let msgList: Array<any> = [];
           json.forEach((j: any, i: number) => {
@@ -167,7 +167,7 @@ class HomeContainer extends React.Component<props, state> {
         return resp.json();
       })
       .then((json) => {
-        console.log(json);
+        //console.log(json);
         if (json) {
           this.setState(
             { showNewMsg: false, event: undefined, txtMessage: "" },
@@ -205,7 +205,7 @@ class HomeContainer extends React.Component<props, state> {
         return resp.json();
       })
       .then((json) => {
-        console.log(json);
+        //console.log(json);
         if (json.length > 0) {
           this.setState({
             showAlert: true,
@@ -224,7 +224,7 @@ class HomeContainer extends React.Component<props, state> {
         return resp.json();
       })
       .then((json) => {
-        console.log(json);
+        //console.log(json);
         if (json.length > 0) {
           this.setState(
             { showAlert: true, alertMsg: "You have blocked " + user },
@@ -460,7 +460,7 @@ class HomeContainer extends React.Component<props, state> {
               <IonLoading
                 cssClass="my-custom-class"
                 isOpen={true}
-                onDidDismiss={() => console.log("loading")}
+                onDidDismiss={() => //console.log("loading")}
                 message={"Loading, please wait..."}
                 duration={30000}
               />

@@ -97,11 +97,11 @@ class TradeContainer extends React.Component<props, state> {
     this.pullTrades(this.props.user.ID).then((result: any) => {
       this.groupTradesById(result);
     });
-    console.log("comp did mount");
+    //console.log("comp did mount");
   }
 
   ionViewWillEnter() {
-    console.log("Ion view will enter");
+    //console.log("Ion view will enter");
   }
 
   ionViewWillLeave() {}
@@ -110,7 +110,7 @@ class TradeContainer extends React.Component<props, state> {
     this.pullTrades(this.props.user.ID).then((result: any) => {
       this.groupTradesById(result);
     });
-    console.log("Ion view did enter");
+    //console.log("Ion view did enter");
   }
 
   componentDidUpdate() {}
@@ -142,7 +142,7 @@ class TradeContainer extends React.Component<props, state> {
           return resp.json();
         })
         .then((json) => {
-          //console.log(json);
+          ////console.log(json);
           if (json.length > 0) {
             resolve(json);
           } else {
@@ -231,7 +231,7 @@ class TradeContainer extends React.Component<props, state> {
           return resp.json();
         })
         .then((json) => {
-          //console.log(json);
+          ////console.log(json);
           if (json) {
             resolve(json);
           } else {
@@ -248,7 +248,7 @@ class TradeContainer extends React.Component<props, state> {
   groupTradesById = (array: Array<any>) => {
     const newArray = this.groupByKey(array, "TradeID");
     this.setState({ filteredTradeList: newArray }, () => {
-      console.log(this.state.filteredTradeList);
+      //console.log(this.state.filteredTradeList);
     });
   };
 
@@ -399,7 +399,7 @@ class TradeContainer extends React.Component<props, state> {
       let otherLabel: string = "";
 
       this.state.filteredTradeList[key].forEach((card: any) => {
-        //console.log(card);
+        ////console.log(card);
         if (card.UserID === this.props.user.ID) {
           yourItems.push(
             <div
@@ -555,7 +555,7 @@ class TradeContainer extends React.Component<props, state> {
   displayTradeMessages = (ID: any) => {
     let msgList: Array<any> = [];
     this.pullTradesMessages(this.props.user.ID, ID).then((result: any) => {
-      //console.log(result);
+      ////console.log(result);
       result.forEach((res: any, i: number) => {
         msgList.push(
           <IonRow key={res.ID + "-" + i}>

@@ -63,7 +63,7 @@ class StatsContainer extends React.Component<props, state> {
     this.pullTemplates();
     this.pullCardCounts();
     this.pullLatestCards();
-    console.log("ionViewDidEnter event fired");
+    //console.log("ionViewDidEnter event fired");
   }
 
   componentDidUpdate(prevProps: any) {
@@ -71,19 +71,19 @@ class StatsContainer extends React.Component<props, state> {
   }
 
   ionViewWillEnter() {
-    console.log("ionViewWillEnter event fired");
+    //console.log("ionViewWillEnter event fired");
   }
 
   ionViewWillLeave() {
-    console.log("ionViewWillLeave event fired");
+    //console.log("ionViewWillLeave event fired");
   }
 
   ionViewDidEnter() {
-    console.log("ionViewDidEnter event fired");
+    //console.log("ionViewDidEnter event fired");
   }
 
   ionViewDidLeave() {
-    console.log("ionViewDidLeave event fired");
+    //console.log("ionViewDidLeave event fired");
   }
 
   viewHeight = (offset: number) => {
@@ -94,7 +94,7 @@ class StatsContainer extends React.Component<props, state> {
   pullLoginCheck() {
     callServer("stat_loginCheck", "", this.props.user.ID)
       ?.then((resp) => {
-        console.log(resp);
+        //console.log(resp);
         return resp.json();
       })
       .then((json) => {

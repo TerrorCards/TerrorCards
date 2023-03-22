@@ -26,25 +26,25 @@ class NewsContainer extends React.Component<props, state> {
 
   componentDidMount() {
     this.pullNews();
-    console.log("ionViewDidEnter event fired");
+    //console.log("ionViewDidEnter event fired");
   }
 
   componentDidUpdate(prevProps: any) {}
 
   ionViewWillEnter() {
-    console.log("ionViewWillEnter event fired");
+    //console.log("ionViewWillEnter event fired");
   }
 
   ionViewWillLeave() {
-    console.log("ionViewWillLeave event fired");
+    //console.log("ionViewWillLeave event fired");
   }
 
   ionViewDidEnter() {
-    console.log("ionViewDidEnter event fired");
+    //console.log("ionViewDidEnter event fired");
   }
 
   ionViewDidLeave() {
-    console.log("ionViewDidLeave event fired");
+    //console.log("ionViewDidLeave event fired");
   }
 
   //BEGIN BANNER CODE
@@ -54,7 +54,7 @@ class NewsContainer extends React.Component<props, state> {
         return resp.json();
       })
       .then((json) => {
-        console.log(json);
+        //console.log(json);
         if (json.length > 0) {
           let msgList: Array<any> = [];
           json.forEach((j: any, i: number) => {

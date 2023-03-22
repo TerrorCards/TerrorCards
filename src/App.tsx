@@ -138,7 +138,7 @@ class App extends React.Component<props, state> {
   tradesExist = false;
 
   componentDidMount() {
-    console.log("componet did mount event fired");
+    //console.log("componet did mount event fired");
     this.getUserStorage();
   }
 
@@ -161,14 +161,14 @@ class App extends React.Component<props, state> {
   }
 
   componentDidUpdate(prevProps: any) {
-    console.log("component did update");
+    //console.log("component did update");
     callServer("hasTrades", "", this.state.user.ID)
       ?.then((resp) => {
         return resp.json();
       })
       .then((json) => {
         if (json) {
-          console.log(json);
+          //console.log(json);
           if (json === "Yes") {
             this.tradesExist = true;
             //this.setState({ hasTrades: true });
@@ -178,24 +178,24 @@ class App extends React.Component<props, state> {
         }
       })
       .catch((err: any) => {
-        console.log(err);
+        //console.log(err);
       });
   }
 
   ionViewWillEnter() {
-    console.log("ionViewWillEnter event fired");
+    //console.log("ionViewWillEnter event fired");
   }
 
   ionViewWillLeave() {
-    console.log("ionViewWillLeave event fired");
+    //console.log("ionViewWillLeave event fired");
   }
 
   ionViewDidEnter() {
-    console.log("ionViewDidEnter event fired");
+    //console.log("ionViewDidEnter event fired");
   }
 
   ionViewDidLeave() {
-    console.log("ionViewDidLeave event fired");
+    //console.log("ionViewDidLeave event fired");
   }
 
   getUserStorage = () => {
@@ -203,7 +203,7 @@ class App extends React.Component<props, state> {
     //store.clear();
     //await store.set('username', "TerrorCards");
     store.get("userProfile").then((userProfile: any) => {
-      console.log(userProfile);
+      //console.log(userProfile);
       if (userProfile !== null) {
         //continue normally
         //const newState = {ID: username, credit:0};
