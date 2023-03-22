@@ -217,7 +217,11 @@ class HuntContainer extends React.Component<props, state> {
                     class={"ListItemSizing"}
                   />
                 </IonCol>
-                <IonCol class="ion-text-center">{p.Player}</IonCol>
+                <IonCol class="ion-text-center">
+                  {p.Player.length > 10
+                    ? p.Player.substring(0, 9) + "..."
+                    : p.Player}
+                </IonCol>
                 <IonCol size="auto">
                   <IonButton
                     color="success"

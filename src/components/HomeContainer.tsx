@@ -580,6 +580,7 @@ class HomeContainer extends React.Component<props, state> {
             this.setState({ showNewMsg: false, event: undefined })
           }
           side="left"
+          className={"popover-message-size"}
         >
           <IonTextarea
             rows={10}

@@ -328,7 +328,7 @@ class TradeContainer extends React.Component<props, state> {
           onDidDismiss={() =>
             this.setState({ showInfoPopover: false, event: undefined })
           }
-          className={"contactPopover"}
+          className={"popover-message-size-height"}
         >
           <IonContent style={{ height: "100%" }}>
             <IonGrid>

@@ -278,6 +278,9 @@ class GalleryMenu extends React.Component<props, state> {
             placeholder=""
             onIonChange={(e: any) => {
               this.updateSettings("year", e.detail.value, "cards");
+              setTimeout(() => {
+                this.pullSets();
+              }, 1000);
             }}
           >
             {this.state.availableYears}

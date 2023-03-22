@@ -9,7 +9,6 @@ import {
 } from '@ionic/react';
 import { checkmark, close, closeCircleOutline } from 'ionicons/icons';
 import { callServer } from './ajaxcalls';
-
 import { Camera, CameraResultType } from '@capacitor/camera';
 
 interface props {

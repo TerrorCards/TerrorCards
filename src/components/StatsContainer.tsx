@@ -275,7 +275,7 @@ class StatsContainer extends React.Component<props, state> {
             <IonRow>
               <IonText color="dark">
                 <IonButton fill="clear" size="small" color="dark">
-                  Latest Chase Cards
+                  Latest Cards
                 </IonButton>{" "}
                 <IonButton
                   color={

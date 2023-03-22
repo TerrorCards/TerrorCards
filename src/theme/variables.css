@@ -258,7 +258,21 @@ body {
   left: 5% !important;
 }
 
+.popover-message-size {
+  --width: 75%;
+}
+
+.popover-message-size-height {
+  --width: 75%;
+  --height: 500;
+}
+
 .modal-size-override {
   --height: 100% !important;
   --width: 100% !important;
+}
+
+.modal-size-menu-override {
+  --height: 75% !important;
+  --width: 75% !important;
 }

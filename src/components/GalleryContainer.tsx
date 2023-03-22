@@ -456,12 +456,16 @@ class GalleryContainer extends React.Component<props, state> {
             </IonCol>
             <IonCol>
               <IonButton
+                color="dark"
                 fill="clear"
+                expand="full"
+                size="small"
                 onClick={(e: any) => {
                   this.setState({ showSettingPopover: true });
                 }}
               >
-                <IonIcon slot="end" icon={settingsOutline} color="dark" />
+                <IonIcon slot="start" icon={settingsOutline} color="dark" />
+                Filters
               </IonButton>
             </IonCol>
           </IonRow>
@@ -480,6 +484,7 @@ class GalleryContainer extends React.Component<props, state> {
           onDidDismiss={() =>
             this.setState({ showSettingPopover: false, event: undefined })
           }
+          className={"popover-message-size"}
         >
           <GalleryMenu
             layoutAction={this.props.settingsCallback}

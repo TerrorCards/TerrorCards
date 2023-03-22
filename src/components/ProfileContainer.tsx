@@ -16,6 +16,7 @@ import {
 } from "@ionic/react";
 import { aperture, repeat, closeCircle, appsOutline } from "ionicons/icons";
 import { callServer } from "./ajaxcalls";
+import "./ProfileContainer.css";
 
 interface props {
   user: any;
@@ -237,6 +238,7 @@ class ProfileContainer extends React.Component<props, state> {
               showBlockList: false,
             })
           }
+          className={"modal-size-menu-override"}
         >
           <IonContent>
             <IonGrid>
@@ -291,7 +293,7 @@ class ProfileContainer extends React.Component<props, state> {
     const fList: any = [];
     this.state.friendsList.forEach((friend: any) => {
       fList.push(
-        <IonItem>
+        <IonItem key={friend.Friend}>
           <IonButton
             fill="clear"
             onClick={() => {
@@ -322,7 +324,7 @@ class ProfileContainer extends React.Component<props, state> {
     const fList: any = [];
     this.state.blockList.forEach((block: any) => {
       fList.push(
-        <IonItem>
+        <IonItem key={block.Block}>
           <IonAvatar>
             <IonImg src={block.Image} />
           </IonAvatar>

@@ -406,6 +406,7 @@ class TradeSetup extends React.Component<props, state> {
             onDidDismiss={() =>
               this.setState({ showFilterMenu: false, event: undefined })
             }
+            className={"popover-message-size"}
           >
             <GalleryMenu
               layoutAction={this.processCardListFilters}
