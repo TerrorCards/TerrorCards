@@ -460,7 +460,7 @@ class HomeContainer extends React.Component<props, state> {
               <IonLoading
                 cssClass="my-custom-class"
                 isOpen={true}
-                onDidDismiss={() => //console.log("loading")}
+                onDidDismiss={() => console.log("loading")}
                 message={"Loading, please wait..."}
                 duration={30000}
               />
