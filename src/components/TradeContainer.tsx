@@ -18,6 +18,7 @@ import {
   IonPopover,
   IonIcon,
   IonBadge,
+  IonText,
   withIonLifeCycle,
 } from "@ionic/react";
 import "./TradeContainer.css";
@@ -622,13 +623,18 @@ class TradeContainer extends React.Component<props, state> {
             </IonCol>
           </IonRow>
           <IonRow>
-            <IonCol>Card Count: {result[0].count}</IonCol>
-            <IonCol>Sold Out: {result[0].cardSoldOut}</IonCol>
+            <IonCol>
+              <IonText color="dark">Card Count: {result[0].count}</IonText>
+            </IonCol>
+            <IonCol>
+              <IonText color="dark">Sold Out: {result[0].cardSoldOut}</IonText>
+            </IonCol>
           </IonRow>
           <IonRow>
-            <IonCol>Set: {card.SetName.replace(/_/g, " ")}</IonCol>
             <IonCol>
-              Recent trades: {result[0].recentTrades} <br></br>(past 48 hrs)
+              <IonText color="dark">
+                Set: {card.SetName.replace(/_/g, " ")}
+              </IonText>
             </IonCol>
           </IonRow>
         </IonGrid>
