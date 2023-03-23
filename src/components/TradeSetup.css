@@ -5,6 +5,13 @@
   right: 0px;
 }
 
+.trade-button-cc {
+  --color: black;
+  position: absolute;
+  top: 0px;
+  left: 0px;
+}
+
 .trade-button-remove {
   position: absolute;
   bottom: 0px;

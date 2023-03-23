@@ -18,6 +18,7 @@ import {
   IonPopover,
   IonIcon,
   IonBadge,
+  IonCard,
   withIonLifeCycle,
 } from "@ionic/react";
 import "./TradeSetup.css";
@@ -27,6 +28,7 @@ import {
   informationCircle,
   closeCircleOutline,
   settingsOutline,
+  informationCircleOutline,
 } from "ionicons/icons";
 
 interface props {
@@ -42,6 +44,7 @@ interface state {
   showFilterMenu: boolean;
   showTradeSaveResult: boolean;
   showTradeSaveResultMessage: string;
+  showCCPopover: boolean;
   alertType: string;
   event: any;
 
@@ -55,6 +58,7 @@ interface state {
   otherChunkList: Array<any>;
   selectionCardList: Array<any>;
   tradeMessage: string;
+  cardCount: any;
 }
 
 class TradeSetup extends React.Component<props, state> {
@@ -68,6 +72,7 @@ class TradeSetup extends React.Component<props, state> {
       showFilterMenu: false,
       showTradeSaveResult: false,
       showTradeSaveResultMessage: "",
+      showCCPopover: false,
       alertType: "",
       event: undefined,
 
@@ -87,6 +92,7 @@ class TradeSetup extends React.Component<props, state> {
       otherChunkList: [],
       selectionCardList: [],
       tradeMessage: "",
+      cardCount: 0,
     };
   }
 
@@ -242,6 +248,28 @@ class TradeSetup extends React.Component<props, state> {
         });
     }
   };
+
+  checkCardCount(card: any, evt: any) {
+    callServer(
+      "cardCount",
+      {
+        number: card.Number,
+        year: card.Card_Year,
+      },
+      this.props.user.ID
+    )
+      ?.then((resp) => {
+        //console.log(resp);
+        return resp.json();
+      })
+      .then((json) => {
+        this.setState({
+          showCCPopover: true,
+          event: evt,
+          cardCount: json[0].count,
+        });
+      });
+  }
 
   //Functions to do chunking of data
   chunkCards = (array: Array<any>) => {
@@ -415,6 +443,21 @@ class TradeSetup extends React.Component<props, state> {
               type={"cards"}
             />
           </IonPopover>
+
+          <IonPopover
+            isOpen={this.state.showCCPopover}
+            onDidDismiss={() =>
+              this.setState({
+                showCCPopover: false,
+                event: undefined,
+                cardCount: 0,
+              })
+            }
+            side="bottom"
+            alignment="center"
+          >
+            <IonCard>Card Count: {this.state.cardCount}</IonCard>
+          </IonPopover>
         </IonContent>
       </IonPage>
     );
@@ -581,6 +624,19 @@ class TradeSetup extends React.Component<props, state> {
                 }}
               >
                 +
+              </IonButton>
+            </div>
+            <div className="trade-button-cc">
+              <IonButton
+                strong={true}
+                class="trade-button-cc"
+                size="small"
+                fill="clear"
+                onClick={(e: any) => {
+                  this.checkCardCount(c, e);
+                }}
+              >
+                <IonIcon icon={informationCircleOutline} color="danger" />
               </IonButton>
             </div>
             {c.Count !== null && c.Count > 1 && (
