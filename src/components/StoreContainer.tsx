@@ -266,6 +266,10 @@ class StoreContainer extends React.Component<props, state> {
                 <IonGrid>
                   <IonRow>
                     <IonCol>
+                      {JSON.stringify(p)}
+                      <br></br>
+                      <br></br>
+                      {JSON.stringify(InAppPurchase2)}
                       <IonImg src={""} />
                     </IonCol>
                     <IonCol>
