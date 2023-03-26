@@ -96,7 +96,11 @@ class StoreContainer extends React.Component<props, state> {
   }
 
   componentWillMount() {
-    this.pullInApp();
+    if (InAppPurchase2.products.length > 0) {
+      //do things, don't pull again.
+    } else {
+      this.pullInApp();
+    }
   }
 
   ionViewWillLeave() {}
@@ -136,10 +140,11 @@ class StoreContainer extends React.Component<props, state> {
             regArray.push(this.registerAppStoreProduct(item.ID));
           });
           Promise.all(regArray).then((resp) => {
+            InAppPurchase2.refresh();
             this.setState(
               { allCoinList: InAppPurchase2.products, isInAppLoaded: true },
               () => {
-                InAppPurchase2.refresh();
+                //do nothing
               }
             );
           });
@@ -265,13 +270,6 @@ class StoreContainer extends React.Component<props, state> {
               <IonCardContent>
                 <IonGrid>
                   <IonRow>
-                    <IonCol>
-                      {JSON.stringify(p)}
-                      <br></br>
-                      <br></br>
-                      {JSON.stringify(InAppPurchase2)}
-                      <IonImg src={""} />
-                    </IonCol>
                     <IonCol>
                       <div style={{ display: "flex", flexDirection: "column" }}>
                         <div style={{ display: "flex", flex: 2 }}>
