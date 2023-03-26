@@ -139,7 +139,7 @@ class StoreContainer extends React.Component<props, state> {
             this.setState(
               { allCoinList: InAppPurchase2.products, isInAppLoaded: true },
               () => {
-                //this.renderCoinsList();
+                InAppPurchase2.refresh();
               }
             );
           });
@@ -560,7 +560,7 @@ class StoreContainer extends React.Component<props, state> {
 
           p.finish();
         });
-      InAppPurchase2.refresh();
+      //InAppPurchase2.refresh();
       resolve(true);
     });
   };
