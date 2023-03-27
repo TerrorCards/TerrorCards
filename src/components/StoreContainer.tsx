@@ -16,8 +16,6 @@ import {
   IonGrid,
   IonRow,
   IonCol,
-  IonSpinner,
-  IonItem,
   withIonLifeCycle,
 } from "@ionic/react";
 import "./StoreContainer.css";
