@@ -96,8 +96,12 @@ class StoreContainer extends React.Component<props, state> {
   }
 
   componentWillMount() {
-    if (InAppPurchase2.products.length > 0) {
-      //do things, don't pull again.
+    if (InAppPurchase2?.products) {
+      if (InAppPurchase2.products.length > 0) {
+        this.setState({ isInAppLoaded: true });
+      } else {
+        this.pullInApp();
+      }
     } else {
       this.pullInApp();
     }
