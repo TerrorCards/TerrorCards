@@ -45,7 +45,6 @@ interface state {
   targetType: any;
   showCoinMessage: boolean;
   coinPurchaseMsg: any;
-  isInAppLoaded: boolean;
 }
 
 class StoreContainer extends React.Component<props, state> {
@@ -67,7 +66,6 @@ class StoreContainer extends React.Component<props, state> {
       targetType: null,
       showCoinMessage: false,
       coinPurchaseMsg: null,
-      isInAppLoaded: false,
     };
   }
 
@@ -307,9 +305,7 @@ class StoreContainer extends React.Component<props, state> {
   changeStoreType = (value: string) => {
     this.setState({ storeType: value }, () => {
       if (value === "coins") {
-        if (this.state.isInAppLoaded) {
-          this.renderCoinsList();
-        }
+        this.renderCoinsList();
       } else {
         this.filterPacks();
       }
