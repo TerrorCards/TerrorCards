@@ -45,6 +45,7 @@ import ProfileManagerContainer from "./components/ProfileManagerContainer";
 import { callServer } from "./components/ajaxcalls";
 
 import { Device } from "@capacitor/device";
+import { InAppPurchase2 } from "@awesome-cordova-plugins/in-app-purchase-2";
 
 /* Core CSS required for Ionic components to work properly */
 import "@ionic/react/css/core.css";
@@ -83,12 +84,14 @@ interface state {
   hasTrades: boolean;
   dailyLogin: boolean;
   dailyMessage: string;
+  showCoinMessage: boolean;
+  coinPurchaseMsg: string;
 }
 
 const store = new Storage();
 store.create();
 
-setupIonicReact({ mode: "md" });
+setupIonicReact({ mode: "ios" });
 
 class App extends React.Component<props, state> {
   constructor(props: any) {
@@ -128,6 +131,8 @@ class App extends React.Component<props, state> {
       hasTrades: false,
       dailyLogin: false,
       dailyMessage: "",
+      showCoinMessage: false,
+      coinPurchaseMsg: "",
     };
   }
 
@@ -149,6 +154,9 @@ class App extends React.Component<props, state> {
         this.deviceInfo.uuid = i.uuid;
       });
     });
+
+    this.pullInApp();
+
     /*
     this.deviceInfo.uuid = Device.uuid;
     this.deviceInfo.platform = Device.platform;
@@ -364,6 +372,8 @@ class App extends React.Component<props, state> {
                   storeProps={""}
                   user={this.state.user}
                   callbackPackOpenTimer={this.fnCallbackRefreshTime}
+                  inAppPurchaseObject={InAppPurchase2.products}
+                  coinBuyAction={this.fnCanBuyCoins}
                 />
               </Route>
               <Route path="/trade">
@@ -511,6 +521,25 @@ class App extends React.Component<props, state> {
               },
             ]}
           />
+
+          <IonAlert
+            isOpen={this.state.showCoinMessage}
+            onDidDismiss={() => {
+              this.setState({ showCoinMessage: false });
+            }}
+            header="Message"
+            message={this.state.coinPurchaseMsg}
+            buttons={[
+              {
+                text: "Ok",
+                role: "cancel",
+                cssClass: "secondary",
+                handler: (blah: any) => {
+                  this.setState({ showCoinMessage: false });
+                },
+              },
+            ]}
+          />
         </IonReactRouter>
       </IonApp>
     ) : (
@@ -532,6 +561,79 @@ class App extends React.Component<props, state> {
       </IonApp>
     );
   }
+
+  // in app purchase stuff
+  pullInApp = () => {
+    callServer("loadInAppItems", "", this.state.user.ID)
+      ?.then((resp) => {
+        return resp.json();
+      })
+      .then((json) => {
+        if (json.length > 0) {
+          const items = json;
+          const regArray: Array<any> = [];
+          items.forEach((item: any) => {
+            regArray.push(this.registerAppStoreProduct(item.ID));
+          });
+          Promise.all(regArray).then((resp) => {
+            InAppPurchase2.refresh();
+          });
+        }
+      })
+      .catch((err: any) => {
+        console.log(err);
+      });
+  };
+
+  registerAppStoreProduct = (productId: any) => {
+    new Promise((resolve, reject) => {
+      InAppPurchase2.register({
+        id: productId,
+        type: InAppPurchase2.CONSUMABLE,
+      });
+
+      InAppPurchase2.when(productId)
+        .approved((p: any) => p.verify())
+        .verified((p: any) => {
+          let value = 0;
+          if (p.id.indexOf("25k") > -1) {
+            value = 25000;
+          } else if (p.id.indexOf("100k") > -1) {
+            value = 100000;
+          } else if (p.id.indexOf("250k") > -1) {
+            value = 250000;
+          } else if (p.id.indexOf("500k") > -1) {
+            value = 500000;
+          } else if (p.id.indexOf("750k") > -1) {
+            value = 750000;
+          } else if (p.id.indexOf("1m") > -1) {
+            value = 1000000;
+          } else {
+            value = 0;
+          }
+          callServer(
+            "updateCredit",
+            { credit: value },
+            this.state.user.ID
+          )?.then((result: any) => {
+            this.setState({
+              showCoinMessage: true,
+              coinPurchaseMsg:
+                "Thank you. Account updated by " + value + " credit",
+            });
+            this.fnCallbackRefreshTime(Date.now());
+          });
+
+          p.finish();
+        });
+      //InAppPurchase2.refresh();
+      resolve(true);
+    });
+  };
+
+  fnCanBuyCoins = (item: any) => {
+    InAppPurchase2.order(item);
+  };
 }
 
 export default withIonLifeCycle(App);
