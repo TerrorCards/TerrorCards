@@ -267,16 +267,18 @@ class HomeContainer extends React.Component<props, state> {
               }}
             />
           </IonItem>
-          <IonItemOptions side="start">
-            <IonItemOption
-              color="dark"
-              onClick={() => {
-                this.sendTradeCallback(j.ID);
-              }}
-            >
-              Trade
-            </IonItemOption>
-          </IonItemOptions>
+          {j.ID !== this.props.user.ID && (
+            <IonItemOptions side="start">
+              <IonItemOption
+                color="dark"
+                onClick={() => {
+                  this.sendTradeCallback(j.ID);
+                }}
+              >
+                Trade
+              </IonItemOption>
+            </IonItemOptions>
+          )}
         </IonItemSliding>
         <IonCardContent>
           <div dangerouslySetInnerHTML={{ __html: j.Text }}></div>
