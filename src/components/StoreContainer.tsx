@@ -402,6 +402,13 @@ class StoreContainer extends React.Component<props, state> {
         </IonSegment>
 
         <IonList>{this.state.packItems}</IonList>
+        <IonGrid>
+          <IonRow>
+            <IonCol>
+              <div style={{ height: 75 }}></div>
+            </IonCol>
+          </IonRow>
+        </IonGrid>
 
         <IonModal
           isOpen={this.state.showCards}
@@ -448,6 +455,14 @@ class StoreContainer extends React.Component<props, state> {
           message={"Are you sure you want to purchase?"}
           buttons={[
             {
+              text: "No",
+              role: "ok",
+              cssClass: "secondary",
+              handler: (blah: any) => {
+                this.setState({ showConfirmPurchase: false });
+              },
+            },
+            {
               text: "Yes",
               role: "ok",
               cssClass: "secondary",
@@ -459,14 +474,6 @@ class StoreContainer extends React.Component<props, state> {
                     this._canBuy();
                   }
                 });
-              },
-            },
-            {
-              text: "No",
-              role: "ok",
-              cssClass: "secondary",
-              handler: (blah: any) => {
-                this.setState({ showConfirmPurchase: false });
               },
             },
           ]}

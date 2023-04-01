@@ -23,7 +23,7 @@ import {
 } from "@ionic/react";
 import "./TradeContainer.css";
 import { callServer } from "./ajaxcalls";
-import { informationCircle } from "ionicons/icons";
+import { informationCircle, closeCircleOutline } from "ionicons/icons";
 
 interface props {
   user: any;
@@ -371,14 +371,26 @@ class TradeContainer extends React.Component<props, state> {
         </IonPopover>
 
         <IonModal isOpen={this.state.showDetails}>
+          <div style={{ height: 10 }}></div>
+          <div style={{ textAlign: "end" }}>
+            <IonButton
+              fill="clear"
+              onClick={(e: any) => {
+                this.setState({
+                  showDetails: false,
+                  cardDetails: null,
+                });
+              }}
+            >
+              <IonIcon
+                slot="icon-only"
+                icon={closeCircleOutline}
+                color="dark"
+                size="l"
+              />
+            </IonButton>
+          </div>
           {this.state.cardDetails}
-          <IonButton
-            onClick={() =>
-              this.setState({ showDetails: false, cardDetails: null })
-            }
-          >
-            Close Details
-          </IonButton>
         </IonModal>
 
         <IonPopover
@@ -612,11 +624,6 @@ class TradeContainer extends React.Component<props, state> {
     this.pullCardDetails(this.props.user.ID, card).then((result: any) => {
       const details = (
         <IonGrid>
-          <IonRow>
-            <IonCol>
-              <div style={{ height: 50 }}></div>
-            </IonCol>
-          </IonRow>
           <IonRow>
             <IonCol>
               <img src={card.Image} width="100%" alt="" />

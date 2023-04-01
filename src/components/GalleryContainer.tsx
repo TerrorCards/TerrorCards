@@ -12,8 +12,14 @@ import {
   IonBadge,
   IonText,
   IonPopover,
+  IonLabel,
 } from "@ionic/react";
-import { copyOutline, flashOutline, settingsOutline } from "ionicons/icons";
+import {
+  copyOutline,
+  flashOutline,
+  settingsOutline,
+  closeCircleOutline,
+} from "ionicons/icons";
 import "./GalleryContainer.css";
 import GalleryMenu from "./GalleryMenu";
 import { callServer } from "./ajaxcalls";
@@ -165,12 +171,15 @@ class GalleryContainer extends React.Component<props, state> {
           </IonRow>
           <IonRow>
             <IonCol>
-              <IonText color="dark">Card Count: {result[0].count}</IonText>
+              <IonText color="dark">Count: {result[0].count}</IonText>
             </IonCol>
             <IonCol>
               <IonText color="dark">
-                You Own: {card.Count !== null ? card.Count : 0}
+                Own: {card.Count !== null ? card.Count : 0}
               </IonText>
+            </IonCol>
+            <IonCol>
+              <IonText color="dark">Sold Out: {result[0].cardSoldOut}</IonText>
             </IonCol>
           </IonRow>
           <IonRow>
@@ -178,9 +187,6 @@ class GalleryContainer extends React.Component<props, state> {
               <IonText color="dark">
                 Set: {card.SetName.replace(/_/g, " ")}
               </IonText>
-            </IonCol>
-            <IonCol>
-              <IonText color="dark">Sold Out: {result[0].cardSoldOut}</IonText>
             </IonCol>
           </IonRow>
         </IonGrid>
@@ -226,7 +232,14 @@ class GalleryContainer extends React.Component<props, state> {
   pullCardDetails = (user: string, card: any) => {
     return new Promise((resolve: any, reject: any) => {
       //console.log(card);
-      callServer("cardDetail", { number: card.Number, year: card.Year }, user)
+      callServer(
+        "cardDetail",
+        {
+          number: card.Number !== null ? card.Number : card.ID,
+          year: card.Year,
+        },
+        user
+      )
         ?.then((resp) => {
           return resp.json();
         })
@@ -495,30 +508,35 @@ class GalleryContainer extends React.Component<props, state> {
           />
         </IonPopover>
 
-        <IonModal
-          isOpen={this.state.showDetails}
-          className={"modal-size-override"}
-        >
+        <IonModal isOpen={this.state.showDetails}>
+          <div style={{ height: 10 }}></div>
           <IonGrid>
             <IonRow>
               <IonCol>
-                <div style={{ height: 35 }}></div>
+                <IonLabel>
+                  <div style={{ textAlign: "end" }}>
+                    <IonButton
+                      fill="clear"
+                      onClick={(e: any) => {
+                        this.setState({
+                          showDetails: false,
+                          cardDetails: null,
+                        });
+                      }}
+                    >
+                      <IonIcon
+                        slot="icon-only"
+                        icon={closeCircleOutline}
+                        color="dark"
+                        size="l"
+                      />
+                    </IonButton>
+                  </div>
+                </IonLabel>
               </IonCol>
             </IonRow>
             <IonRow>
               <IonCol>{this.state.cardDetails}</IonCol>
-            </IonRow>
-            <IonRow>
-              <IonCol>
-                <IonButton
-                  expand="block"
-                  onClick={() =>
-                    this.setState({ showDetails: false, cardDetails: null })
-                  }
-                >
-                  Close Details
-                </IonButton>
-              </IonCol>
             </IonRow>
             <IonRow>
               <IonCol>

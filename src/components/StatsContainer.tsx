@@ -373,6 +373,11 @@ class StatsContainer extends React.Component<props, state> {
                 : ""}
             </IonCol>
           </IonRow>
+          <IonRow>
+            <IonCol>
+              <div style={{ height: 25 }}></div>
+            </IonCol>
+          </IonRow>
         </IonGrid>
       </IonContent>
     );

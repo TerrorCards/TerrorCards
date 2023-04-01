@@ -256,12 +256,14 @@ class HomeContainer extends React.Component<props, state> {
             <IonIcon
               icon={listCircle}
               onClick={(e: any) => {
-                e.persist();
-                this.setState({
-                  showPopover: true,
-                  event: e,
-                  tradePartner: j.ID,
-                });
+                if (j.ID !== this.props.user.ID) {
+                  e.persist();
+                  this.setState({
+                    showPopover: true,
+                    event: e,
+                    tradePartner: j.ID,
+                  });
+                }
               }}
             />
           </IonItem>
