@@ -509,7 +509,6 @@ class GalleryContainer extends React.Component<props, state> {
         </IonPopover>
 
         <IonModal isOpen={this.state.showDetails}>
-          <div style={{ height: 10 }}></div>
           <IonGrid>
             <IonRow>
               <IonCol>

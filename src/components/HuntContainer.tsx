@@ -510,7 +510,7 @@ class HuntContainer extends React.Component<props, state> {
         this.battleWinner = this.gBattleUser.Player;
         this.battleLoser = this.gBattleTarget.Player;
       }
-      //playBattleResults({round:pParam.round, player:this.gBattleTarget.ID, damage:difference, lifeLeft:this.gBattleTarget.Life});
+      //playBattleResults({round:pParam.round, player:this.gBattleTarget.Player, damage:difference, lifeLeft:this.gBattleTarget.Life});
       return {
         round: pParam.round,
         player: this.gBattleTarget.Player,
@@ -536,7 +536,7 @@ class HuntContainer extends React.Component<props, state> {
         this.battleWinner = this.gBattleTarget.Player;
         this.battleLoser = this.gBattleUser.Player;
       }
-      //playBattleResults({round:pParam.round, player:this.gBattleUser.ID, damage:difference, lifeLeft:this.gBattleUser.Life});
+      //playBattleResults({round:pParam.round, player:this.gBattleUser.Player, damage:difference, lifeLeft:this.gBattleUser.Life});
       return {
         round: pParam.round,
         player: this.gBattleUser.Player,
@@ -549,11 +549,11 @@ class HuntContainer extends React.Component<props, state> {
   battleEndGame = (params: any) => {
     if (this.battleWinner === "") {
       if (this.gBattleUser.Life >= this.gBattleTarget.Life) {
-        this.battleWinner = this.gBattleUser.ID;
-        this.battleLoser = this.gBattleTarget.ID;
+        this.battleWinner = this.gBattleUser.Player;
+        this.battleLoser = this.gBattleTarget.Player;
       } else {
-        this.battleWinner = this.gBattleTarget.ID;
-        this.battleLoser = this.gBattleUser.ID;
+        this.battleWinner = this.gBattleTarget.Player;
+        this.battleLoser = this.gBattleUser.Player;
       }
     }
 
@@ -563,8 +563,8 @@ class HuntContainer extends React.Component<props, state> {
         {
           winner: this.battleWinner,
           loser: this.battleLoser,
-          you: this.gBattleUser.ID,
-          target: this.gBattleTarget.ID,
+          you: this.gBattleUser.Player,
+          target: this.gBattleTarget.Player,
         },
         this.props.user.ID
       )
@@ -583,8 +583,8 @@ class HuntContainer extends React.Component<props, state> {
         {
           winner: "",
           loser: "",
-          you: this.gBattleUser.ID,
-          target: this.gBattleTarget.ID,
+          you: this.gBattleUser.Player,
+          target: this.gBattleTarget.Player,
         },
         this.props.user.ID
       )
@@ -607,7 +607,7 @@ class HuntContainer extends React.Component<props, state> {
       const value = pParam[index];
       let txtResult = value.player + " hurt " + value.damage;
       const test2 = { yourDamMsg: "", otherDamMsg: "" };
-      if (value.player === this.gBattleUser.ID) {
+      if (value.player === this.gBattleUser.Player) {
         test2.yourDamMsg = txtResult;
       } else {
         test2.otherDamMsg = txtResult;

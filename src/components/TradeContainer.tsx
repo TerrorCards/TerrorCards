@@ -371,7 +371,6 @@ class TradeContainer extends React.Component<props, state> {
         </IonPopover>
 
         <IonModal isOpen={this.state.showDetails}>
-          <div style={{ height: 10 }}></div>
           <div style={{ textAlign: "end" }}>
             <IonButton
               fill="clear"
