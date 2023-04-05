@@ -480,6 +480,31 @@ export function callServer(pTask, pData, pUserId) {
 
       break;
     }
+    case "tradeWhoHasCard": {
+      jsonstr = prepData(pData);
+      formData = new FormData();
+      formData.append("uUserId", pUserId);
+      formData.append("uContent", jsonstr);
+      /*           
+            test = fetch(serverpath + "trade.php", {
+              method: 'POST',
+              headers: {
+                "Content-Type": 'multipart/form-data'
+              },
+              body: formData
+            });
+            */
+      test = fetch(
+        serverpath +
+          "card_who_has.php?" +
+          new URLSearchParams({
+            uUserId: pUserId,
+            uContent: jsonstr,
+          })
+      );
+
+      break;
+    }
     case "pullFactoryList": {
       //jsonstr = prepData(pData);
       formData = new FormData();
@@ -1339,6 +1364,32 @@ export function callServer(pTask, pData, pUserId) {
       test = fetch(
         serverpath +
           "stats_login_check.php?" +
+          new URLSearchParams({
+            uUserId: pUserId,
+            uContent: jsonstr,
+          })
+      );
+
+      break;
+    }
+
+    case "stats_tradeCount": {
+      jsonstr = prepData(pData);
+      formData = new FormData();
+      formData.append("uUserId", pUserId);
+      formData.append("uContent", jsonstr);
+      /*
+          test = fetch(serverpath + "inAppList.php", {
+            method: 'POST',
+            headers: {
+              "Content-Type": 'multipart/form-data'
+            },
+            body: formData
+          });
+          */
+      test = fetch(
+        serverpath +
+          "trade_count.php?" +
           new URLSearchParams({
             uUserId: pUserId,
             uContent: jsonstr,

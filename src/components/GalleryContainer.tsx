@@ -22,6 +22,7 @@ import {
 } from "ionicons/icons";
 import "./GalleryContainer.css";
 import GalleryMenu from "./GalleryMenu";
+import CardOwnerMenu from "./CardOwnerMenu";
 import { callServer } from "./ajaxcalls";
 
 interface props {
@@ -29,6 +30,7 @@ interface props {
   nftProps: any;
   settingsCallback: any;
   user: any;
+  tradeCallback: any;
 }
 
 interface state {
@@ -47,6 +49,7 @@ interface state {
   nftImgList: Array<any>;
   showSettingPopover: boolean;
   event: any;
+  showOwners: boolean;
 }
 
 class GalleryContainer extends React.Component<props, state> {
@@ -69,6 +72,7 @@ class GalleryContainer extends React.Component<props, state> {
       nftImgList: [],
       showSettingPopover: false,
       event: undefined,
+      showOwners: false,
     };
   }
 
@@ -149,7 +153,7 @@ class GalleryContainer extends React.Component<props, state> {
   };
   //End chunking functions
 
-  showCardetails = (card: any, front: boolean) => {
+  showCardetails = (card: any, front: boolean, owners: boolean) => {
     //Recent trades: {result[0].recentTrades} <br></br>(past 48 hrs)
     this.pullCardDetails(this.props.user.ID, card).then((result: any) => {
       //console.log(result);
@@ -164,7 +168,7 @@ class GalleryContainer extends React.Component<props, state> {
               <IonImg
                 src={currImg}
                 onClick={() => {
-                  this.showCardetails(card, !front);
+                  this.showCardetails(card, !front, owners);
                 }}
               ></IonImg>
             </IonCol>
@@ -189,6 +193,32 @@ class GalleryContainer extends React.Component<props, state> {
               </IonText>
             </IonCol>
           </IonRow>
+          <IonRow>
+            <IonCol>
+              <IonButton
+                color={"dark"}
+                size="small"
+                onClick={() => {
+                  this.showCardetails(card, front, !owners);
+                }}
+              >
+                Show owners of this card
+              </IonButton>
+            </IonCol>
+          </IonRow>
+          {owners && (
+            <IonRow>
+              <IonCol>
+                <CardOwnerMenu
+                  user={this.props.user}
+                  cardNumber={card.Number !== null ? card.Number : card.ID}
+                  cardYear={card.Year}
+                  tradeCallback={this.props.tradeCallback}
+                  closePanel={null}
+                ></CardOwnerMenu>
+              </IonCol>
+            </IonRow>
+          )}
         </IonGrid>
       );
       this.setState({ cardDetails: details, showDetails: true });
@@ -281,7 +311,7 @@ class GalleryContainer extends React.Component<props, state> {
               src={imgSrc}
               class={c.UserID === null ? "need-card-alpha" : ""}
               onClick={() => {
-                this.showCardetails(c, true);
+                this.showCardetails(c, true, false);
               }}
             ></IonImg>
             {c.Count !== null && c.Count > 1 && (
@@ -311,7 +341,7 @@ class GalleryContainer extends React.Component<props, state> {
       this.props.nftProps.collection +
       "&owner=" +
       this.state.nftAccount +
-      "&page=1&limit=100&order=desc&sort=asset_id";
+      "&page=1&limit=200&order=desc&sort=asset_id";
     if (this.props.nftProps.schema !== "all") {
       url = url + "&schema_name=" + this.props.nftProps.schema;
     }
@@ -509,40 +539,42 @@ class GalleryContainer extends React.Component<props, state> {
         </IonPopover>
 
         <IonModal isOpen={this.state.showDetails}>
-          <IonGrid>
-            <IonRow>
-              <IonCol>
-                <IonLabel>
-                  <div style={{ textAlign: "end" }}>
-                    <IonButton
-                      fill="clear"
-                      onClick={(e: any) => {
-                        this.setState({
-                          showDetails: false,
-                          cardDetails: null,
-                        });
-                      }}
-                    >
-                      <IonIcon
-                        slot="icon-only"
-                        icon={closeCircleOutline}
-                        color="dark"
-                        size="l"
-                      />
-                    </IonButton>
-                  </div>
-                </IonLabel>
-              </IonCol>
-            </IonRow>
-            <IonRow>
-              <IonCol>{this.state.cardDetails}</IonCol>
-            </IonRow>
-            <IonRow>
-              <IonCol>
-                <div style={{ height: 35 }}></div>
-              </IonCol>
-            </IonRow>
-          </IonGrid>
+          <IonContent>
+            <IonGrid>
+              <IonRow>
+                <IonCol>
+                  <IonLabel>
+                    <div style={{ textAlign: "end" }}>
+                      <IonButton
+                        fill="clear"
+                        onClick={(e: any) => {
+                          this.setState({
+                            showDetails: false,
+                            cardDetails: null,
+                          });
+                        }}
+                      >
+                        <IonIcon
+                          slot="icon-only"
+                          icon={closeCircleOutline}
+                          color="dark"
+                          size="l"
+                        />
+                      </IonButton>
+                    </div>
+                  </IonLabel>
+                </IonCol>
+              </IonRow>
+              <IonRow>
+                <IonCol>{this.state.cardDetails}</IonCol>
+              </IonRow>
+              <IonRow>
+                <IonCol>
+                  <div style={{ height: 35 }}></div>
+                </IonCol>
+              </IonRow>
+            </IonGrid>
+          </IonContent>
         </IonModal>
       </IonContent>
     );

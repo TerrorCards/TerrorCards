@@ -12,8 +12,10 @@ import {
   IonButton,
   IonText,
   withIonLifeCycle,
+  IonModal,
 } from "@ionic/react";
 import { callServer } from "./ajaxcalls";
+import CardOwnerMenu from "./CardOwnerMenu";
 
 interface props {
   user: any;
@@ -29,6 +31,10 @@ interface state {
   lastCollectedFlag: string;
   daysToDailyBoost: number;
   pandoraExpires: any;
+  tradeList: Array<any>;
+  showCardOwners: boolean;
+  cardNumber: number;
+  cardYear: number;
 }
 
 class StatsContainer extends React.Component<props, state> {
@@ -55,6 +61,10 @@ class StatsContainer extends React.Component<props, state> {
       lastCollectedFlag: "yours",
       daysToDailyBoost: 0,
       pandoraExpires: null,
+      tradeList: [],
+      showCardOwners: false,
+      cardNumber: 0,
+      cardYear: 0,
     };
   }
 
@@ -63,6 +73,7 @@ class StatsContainer extends React.Component<props, state> {
     this.pullTemplates();
     this.pullCardCounts();
     this.pullLatestCards();
+    this.pullTradeList();
     //console.log("ionViewDidEnter event fired");
   }
 
@@ -172,6 +183,25 @@ class StatsContainer extends React.Component<props, state> {
         console.log(err);
       });
   }
+
+  pullTradeList() {
+    callServer("stats_tradeCount", "", this.props.user.ID)
+      ?.then((resp) => {
+        return resp.json();
+      })
+      .then((json) => {
+        if (json.length > 0) {
+          this.setState({ tradeList: json });
+        }
+      })
+      .catch((err: any) => {
+        console.log(err);
+      });
+  }
+
+  closeTradeOwners = () => {
+    this.setState({ showCardOwners: false, cardNumber: 0, cardYear: 0 });
+  };
 
   renderCurrentYearTemplates() {
     return (
@@ -348,6 +378,55 @@ class StatsContainer extends React.Component<props, state> {
     );
   }
 
+  renderTradeList() {
+    const tradeListDom1_5: any = [];
+
+    this.state.tradeList.forEach((tl: any, i: number) => {
+      if (i < 5) {
+        tradeListDom1_5.push(
+          <IonCol class="ion-text-center" key={i}>
+            <img
+              src={tl.Image}
+              width={50}
+              alt=""
+              onClick={() => {
+                this.setState({
+                  cardNumber: tl.ID,
+                  cardYear: tl.Year,
+                  showCardOwners: true,
+                });
+              }}
+            ></img>
+            <div>{tl.Count} </div>
+          </IonCol>
+        );
+      }
+    });
+    return (
+      <IonCard>
+        <IonCardContent>
+          <IonGrid>
+            <IonRow class="ion-align-items-center">{tradeListDom1_5}</IonRow>
+          </IonGrid>
+        </IonCardContent>
+        <IonModal
+          isOpen={this.state.showCardOwners}
+          className={"modal-size-override"}
+        >
+          <IonContent>
+            <CardOwnerMenu
+              user={this.props.user}
+              cardNumber={this.state.cardNumber}
+              cardYear={this.state.cardYear}
+              tradeCallback={this.props.tradeSetup}
+              closePanel={this.closeTradeOwners}
+            ></CardOwnerMenu>
+          </IonContent>
+        </IonModal>
+      </IonCard>
+    );
+  }
+
   render() {
     return (
       <IonContent>
@@ -361,6 +440,12 @@ class StatsContainer extends React.Component<props, state> {
           </IonRow>
           <IonRow>
             <IonCol>{this.renderSystemLatestCards()}</IonCol>
+          </IonRow>
+          <IonRow>
+            <IonCol>Most traded in the last 48 hours</IonCol>
+          </IonRow>
+          <IonRow>
+            <IonCol>{this.renderTradeList()}</IonCol>
           </IonRow>
           <IonRow>
             <IonCol>Information</IonCol>

@@ -442,7 +442,7 @@ class HomeContainer extends React.Component<props, state> {
             style={{
               height:
                 this.state.msg.length > 0
-                  ? this.viewHeight(1.75)
+                  ? this.viewHeight(1.65)
                   : this.viewHeight(1.5),
               overflowY: "auto",
               backgroundColor: "#333",

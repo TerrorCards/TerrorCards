@@ -91,7 +91,7 @@ interface state {
 const store = new Storage();
 store.create();
 
-setupIonicReact({ mode: "md" });
+setupIonicReact({ mode: "ios" });
 
 class App extends React.Component<props, state> {
   constructor(props: any) {
@@ -359,6 +359,7 @@ class App extends React.Component<props, state> {
                   settingsCallback={this.setGallerySettingsStorage}
                   key={this.state.galleryDigitalSettings.layoutCount}
                   user={this.state.user}
+                  tradeCallback={this.showTradeModal}
                 />
               </Route>
               <Route path="/store">

@@ -32,13 +32,10 @@ interface state {
     currDescription: string;
     currContactUs: string;
     currUserName: string;
-    currPromo: string;
     requestType: string;
     status: boolean;
     confirmDeleteAlert: boolean;
     needToRegister: boolean;
-    showPromoAlert: boolean;
-    promoMsg: string;
     updatedImg: boolean;
     statusInvalidUser: boolean;
     statusInvalidEmail: boolean;
@@ -60,13 +57,10 @@ class ProfileManagerContainer extends React.Component<props, state> {
             currDescription: "",
             currContactUs: "",
             currUserName:"",
-            currPromo:"",
             requestType: "",
             status: false,
             confirmDeleteAlert: false,
             needToRegister: false,
-            showPromoAlert: false,
-            promoMsg: "",
             updatedImg: false,
             statusInvalidUser: false,
             statusInvalidEmail: false            
@@ -337,36 +331,6 @@ class ProfileManagerContainer extends React.Component<props, state> {
 
     }
 
-    checkPromo() {
-        callServer("processPromo", {promo: this.state.currPromo}, this.props.user.ID)?.then((resp) => { return resp.json(); })
-        .then((json) => {
-            if (json) {
-                this.setState({showPromoAlert:true, promoMsg: json[0].Message})
-            }
-        })
-        .catch((err: any) => {
-            console.log(err);
-        }); 
-    }
-
-    sectionContent() {
-        return (<IonCol>
-            <IonLabel>Promo Code</IonLabel>
-            <IonItem fill="solid">
-                        <IonInput value={this.state.currPromo} placeholder="Promo code" 
-                        onIonChange={(e) => {
-                            this.setState({currPromo: e.detail.value!})
-                        }}
-                        onIonBlur={(e) => {
-                                if(this.state.currPromo !== "") {
-                                    this.checkPromo()
-                                }                                   
-                        }}
-                        ></IonInput> 
-            </IonItem>           
-        </IonCol>)
-    }
-
     callCamera = () => {
         this.setState({updatedImg: false}, async() => {
             const image = await Camera.getPhoto({
@@ -511,10 +475,10 @@ class ProfileManagerContainer extends React.Component<props, state> {
                             }                                  
                             </IonLabel>
                             <IonItem fill="solid">
-                            <IonTextarea value={this.state.currDescription} placeholder="About yourself" onIonChange={(e) => {
+                            <IonTextarea value={this.state.currDescription} placeholder="About yourself" onIonChange={(e:any) => {
                                 this.setState({currDescription: e.detail.value!})
                             }}
-                            onIonBlur={(e) => {
+                            onIonBlur={() => {
                                 if(this.state.currDescription !== this.state.info.currDescription) {
                                     this.setDescription()
                                 }                                    
@@ -576,17 +540,17 @@ class ProfileManagerContainer extends React.Component<props, state> {
                             }                                 
                             </IonLabel>
                             <IonItem fill="solid">
-                            <IonInput type="text" value={this.state.currWallet} placeholder="Enter your wallet"  onIonChange={(e) => {
+                            <IonInput type="text" value={this.state.currWallet} placeholder="Enter your wallet"  onIonChange={(e:any) => {
                                 this.setState({currWallet: e.detail.value!})
                             }}
-                            onIonBlur={(e) => {
+                            onIonBlur={() => {
                                 if(this.state.currWallet !== this.state.info.Wallet) {
                                     this.setWallet()
                                 }                                    
                             }}></IonInput>
                             </IonItem>
                         </IonCol>
-                        {this.sectionContent()}
+                        <IonCol></IonCol>
                     </IonRow> 
                     <IonRow>
                         <IonCol><br></br><br></br></IonCol>
@@ -602,10 +566,10 @@ class ProfileManagerContainer extends React.Component<props, state> {
                             }                                  
                             </IonLabel>
                             <IonItem fill="solid">
-                            <IonTextarea value={this.state.currContactUs} placeholder="Your message" onIonChange={(e) => {
+                            <IonTextarea value={this.state.currContactUs} placeholder="Your message" onIonChange={(e:any) => {
                                 this.setState({currContactUs: e.detail.value!})
                             }}
-                            onIonBlur={(e) => {
+                            onIonBlur={() => {
                                 if(this.state.currContactUs !== "") {
                                     this.sendContactUs(this.state.currContactUs);
                                 }                                    
@@ -652,26 +616,6 @@ class ProfileManagerContainer extends React.Component<props, state> {
                 </IonGrid>
                 </IonContent>               
                 }
-
-         <IonAlert
-          isOpen={this.state.showPromoAlert}
-          onDidDismiss={() => {
-              this.setState({showPromoAlert:false, promoMsg: ""});
-          }}
-          cssClass="my-custom-class"
-          header={"Promo"}
-          message={this.state.promoMsg}
-          buttons={[
-            {
-              text: "Ok",
-              role: "cancel",
-              cssClass: "secondary",
-              handler: (blah: any) => {
-                this.setState({showPromoAlert:false, promoMsg: ""});
-              },
-            }
-          ]}
-        />
             </IonPage>
         );
     }
