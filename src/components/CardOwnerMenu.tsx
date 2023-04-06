@@ -124,34 +124,36 @@ class CardOwnerMenu extends React.Component<props, state> {
   render() {
     if (this.props.closePanel !== null) {
       return (
-        <IonPage>
-          <IonHeader>
-            <IonToolbar>
-              <IonItem>
-                <IonLabel>
-                  <div style={{ textAlign: "end" }}>
-                    <IonButton
-                      fill="clear"
-                      onClick={(e: any) => {
-                        this.props.closePanel();
-                      }}
-                    >
-                      <IonIcon
-                        slot="icon-only"
-                        icon={closeCircleOutline}
-                        color="dark"
-                        size="l"
-                      />
-                    </IonButton>
-                  </div>
-                </IonLabel>
-              </IonItem>
-            </IonToolbar>
-          </IonHeader>
-          <IonContent>
-            <IonList>{this.renderPlayerList()}</IonList>
-          </IonContent>
-        </IonPage>
+        <IonGrid>
+          <IonRow>
+            <IonCol>
+              <div style={{ height: 10 }}></div>
+              Owners with this card
+            </IonCol>
+            <IonCol>
+              <div style={{ textAlign: "end" }}>
+                <IonButton
+                  fill="clear"
+                  onClick={(e: any) => {
+                    this.props.closePanel();
+                  }}
+                >
+                  <IonIcon
+                    slot="icon-only"
+                    icon={closeCircleOutline}
+                    color="dark"
+                    size="l"
+                  />
+                </IonButton>
+              </div>
+            </IonCol>
+          </IonRow>
+          <IonRow>
+            <IonCol>
+              <IonList>{this.renderPlayerList()}</IonList>
+            </IonCol>
+          </IonRow>
+        </IonGrid>
       );
     } else {
       return <IonList>{this.renderPlayerList()}</IonList>;
