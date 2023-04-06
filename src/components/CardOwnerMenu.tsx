@@ -121,10 +121,11 @@ class CardOwnerMenu extends React.Component<props, state> {
         <IonGrid>
           <IonRow>
             <IonCol>
-              <div style={{ height: 10 }}></div>
+              <div style={{ height: 30 }}></div>
               Owners with this card
             </IonCol>
             <IonCol>
+              <div style={{ height: 20 }}></div>
               <div style={{ textAlign: "end" }}>
                 <IonButton
                   fill="clear"
