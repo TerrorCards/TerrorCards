@@ -62,7 +62,7 @@ class CardOwnerMenu extends React.Component<props, state> {
         return resp.json();
       })
       .then((json) => {
-        console.log(json);
+        //console.log(json);
         if (json.length > 0) {
           this.setState({ playerList: json });
         }
