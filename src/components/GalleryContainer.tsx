@@ -86,6 +86,10 @@ class GalleryContainer extends React.Component<props, state> {
       prevProps.galleryProps.year !== this.props.galleryProps.year ||
       prevProps.galleryProps.view !== this.props.galleryProps.view ||
       prevProps.galleryProps.set !== this.props.galleryProps.set ||
+      prevProps.galleryProps.viewSortField !==
+        this.props.galleryProps.viewSortField ||
+      prevProps.galleryProps.viewSortDirection !==
+        this.props.galleryProps.viewSortDirection ||
       prevProps.nftProps.collection !== this.props.nftProps.collection ||
       prevProps.nftProps.schema !== this.props.nftProps.schema ||
       prevProps.nftProps.template !== this.props.nftProps.template
@@ -93,7 +97,17 @@ class GalleryContainer extends React.Component<props, state> {
       if (this.state.viewState === "nft") {
         this.pullNFTs();
       } else {
-        this.pullCards();
+        if (
+          prevProps.galleryProps.viewSortField !==
+            this.props.galleryProps.viewSortField ||
+          prevProps.galleryProps.viewSortDirection !==
+            this.props.galleryProps.viewSortDirection
+        ) {
+          //just re-sort cards.
+          this.sortCards();
+        } else {
+          this.pullCards();
+        }
       }
       //console.log("Props updated");
     }
@@ -102,7 +116,11 @@ class GalleryContainer extends React.Component<props, state> {
         this.props.galleryProps.layoutCount ||
       prevProps.nftProps.layoutCount !== this.props.nftProps.layoutCount
     ) {
-      this.resetChunks();
+      if (this.state.viewState === "nft") {
+        this.resetChunks();
+      } else {
+        this.sortCards();
+      }
     }
   }
 
@@ -232,6 +250,8 @@ class GalleryContainer extends React.Component<props, state> {
         year: this.props.galleryProps.year,
         category: this.props.galleryProps.set,
         view: this.props.galleryProps.view,
+        viewSortField: this.props.galleryProps.viewSortField,
+        viewSortDirection: this.props.galleryProps.viewSortDirection,
       },
       this.props.user.ID
     )
@@ -257,6 +277,21 @@ class GalleryContainer extends React.Component<props, state> {
       .catch((err: any) => {
         console.log(err);
       });
+  };
+
+  sortCards = () => {
+    const newDataList = [...this.state.dataList];
+    let param = "SetName";
+    if (this.props.galleryProps.viewSortField === "duplicates") {
+      param = "-Count";
+    }
+    if (this.props.galleryProps.viewSortField === "acquired") {
+      param = "-Date";
+    }
+    newDataList.sort(this.dynamicSort(param));
+    this.setState({ dataList: newDataList }, () => {
+      this.resetChunks();
+    });
   };
 
   pullCardDetails = (user: string, card: any) => {
@@ -461,6 +496,22 @@ class GalleryContainer extends React.Component<props, state> {
         this.imgList();
       }
     });
+  };
+
+  dynamicSort = (property: string) => {
+    var sortOrder = 1;
+    if (property[0] === "-") {
+      sortOrder = -1;
+      property = property.substr(1);
+    }
+    return function (a: any, b: any) {
+      /* next line works with strings and numbers,
+       * and you may want to customize it to your needs
+       */
+      var result =
+        a[property] < b[property] ? -1 : a[property] > b[property] ? 1 : 0;
+      return result * sortOrder;
+    };
   };
 
   render() {

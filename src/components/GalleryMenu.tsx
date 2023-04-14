@@ -310,6 +310,22 @@ class GalleryMenu extends React.Component<props, state> {
             {this.state.availableViews}
           </IonSelect>
         </IonItem>
+        {this.props.layoutProps.viewSortField !== "" && (
+          <IonItem>
+            <IonLabel>Sort</IonLabel>
+            <IonSelect
+              value={this.props.layoutProps.viewSortField}
+              placeholder=""
+              onIonChange={(e: any) => {
+                this.updateSettings("viewSortField", e.detail.value, "cards");
+              }}
+            >
+              <IonSelectOption value={"acquired"}>Acquired</IonSelectOption>
+              <IonSelectOption value={"duplicates"}>Duplicates</IonSelectOption>
+              <IonSelectOption value={"set"}>Set</IonSelectOption>
+            </IonSelect>
+          </IonItem>
+        )}
         <IonListHeader>Layout Settings</IonListHeader>
         <IonItem>
           <IonLabel># per row</IonLabel>

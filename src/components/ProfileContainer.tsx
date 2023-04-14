@@ -1,5 +1,6 @@
 import React from "react";
 import {
+  IonAlert,
   IonContent,
   IonCol,
   IonRow,
@@ -12,9 +13,16 @@ import {
   IonImg,
   IonPopover,
   IonText,
+  IonSearchbar,
   withIonLifeCycle,
 } from "@ionic/react";
-import { aperture, repeat, closeCircle, appsOutline } from "ionicons/icons";
+import {
+  aperture,
+  repeat,
+  closeCircle,
+  appsOutline,
+  personAddOutline,
+} from "ionicons/icons";
 import { callServer } from "./ajaxcalls";
 import "./ProfileContainer.css";
 
@@ -36,6 +44,10 @@ interface state {
   blockList: any;
   showPopover: boolean;
   event: any;
+  playerList: any;
+  searchValue: string;
+  showFriendAlert: boolean;
+  alertMsg: string;
 }
 
 class ProfileContainer extends React.Component<props, state> {
@@ -53,6 +65,10 @@ class ProfileContainer extends React.Component<props, state> {
       showBlockList: false,
       showPopover: false,
       event: null,
+      playerList: [],
+      searchValue: "",
+      showFriendAlert: false,
+      alertMsg: "",
     };
   }
 
@@ -171,6 +187,46 @@ class ProfileContainer extends React.Component<props, state> {
       });
   }
 
+  searchPlayers(searchVal: string) {
+    console.log(searchVal);
+    if (searchVal.length >= 3) {
+      callServer(
+        "pullPlayerSearchList",
+        { search: searchVal },
+        this.props.user.ID
+      )
+        ?.then((resp) => {
+          return resp.json();
+        })
+        .then((json) => {
+          if (json) {
+            this.setState({ playerList: json, searchValue: searchVal });
+          }
+        })
+        .catch((err: any) => {
+          console.log(err);
+        });
+    } else {
+      this.setState({ searchValue: searchVal, playerList: [] });
+    }
+  }
+
+  addToFriend(player: string) {
+    callServer("addFriend", { friend: player }, this.props.user.ID)
+      ?.then((resp) => {
+        return resp.json();
+      })
+      .then((json) => {
+        this.setState({
+          showFriendAlert: true,
+          alertMsg: player + " has been added to your friends list.",
+        });
+      })
+      .catch((err: any) => {
+        console.log(err);
+      });
+  }
+
   sendTradeCallback = (tradePartner: any) => {
     this.props.tradeCallback(tradePartner);
   };
@@ -243,14 +299,32 @@ class ProfileContainer extends React.Component<props, state> {
           <IonContent>
             <IonGrid>
               <IonRow>
+                <IonCol>Player Search</IonCol>
+              </IonRow>
+              <IonRow>
+                <IonCol>{this.renderPlayerSearch()}</IonCol>
+              </IonRow>
+              <IonRow>
+                <IonCol>
+                  <div style={{ height: 15 }}></div>
+                </IonCol>
+              </IonRow>
+              <IonRow>
                 <IonCol>
                   <IonLabel
                     onClick={() => {
-                      this.pullFriendsList();
-                      this.setState({
-                        showFriendsList: true,
-                        showBlockList: false,
-                      });
+                      if (this.state.showFriendsList === true) {
+                        this.setState({
+                          showFriendsList: false,
+                          showBlockList: false,
+                        });
+                      } else {
+                        this.pullFriendsList();
+                        this.setState({
+                          showFriendsList: true,
+                          showBlockList: false,
+                        });
+                      }
                     }}
                   >
                     Friends List
@@ -266,11 +340,18 @@ class ProfileContainer extends React.Component<props, state> {
                 <IonCol>
                   <IonLabel
                     onClick={() => {
-                      this.pullBlockList();
-                      this.setState({
-                        showBlockList: true,
-                        showFriendsList: false,
-                      });
+                      if (this.state.showBlockList === true) {
+                        this.setState({
+                          showBlockList: false,
+                          showFriendsList: false,
+                        });
+                      } else {
+                        this.pullBlockList();
+                        this.setState({
+                          showBlockList: true,
+                          showFriendsList: false,
+                        });
+                      }
                     }}
                   >
                     Block List
@@ -285,8 +366,59 @@ class ProfileContainer extends React.Component<props, state> {
             </IonGrid>
           </IonContent>
         </IonPopover>
+        <IonAlert
+          isOpen={this.state.showFriendAlert}
+          onDidDismiss={() => {
+            this.setState({ showFriendAlert: false, alertMsg: "" });
+          }}
+          cssClass="my-custom-class"
+          header={"Message"}
+          message={this.state.alertMsg}
+          buttons={["Cancel"]}
+        />
       </React.Fragment>
     );
+  }
+
+  renderPlayerSearch() {
+    const fList: any = [];
+    fList.push(
+      <IonSearchbar
+        key="searchBar"
+        value={this.state.searchValue}
+        onIonChange={(e: any) => {
+          this.searchPlayers(e.detail.value);
+        }}
+        placeholder="Type atleast 3 characters"
+      ></IonSearchbar>
+    );
+    this.state.playerList.forEach((player: any) => {
+      fList.push(
+        <IonItem key={player.Name}>
+          <IonButton
+            fill="clear"
+            onClick={() => {
+              this.sendTradeCallback(player.Name);
+            }}
+          >
+            <IonIcon slot="icon-only" icon={repeat} color="dark" />
+          </IonButton>
+          <IonAvatar>
+            <IonImg src={player.Image} />
+          </IonAvatar>
+          <IonLabel> {player.Name}</IonLabel>
+          <IonButton
+            fill="clear"
+            onClick={() => {
+              this.addToFriend(player.Name);
+            }}
+          >
+            <IonIcon slot="icon-only" icon={personAddOutline} color="dark" />
+          </IonButton>
+        </IonItem>
+      );
+    });
+    return fList;
   }
 
   renderFriendsList() {

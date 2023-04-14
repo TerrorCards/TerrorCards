@@ -847,6 +847,33 @@ export function callServer(pTask, pData, pUserId) {
 
       break;
     }
+    case "pullPlayerSearchList": {
+      jsonstr = prepData(pData);
+      formData = new FormData();
+      formData.append("uUserId", pUserId);
+      formData.append("uAction", "search");
+      formData.append("uContent", jsonstr);
+      /*
+      test = fetch(serverpath + "friends.php", {
+        method: "POST",
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+        body: formData,
+      });
+      */
+      test = fetch(
+        serverpath +
+          "player_search.php?" +
+          new URLSearchParams({
+            uUserId: pUserId,
+            uContent: jsonstr,
+            uAction: "search",
+          })
+      );
+
+      break;
+    }
     case "pullBlockList": {
       jsonstr = prepData(pData);
       formData = new FormData();

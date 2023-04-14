@@ -107,6 +107,8 @@ class App extends React.Component<props, state> {
         set: "All",
         view: "owned",
         viewOptions: "all",
+        viewSortField: "set",
+        viewSortDirection: "desc",
       },
       galleryNFTSettings: {
         isInitialize: false,
@@ -286,6 +288,8 @@ class App extends React.Component<props, state> {
       set: localSettings.set,
       view: localSettings.view,
       viewOptions: localSettings.viewOptions,
+      viewSortField: localSettings.viewSortField,
+      viewSortDirection: localSettings.viewSortDirection,
     };
     this.setState({ galleryDigitalSettings: newState });
 

@@ -82,6 +82,8 @@ class TradeSetup extends React.Component<props, state> {
         set: "All",
         view: "needs",
         viewOptions: "owned,needs",
+        viewSortField: "",
+        viewSortDirection: "",
       },
 
       step: "you",
@@ -114,6 +116,7 @@ class TradeSetup extends React.Component<props, state> {
   ionViewWillLeave() {}
 
   ionViewDidEnter() {
+    /*
     this.pullCards(this.props.user.ID, this.props.otherUser).then((result) => {
       this.pullCards(this.props.otherUser, this.props.user.ID).then(
         (response) => {
@@ -122,19 +125,43 @@ class TradeSetup extends React.Component<props, state> {
       );
     });
     //console.log("Ion view did enter");
+    */
   }
 
-  componentDidUpdate() {
-    if (this.state.yourCards.length <= 0) {
-      this.pullCards(this.props.user.ID, this.props.otherUser).then(
-        (result) => {
-          this.pullCards(this.props.otherUser, this.props.user.ID).then(
-            (response) => {
-              this.generateImageSelectionList();
-            }
-          );
-        }
-      );
+  componentDidUpdate(prevProps: any, prevState: any) {
+    if (
+      prevState.layoutState.year !== this.state.layoutState.year ||
+      prevState.layoutState.view !== this.state.layoutState.view ||
+      prevState.layoutState.set !== this.state.layoutState.set ||
+      prevState.layoutState.viewSortField !==
+        this.state.layoutState.viewSortField ||
+      prevState.layoutState.viewSortDirection !==
+        this.state.layoutState.viewSortDirection
+    ) {
+      if (
+        prevState.layoutState.viewSortField !==
+          this.state.layoutState.viewSortField ||
+        prevState.layoutState.viewSortDirection !==
+          this.state.layoutState.viewSortDirection
+      ) {
+        this.sortCards();
+        this.generateImageSelectionList();
+      } else {
+        this.pullCards(this.props.user.ID, this.props.otherUser).then(
+          (result) => {
+            this.pullCards(this.props.otherUser, this.props.user.ID).then(
+              (response) => {
+                this.generateImageSelectionList();
+              }
+            );
+          }
+        );
+      }
+    }
+    if (
+      prevState.layoutState.layoutCount !== this.state.layoutState.layoutCount
+    ) {
+      this.generateImageSelectionList();
     }
   }
 
@@ -187,6 +214,19 @@ class TradeSetup extends React.Component<props, state> {
               this.setState({
                 otherCards: json,
                 otherChunkList: chunkWithMatchNumbers,
+              });
+            }
+            resolve(true);
+          } else {
+            if (user === this.props.user.ID) {
+              this.setState({
+                yourCards: [],
+                yourChunkList: [],
+              });
+            } else {
+              this.setState({
+                otherCards: [],
+                otherChunkList: [],
               });
             }
             resolve(true);
@@ -291,6 +331,52 @@ class TradeSetup extends React.Component<props, state> {
     return temparray;
   };
   //End chunking functions
+
+  sortCards = () => {
+    const yourDataList = [...this.state.yourCards];
+    const otherDataList = [...this.state.otherCards];
+    let param = "SetName";
+    if (this.state.layoutState.viewSortField === "duplicates") {
+      param = "-Count";
+    }
+    if (this.state.layoutState.viewSortField === "acquired") {
+      param = "-Date";
+    }
+    yourDataList.sort(this.dynamicSort(param));
+    otherDataList.sort(this.dynamicSort(param));
+    const chunk1 = this.chunkCards(yourDataList);
+    const chunkWithMatchNumbers1 = this.matchCountNumbers(
+      chunk1,
+      this.props.user.ID
+    );
+    const chunk2 = this.chunkCards(yourDataList);
+    const chunkWithMatchNumbers2 = this.matchCountNumbers(
+      chunk2,
+      this.props.otherUser
+    );
+    this.setState({
+      yourCards: yourDataList,
+      otherCards: otherDataList,
+      yourChunkList: chunkWithMatchNumbers1,
+      otherChunkList: chunkWithMatchNumbers2,
+    });
+  };
+
+  dynamicSort = (property: string) => {
+    var sortOrder = 1;
+    if (property[0] === "-") {
+      sortOrder = -1;
+      property = property.substr(1);
+    }
+    return function (a: any, b: any) {
+      /* next line works with strings and numbers,
+       * and you may want to customize it to your needs
+       */
+      var result =
+        a[property] < b[property] ? -1 : a[property] > b[property] ? 1 : 0;
+      return result * sortOrder;
+    };
+  };
 
   render() {
     let content: any = "";
@@ -802,6 +888,7 @@ class TradeSetup extends React.Component<props, state> {
 
   showCardSelection = (person: string) => {
     let message = "";
+    let noCards = "No cards for this filter";
     let itemsList = [];
     if (person === "you") {
       message = "You are giving to " + this.props.otherUser;
@@ -832,8 +919,13 @@ class TradeSetup extends React.Component<props, state> {
             </IonCol>
           </IonRow>
         </IonGrid>
-        <div style={{ height: "70%", overflowY: "auto" }}>
-          {this.state.selectionCardList}
+        <div
+          style={{ height: "70%", overflowY: "auto" }}
+          className="ion-text-left ion-align-items-center"
+        >
+          {this.state.selectionCardList.length > 0
+            ? this.state.selectionCardList
+            : noCards}
         </div>
       </React.Fragment>
     );
