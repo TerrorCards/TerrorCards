@@ -13,6 +13,7 @@ import {
   IonText,
   IonPopover,
   IonLabel,
+  IonAlert,
 } from "@ionic/react";
 import {
   copyOutline,
@@ -36,7 +37,10 @@ interface props {
 interface state {
   showModal: boolean;
   showDetails: boolean;
+  showAlert: boolean;
+  alertMsg: string;
   cardDetails: any;
+  cardDetailsFromServer: any;
   dataList: Array<any>;
   chunkedList: Array<any>;
   length: number;
@@ -50,6 +54,10 @@ interface state {
   showSettingPopover: boolean;
   event: any;
   showOwners: boolean;
+  activeNFTMintCard: any;
+  showMintConfirm: boolean;
+  showMintButton: boolean;
+  mintButtonHelp: string;
 }
 
 class GalleryContainer extends React.Component<props, state> {
@@ -59,7 +67,9 @@ class GalleryContainer extends React.Component<props, state> {
     this.state = {
       showModal: false,
       showDetails: false,
+      showAlert: false,
       cardDetails: null,
+      cardDetailsFromServer: null,
       dataList: [],
       chunkedList: [],
       length: 0,
@@ -73,6 +83,11 @@ class GalleryContainer extends React.Component<props, state> {
       showSettingPopover: false,
       event: undefined,
       showOwners: false,
+      alertMsg: "",
+      activeNFTMintCard: null,
+      showMintConfirm: false,
+      showMintButton: false,
+      mintButtonHelp: "",
     };
   }
 
@@ -174,72 +189,113 @@ class GalleryContainer extends React.Component<props, state> {
   showCardetails = (card: any, front: boolean, owners: boolean) => {
     //Recent trades: {result[0].recentTrades} <br></br>(past 48 hrs)
     this.pullCardDetails(this.props.user.ID, card).then((result: any) => {
-      //console.log(result);
-      let currImg = card.Image;
-      if (!front) {
-        currImg = card.Image.replace(/front/g, "back");
-      }
-      const details = (
-        <IonGrid>
-          <IonRow>
-            <IonCol>
-              <IonImg
-                src={currImg}
-                onClick={() => {
-                  this.showCardetails(card, !front, owners);
-                }}
-              ></IonImg>
-            </IonCol>
-          </IonRow>
-          <IonRow>
-            <IonCol>
-              <IonText color="dark">Count: {result[0].count}</IonText>
-            </IonCol>
-            <IonCol>
-              <IonText color="dark">
-                Own: {card.Count !== null ? card.Count : 0}
-              </IonText>
-            </IonCol>
-            <IonCol>
-              <IonText color="dark">Sold Out: {result[0].cardSoldOut}</IonText>
-            </IonCol>
-          </IonRow>
-          <IonRow>
-            <IonCol>
-              <IonText color="dark">
-                Set: {card.SetName.replace(/_/g, " ")}
-              </IonText>
-            </IonCol>
-          </IonRow>
-          <IonRow>
-            <IonCol>
-              <IonButton
-                color={"dark"}
-                size="small"
-                onClick={() => {
-                  this.showCardetails(card, front, !owners);
-                }}
-              >
-                Show owners of this card
-              </IonButton>
-            </IonCol>
-          </IonRow>
-          {owners && (
+      this.checkMintNFTReqs(card).then((mintCheck: any) => {
+        //console.log(result);
+        let currImg = card.Image;
+        if (!front) {
+          currImg = card.Image.replace(/front/g, "back");
+        }
+        const details = (
+          <IonGrid>
             <IonRow>
               <IonCol>
-                <CardOwnerMenu
-                  user={this.props.user}
-                  cardNumber={card.Number !== null ? card.Number : card.ID}
-                  cardYear={card.Year}
-                  tradeCallback={this.props.tradeCallback}
-                  closePanel={null}
-                ></CardOwnerMenu>
+                <IonImg
+                  src={currImg}
+                  onClick={() => {
+                    this.showCardetails(card, !front, owners);
+                  }}
+                ></IonImg>
               </IonCol>
             </IonRow>
-          )}
-        </IonGrid>
-      );
-      this.setState({ cardDetails: details, showDetails: true });
+            <IonRow>
+              <IonCol>
+                <IonText color="dark">Count: {result[0].count}</IonText>
+              </IonCol>
+              <IonCol>
+                <IonText color="dark">
+                  Own: {card.Count !== null ? card.Count : 0}
+                </IonText>
+              </IonCol>
+              <IonCol>
+                <IonText color="dark">
+                  Sold Out: {result[0].cardSoldOut}
+                </IonText>
+              </IonCol>
+            </IonRow>
+            <IonRow>
+              <IonCol>
+                <IonText color="dark">
+                  Set: {card.SetName.replace(/_/g, " ")}
+                </IonText>
+              </IonCol>
+            </IonRow>
+            <IonRow>
+              <IonCol>
+                <IonGrid>
+                  <IonRow>
+                    <IonCol>
+                      <IonButton
+                        color={"dark"}
+                        size="small"
+                        expand="block"
+                        onClick={() => {
+                          this.showCardetails(card, front, !owners);
+                        }}
+                      >
+                        Show owners
+                      </IonButton>
+                    </IonCol>
+                    <IonCol>
+                      {mintCheck.status === "success" && (
+                        <IonButton
+                          color={"dark"}
+                          size="small"
+                          expand="block"
+                          onClick={() => {
+                            this.setState({
+                              activeNFTMintCard: card,
+                              showMintConfirm: true,
+                            });
+                          }}
+                        >
+                          Mint NFT
+                        </IonButton>
+                      )}
+                      {mintCheck.status === "success" && (
+                        <div>{this.state.mintButtonHelp}</div>
+                      )}
+                      {mintCheck.status === "fail" && (
+                        <IonButton
+                          color={"danger"}
+                          size="small"
+                          expand="block"
+                          disabled
+                        >
+                          {mintCheck.message}
+                        </IonButton>
+                      )}
+                    </IonCol>
+                  </IonRow>
+                </IonGrid>
+              </IonCol>
+            </IonRow>
+            {owners && (
+              <IonRow>
+                <IonCol>
+                  <CardOwnerMenu
+                    user={this.props.user}
+                    cardNumber={card.Number !== null ? card.Number : card.ID}
+                    cardYear={card.Year}
+                    tradeCallback={this.props.tradeCallback}
+                    closePanel={null}
+                  ></CardOwnerMenu>
+                </IonCol>
+              </IonRow>
+            )}
+          </IonGrid>
+        );
+        this.setState({ cardDetails: details, showDetails: true }, () => {});
+      });
     });
   };
 
@@ -404,6 +460,65 @@ class GalleryContainer extends React.Component<props, state> {
       })
       .catch((err: any) => {
         console.log(err);
+      });
+  };
+
+  checkMintNFTReqs = (card: any) => {
+    return new Promise((resolve: any, reject: any) => {
+      callServer(
+        "mintNFT_checkReqs",
+        {
+          number: card.Number !== null ? card.Number : card.ID,
+          year: card.Year,
+        },
+        this.props.user.ID
+      )
+        ?.then((resp) => {
+          return resp.json();
+        })
+        .then((json) => {
+          if (json.status === "success") {
+            this.setState(
+              {
+                showMintButton: true,
+                mintButtonHelp: json.message,
+              },
+              () => {
+                resolve(json);
+              }
+            );
+          } else {
+            resolve({ status: json.status, message: json.message });
+          }
+          //console.log(json);
+        })
+        .catch((err: any) => {
+          //console.log(err);
+          resolve(err);
+        });
+    });
+  };
+
+  mintNFT = (card: any) => {
+    callServer(
+      "mintNFT",
+      { number: card.Number, year: card.Year },
+      this.props.user.ID
+    )
+      ?.then((resp) => {
+        return resp.json();
+      })
+      .then((json) => {
+        this.setState({
+          showAlert: true,
+          alertMsg: json.message,
+          showMintConfirm: false,
+          activeNFTMintCard: null,
+        });
+        //console.log(json);
+      })
+      .catch((err: any) => {
+        //console.log(err);
       });
   };
 
@@ -627,6 +742,58 @@ class GalleryContainer extends React.Component<props, state> {
             </IonGrid>
           </IonContent>
         </IonModal>
+
+        <IonAlert
+          isOpen={this.state.showMintConfirm}
+          onDidDismiss={() =>
+            this.setState({ showMintConfirm: false, activeNFTMintCard: null })
+          }
+          cssClass="my-custom-class"
+          header={"Are you sure?"}
+          message={"Minting will remove or decrease this card."}
+          buttons={[
+            {
+              text: "No",
+              role: "cancel",
+              cssClass: "secondary",
+              handler: (blah: any) => {
+                this.setState({
+                  showMintConfirm: false,
+                  activeNFTMintCard: null,
+                });
+              },
+            },
+            {
+              text: "Yes",
+              handler: () => {
+                this.mintNFT(this.state.activeNFTMintCard);
+              },
+            },
+          ]}
+        />
+
+        <IonAlert
+          isOpen={this.state.showAlert}
+          onDidDismiss={() => {
+            this.setState({ showAlert: false, alertMsg: "" }, () => {
+              this.setState(
+                {
+                  showDetails: false,
+                  cardDetails: null,
+                },
+                () => {
+                  this.setState({ viewState: "nft" }, () => {
+                    this.pullUserNFTAccount();
+                  });
+                }
+              );
+            });
+          }}
+          cssClass="my-custom-class"
+          header={"Message"}
+          message={this.state.alertMsg}
+          buttons={["Cancel"]}
+        />
       </IonContent>
     );
   }

@@ -1426,6 +1426,106 @@ export function callServer(pTask, pData, pUserId) {
       break;
     }
 
+    case "checkWaxEndpointStatus": {
+      jsonstr = prepData(pData);
+      formData = new FormData();
+      formData.append("uUserId", pUserId);
+      /*
+            test = fetch(serverpath + "cards_players.php", {
+              method: 'POST',
+              headers: {
+                "Content-Type": 'multipart/form-data'
+              },
+              body: formData
+            });
+            */
+
+      test = fetch(
+        serverpath +
+          "wax_tools/waxcheck.php?" +
+          new URLSearchParams({
+            uUserId: pUserId,
+          })
+      );
+      break;
+    }
+
+    case "mintNFT_checkReqs": {
+      jsonstr = prepData(pData);
+      formData = new FormData();
+      formData.append("uUserId", pUserId);
+      formData.append("uContent", jsonstr);
+      /*
+            test = fetch(serverpath + "cards_players.php", {
+              method: 'POST',
+              headers: {
+                "Content-Type": 'multipart/form-data'
+              },
+              body: formData
+            });
+            */
+
+      test = fetch(
+        serverpath +
+          "wax_tools/waxrequirementcheck.php?" +
+          new URLSearchParams({
+            uUserId: pUserId,
+            uContent: jsonstr,
+          })
+      );
+      break;
+    }
+
+    case "mintNFT": {
+      jsonstr = prepData(pData);
+      formData = new FormData();
+      formData.append("uUserId", pUserId);
+      formData.append("uContent", jsonstr);
+      /*
+            test = fetch(serverpath + "cards_players.php", {
+              method: 'POST',
+              headers: {
+                "Content-Type": 'multipart/form-data'
+              },
+              body: formData
+            });
+            */
+
+      test = fetch(
+        serverpath +
+          "wax_tools/waxmint.php?" +
+          new URLSearchParams({
+            uUserId: pUserId,
+            uContent: jsonstr,
+          })
+      );
+      break;
+    }
+
+    case "mintCommunityToken": {
+      jsonstr = prepData(pData);
+      formData = new FormData();
+      formData.append("uUserId", pUserId);
+      /*
+            test = fetch(serverpath + "cards_players.php", {
+              method: 'POST',
+              headers: {
+                "Content-Type": 'multipart/form-data'
+              },
+              body: formData
+            });
+            */
+
+      test = fetch(
+        serverpath +
+          "wax_tools/waxcommunity.php?" +
+          new URLSearchParams({
+            uUserId: pUserId,
+          })
+      );
+      break;
+    }
+
     default:
       break;
   }

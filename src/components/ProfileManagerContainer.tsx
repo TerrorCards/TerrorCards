@@ -39,6 +39,9 @@ interface state {
     updatedImg: boolean;
     statusInvalidUser: boolean;
     statusInvalidEmail: boolean;
+
+    showAlert: boolean;
+    alertMsg: string;
 };
 
 class ProfileManagerContainer extends React.Component<props, state> {
@@ -63,7 +66,9 @@ class ProfileManagerContainer extends React.Component<props, state> {
             needToRegister: false,
             updatedImg: false,
             statusInvalidUser: false,
-            statusInvalidEmail: false            
+            statusInvalidEmail: false,
+            showAlert: false,
+            alertMsg: ""         
         }
     }
 
@@ -363,6 +368,18 @@ class ProfileManagerContainer extends React.Component<props, state> {
         }); 
     }
 
+    mintCommunityToken = () => {
+        callServer("mintCommunityToken", "", this.props.user.ID)?.then((resp) => { return resp.json(); })
+        .then((json) => {
+            if (json) {
+                this.setState({showAlert:true, alertMsg: json.message})
+            }
+        })
+        .catch((err: any) => {
+            console.log(err);
+        });
+    }
+
     render() {
         return (
             <IonPage>
@@ -548,9 +565,14 @@ class ProfileManagerContainer extends React.Component<props, state> {
                                     this.setWallet()
                                 }                                    
                             }}></IonInput>
-                            </IonItem>
+                            </IonItem>                           
                         </IonCol>
-                        <IonCol></IonCol>
+                        <IonCol>
+                        <IonLabel position="stacked">Mint community token</IonLabel> 
+                        <IonItem fill="solid">                           
+                                <IonButton expand="block" onClick={() => {this.mintCommunityToken()}}>{"Mint Token"}</IonButton>
+                            </IonItem> 
+                        </IonCol>
                     </IonRow> 
                     <IonRow>
                         <IonCol><br></br><br></br></IonCol>
@@ -614,6 +636,16 @@ class ProfileManagerContainer extends React.Component<props, state> {
                         </IonCol>
                     </IonRow>                         
                 </IonGrid>
+                <IonAlert
+                    isOpen={this.state.showAlert}
+                    onDidDismiss={() => {
+                        this.setState({ showAlert: false, alertMsg: "" });
+                    }}
+                    cssClass="my-custom-class"
+                    header={"Message"}
+                    message={this.state.alertMsg}
+                    buttons={["Cancel"]}
+                    />
                 </IonContent>               
                 }
             </IonPage>
