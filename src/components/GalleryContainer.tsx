@@ -792,7 +792,7 @@ class GalleryContainer extends React.Component<props, state> {
           cssClass="my-custom-class"
           header={"Message"}
           message={this.state.alertMsg}
-          buttons={["Cancel"]}
+          buttons={["OK"]}
         />
       </IonContent>
     );
