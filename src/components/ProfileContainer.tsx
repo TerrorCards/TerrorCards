@@ -236,7 +236,7 @@ class ProfileContainer extends React.Component<props, state> {
       <IonGrid>
         <IonRow>
           <IonCol>
-            <div style={{ height: 0 }}></div>
+            <div style={{ height: 25 }}></div>
           </IonCol>
         </IonRow>
         <IonRow>
