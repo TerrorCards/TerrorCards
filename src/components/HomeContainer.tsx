@@ -63,6 +63,8 @@ interface state {
   showTradeSetupModel: boolean;
   tradePartner: string;
   txtMessage: string;
+  showPlayerInfoAlert: boolean;
+  otherPlayerInfo: any;
 }
 
 const slideOpts = {
@@ -89,6 +91,8 @@ class HomeContainer extends React.Component<props, state> {
       showTradeSetupModel: false,
       tradePartner: "",
       txtMessage: "",
+      showPlayerInfoAlert: false,
+      otherPlayerInfo: null,
     };
   }
 
@@ -179,6 +183,23 @@ class HomeContainer extends React.Component<props, state> {
       })
       .catch((err: any) => {
         this.setState({ showError: true });
+        console.log(err);
+      });
+  };
+
+  queryPlayerInfo = (player: any) => {
+    callServer("queryUser", { player: player }, this.props.user.ID)
+      ?.then((resp) => {
+        return resp.json();
+      })
+      .then((json) => {
+        const text = "Wax: " + json.Wallet + "<br><br>Bio: " + json.Description;
+        this.setState({
+          showPlayerInfoAlert: true,
+          otherPlayerInfo: text,
+        });
+      })
+      .catch((err: any) => {
         console.log(err);
       });
   };
@@ -279,6 +300,16 @@ class HomeContainer extends React.Component<props, state> {
               </IonItemOption>
             </IonItemOptions>
           )}
+          <IonItemOptions side="end">
+            <IonItemOption
+              color="dark"
+              onClick={() => {
+                this.queryPlayerInfo(j.ID);
+              }}
+            >
+              Info
+            </IonItemOption>
+          </IonItemOptions>
         </IonItemSliding>
         <IonCardContent>
           <div dangerouslySetInnerHTML={{ __html: j.Text }}></div>
@@ -625,6 +656,20 @@ class HomeContainer extends React.Component<props, state> {
           cssClass="my-custom-class"
           header={"Message"}
           message={this.state.alertMsg}
+          buttons={["Cancel"]}
+        />
+
+        <IonAlert
+          isOpen={this.state.showPlayerInfoAlert}
+          onDidDismiss={() => {
+            this.setState({
+              showPlayerInfoAlert: false,
+              otherPlayerInfo: null,
+            });
+          }}
+          cssClass="my-custom-class"
+          header={"Information"}
+          message={this.state.otherPlayerInfo}
           buttons={["Cancel"]}
         />
       </IonContent>

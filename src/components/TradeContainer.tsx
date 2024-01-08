@@ -420,7 +420,7 @@ class TradeContainer extends React.Component<props, state> {
             >
               <img
                 src={card.Image}
-                width="100%"
+                width="95%"
                 onClick={() => {
                   this.showCardetails(card);
                 }}
@@ -433,6 +433,9 @@ class TradeContainer extends React.Component<props, state> {
                 <IonBadge class="quantity-owned-badge">
                   {card.OwnedCount}
                 </IonBadge>
+              )}
+              {card.OwnedCount !== null && card.OwnedCount == 0 && (
+                <IonBadge class="quantity-owned-badge">{"N"}</IonBadge>
               )}
             </div>
           );
@@ -444,7 +447,7 @@ class TradeContainer extends React.Component<props, state> {
             >
               <img
                 src={card.Image}
-                width="100%"
+                width="95%"
                 onClick={() => {
                   this.showCardetails(card);
                 }}
@@ -457,6 +460,9 @@ class TradeContainer extends React.Component<props, state> {
                 <IonBadge class="quantity-owned-badge">
                   {card.OwnedCount}
                 </IonBadge>
+              )}
+              {card.OwnedCount !== null && card.OwnedCount == 0 && (
+                <IonBadge class="quantity-owned-badge">{"N"}</IonBadge>
               )}
             </div>
           );

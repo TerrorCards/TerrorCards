@@ -278,7 +278,7 @@ export function callServer(pTask, pData, pUserId) {
             */
       test = fetch(
         serverpath +
-          "tradeList.php?" +
+          "tradeList2.php?" +
           new URLSearchParams({
             uUserId: pUserId,
             uAction: "showTrades",
@@ -693,6 +693,33 @@ export function callServer(pTask, pData, pUserId) {
 
       break;
     }
+    case "queryUser": {
+      jsonstr = prepData(pData);
+      formData = new FormData();
+      formData.append("uUserId", pUserId);
+      formData.append("uContent", jsonstr);
+      /*
+            test = fetch(serverpath + "tradeCardList.php", {
+              method: 'POST',
+              headers: {
+                "Content-Type": 'multipart/form-data'
+              },
+              body: formData
+            });
+            */
+
+      test = fetch(
+        serverpath +
+          "queryUser.php?" +
+          new URLSearchParams({
+            uUserId: pUserId,
+            uContent: jsonstr,
+          })
+      );
+
+      break;
+    }
+
     case "checkValueExist": {
       jsonstr = prepData(pData);
       formData = new FormData();
