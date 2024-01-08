@@ -1,7 +1,7 @@
 .trade-button-add {
   --color: black;
   position: absolute;
-  bottom: 0px;
+  bottom: 3px;
   right: 0px;
 }
 
