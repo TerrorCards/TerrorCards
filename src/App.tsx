@@ -45,7 +45,8 @@ import ProfileManagerContainer from "./components/ProfileManagerContainer";
 import { callServer } from "./components/ajaxcalls";
 
 import { Device } from "@capacitor/device";
-import { InAppPurchase2 } from "@awesome-cordova-plugins/in-app-purchase-2";
+//import { InAppPurchase2 } from "@awesome-cordova-plugins/in-app-purchase-2";
+import "cordova-plugin-purchase";
 
 /* Core CSS required for Ionic components to work properly */
 import "@ionic/react/css/core.css";
@@ -143,6 +144,9 @@ class App extends React.Component<props, state> {
     platform: null,
   };
   tradesExist = false;
+
+  InAppPurchase2?: CdvPurchase.Store;
+  InAppProductType?: CdvPurchase.ProductType.CONSUMABLE;
 
   componentDidMount() {
     //console.log("componet did mount event fired");
@@ -377,7 +381,7 @@ class App extends React.Component<props, state> {
                   storeProps={""}
                   user={this.state.user}
                   callbackPackOpenTimer={this.fnCallbackRefreshTime}
-                  inAppPurchaseObject={InAppPurchase2.products}
+                  inAppPurchaseObject={this.InAppPurchase2?.products}
                   coinBuyAction={this.fnCanBuyCoins}
                 />
               </Route>
@@ -581,7 +585,7 @@ class App extends React.Component<props, state> {
             regArray.push(this.registerAppStoreProduct(item.ID));
           });
           Promise.all(regArray).then((resp) => {
-            InAppPurchase2.refresh();
+            this.InAppPurchase2?.refresh();
           });
         }
       })
@@ -592,12 +596,13 @@ class App extends React.Component<props, state> {
 
   registerAppStoreProduct = (productId: any) => {
     new Promise((resolve, reject) => {
-      InAppPurchase2.register({
+      this.InAppPurchase2?.register({
         id: productId,
-        type: InAppPurchase2.CONSUMABLE,
+        platform: this.InAppPurchase2.defaultPlatform(),
+        type: this.InAppProductType!,
       });
 
-      InAppPurchase2.when(productId)
+      this.InAppPurchase2?.when()
         .approved((p: any) => p.verify())
         .verified((p: any) => {
           let value = 0;
@@ -637,7 +642,7 @@ class App extends React.Component<props, state> {
   };
 
   fnCanBuyCoins = (item: any) => {
-    InAppPurchase2.order(item);
+    this.InAppPurchase2?.order(item);
   };
 }
 

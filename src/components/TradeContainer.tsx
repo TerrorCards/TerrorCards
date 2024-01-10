@@ -434,7 +434,7 @@ class TradeContainer extends React.Component<props, state> {
                   {card.OwnedCount}
                 </IonBadge>
               )}
-              {card.OwnedCount !== null && card.OwnedCount == 0 && (
+              {card.OwnedCount !== null && card.OwnedCount === 0 && (
                 <IonBadge class="quantity-owned-badge">{"N"}</IonBadge>
               )}
             </div>
@@ -461,7 +461,7 @@ class TradeContainer extends React.Component<props, state> {
                   {card.OwnedCount}
                 </IonBadge>
               )}
-              {card.OwnedCount !== null && card.OwnedCount == 0 && (
+              {card.OwnedCount !== null && card.OwnedCount === 0 && (
                 <IonBadge class="quantity-owned-badge">{"N"}</IonBadge>
               )}
             </div>
