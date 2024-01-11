@@ -573,25 +573,27 @@ class App extends React.Component<props, state> {
 
   // in app purchase stuff
   pullInApp = () => {
-    callServer("loadInAppItems", "", this.state.user.ID)
-      ?.then((resp) => {
-        return resp.json();
-      })
-      .then((json) => {
-        if (json.length > 0) {
-          const items = json;
-          const regArray: Array<any> = [];
-          items.forEach((item: any) => {
-            regArray.push(this.registerAppStoreProduct(item.ID));
-          });
-          Promise.all(regArray).then((resp) => {
-            this.InAppPurchase2?.refresh();
-          });
-        }
-      })
-      .catch((err: any) => {
-        console.log(err);
-      });
+    this.InAppPurchase2?.ready(() => {
+      callServer("loadInAppItems", "", this.state.user.ID)
+        ?.then((resp) => {
+          return resp.json();
+        })
+        .then((json) => {
+          if (json.length > 0) {
+            const items = json;
+            const regArray: Array<any> = [];
+            items.forEach((item: any) => {
+              regArray.push(this.registerAppStoreProduct(item.ID));
+            });
+            Promise.all(regArray).then((resp) => {
+              this.InAppPurchase2?.refresh();
+            });
+          }
+        })
+        .catch((err: any) => {
+          console.log(err);
+        });
+    });
   };
 
   registerAppStoreProduct = (productId: any) => {
