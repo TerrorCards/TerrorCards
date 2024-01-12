@@ -161,8 +161,6 @@ class App extends React.Component<props, state> {
       });
     });
 
-    this.pullInApp();
-
     /*
     this.deviceInfo.uuid = Device.uuid;
     this.deviceInfo.platform = Device.platform;
@@ -176,6 +174,8 @@ class App extends React.Component<props, state> {
 
   componentDidUpdate(prevProps: any) {
     //console.log("component did update");
+    this.pullInApp();
+
     callServer("hasTrades", "", this.state.user.ID)
       ?.then((resp) => {
         return resp.json();
@@ -573,27 +573,28 @@ class App extends React.Component<props, state> {
 
   // in app purchase stuff
   pullInApp = () => {
-    this.InAppPurchase2?.ready(() => {
-      callServer("loadInAppItems", "", this.state.user.ID)
-        ?.then((resp) => {
-          return resp.json();
-        })
-        .then((json) => {
-          if (json.length > 0) {
-            const items = json;
-            const regArray: Array<any> = [];
-            items.forEach((item: any) => {
-              regArray.push(this.registerAppStoreProduct(item.ID));
-            });
-            Promise.all(regArray).then((resp) => {
-              this.InAppPurchase2?.refresh();
-            });
-          }
-        })
-        .catch((err: any) => {
-          console.log(err);
-        });
-    });
+    //this.platform.ready().then(() => {
+    this.InAppPurchase2 = CdvPurchase.store;
+    callServer("loadInAppItems", "", this.state.user.ID)
+      ?.then((resp) => {
+        return resp.json();
+      })
+      .then((json) => {
+        if (json.length > 0) {
+          const items = json;
+          const regArray: Array<any> = [];
+          items.forEach((item: any) => {
+            regArray.push(this.registerAppStoreProduct(item.ID));
+          });
+          Promise.all(regArray).then((resp) => {
+            this.InAppPurchase2?.refresh();
+          });
+        }
+      })
+      .catch((err: any) => {
+        console.log(err);
+      });
+    //});
   };
 
   registerAppStoreProduct = (productId: any) => {
