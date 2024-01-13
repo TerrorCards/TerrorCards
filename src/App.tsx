@@ -47,6 +47,7 @@ import { callServer } from "./components/ajaxcalls";
 import { Device } from "@capacitor/device";
 //import { InAppPurchase2 } from "@awesome-cordova-plugins/in-app-purchase-2";
 import "cordova-plugin-purchase";
+//import "cordova-plugin-purchase/www/store";
 
 /* Core CSS required for Ionic components to work properly */
 import "@ionic/react/css/core.css";
@@ -147,6 +148,7 @@ class App extends React.Component<props, state> {
 
   InAppPurchase2?: CdvPurchase.Store;
   InAppProductType?: CdvPurchase.ProductType.CONSUMABLE;
+  InAppPlatform?: CdvPurchase.Platform.GOOGLE_PLAY;
 
   componentDidMount() {
     //console.log("componet did mount event fired");
@@ -601,7 +603,7 @@ class App extends React.Component<props, state> {
     new Promise((resolve, reject) => {
       this.InAppPurchase2?.register({
         id: productId,
-        platform: this.InAppPurchase2.defaultPlatform(),
+        platform: this.InAppPlatform!,
         type: this.InAppProductType!,
       });
 
