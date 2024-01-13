@@ -589,7 +589,7 @@ class App extends React.Component<props, state> {
             regArray.push(this.registerAppStoreProduct(item.ID));
           });
           Promise.all(regArray).then((resp) => {
-            this.InAppPurchase2?.refresh();
+            this.InAppPurchase2?.update();
           });
         }
       })
