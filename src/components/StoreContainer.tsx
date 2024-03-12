@@ -22,6 +22,11 @@ import "./StoreContainer.css";
 import { callServer } from "./ajaxcalls";
 //import { InAppPurchase2 } from "@awesome-cordova-plugins/in-app-purchase-2";
 
+import "cordova-plugin-purchase";
+//import "cordova-plugin-purchase/www/store";
+import { Plugins } from "@capacitor/core";
+const { App } = Plugins;
+
 interface props {
   storeProps: any;
   user: any;
@@ -81,7 +86,7 @@ class StoreContainer extends React.Component<props, state> {
   componentDidMount() {
     //used when in a tab nav
     this.pullPacks();
-    //this.pullInApp();
+    this.pullInApp();
   }
 
   ionViewWillEnter() {
@@ -117,7 +122,7 @@ class StoreContainer extends React.Component<props, state> {
       });
   };
 
-  /*
+  // in app purchase stuff
   pullInApp = () => {
     callServer("loadInAppItems", "", this.props.user.ID)
       ?.then((resp) => {
@@ -125,27 +130,35 @@ class StoreContainer extends React.Component<props, state> {
       })
       .then((json) => {
         if (json.length > 0) {
+          //App.addListener("appStateChange", (state: any) => {
+          //if (state.isActive) {
+          const { store, ProductType, Platform } = CdvPurchase;
           const items = json;
-          const regArray: Array<any> = [];
           items.forEach((item: any) => {
-            regArray.push(this.registerAppStoreProduct(item.ID));
+            store.register({
+              id: item.ID,
+              platform: Platform.TEST,
+              type: ProductType.CONSUMABLE,
+            });
           });
-          Promise.all(regArray).then((resp) => {
-            InAppPurchase2.refresh();
-            this.setState(
-              { allCoinList: InAppPurchase2.products, isInAppLoaded: true },
-              () => {
-                //do nothing
-              }
-            );
-          });
+          store
+            .when()
+            .approved((p: any) => p.verify())
+            .verified((p: any) => {
+              //do something
+              p.finish();
+            });
+          store.initialize([Platform.TEST]);
+
+          console.log(store.products);
+          //}
+          //});
         }
       })
       .catch((err: any) => {
         console.log(err);
       });
   };
-  */
 
   filterPacks = () => {
     const allItems = [...this.state.allItemsList];
@@ -273,7 +286,7 @@ class StoreContainer extends React.Component<props, state> {
                               //this.canBuyCoins(p.ID);
                             }}
                           >
-                            {p.price} {p.currency}
+                            {p.pricing.price} {p.pricing.currency}
                           </IonButton>
                         </div>
                       </div>

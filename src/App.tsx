@@ -146,9 +146,9 @@ class App extends React.Component<props, state> {
   };
   tradesExist = false;
 
-  InAppPurchase2?: CdvPurchase.Store;
-  InAppProductType?: CdvPurchase.ProductType.CONSUMABLE;
-  InAppPlatform?: CdvPurchase.Platform.GOOGLE_PLAY;
+  InAppPurchase2!: CdvPurchase.Store;
+  InAppProductType!: CdvPurchase.ProductType.CONSUMABLE;
+  InAppPlatform!: CdvPurchase.Platform.TEST;
 
   componentDidMount() {
     //console.log("componet did mount event fired");
@@ -176,7 +176,7 @@ class App extends React.Component<props, state> {
 
   componentDidUpdate(prevProps: any) {
     //console.log("component did update");
-    this.pullInApp();
+    //this.pullInApp();
 
     callServer("hasTrades", "", this.state.user.ID)
       ?.then((resp) => {
@@ -383,7 +383,9 @@ class App extends React.Component<props, state> {
                   storeProps={""}
                   user={this.state.user}
                   callbackPackOpenTimer={this.fnCallbackRefreshTime}
-                  inAppPurchaseObject={this.InAppPurchase2?.products}
+                  inAppPurchaseObject={
+                    this.InAppPurchase2 ? this.InAppPurchase2?.products : []
+                  }
                   coinBuyAction={this.fnCanBuyCoins}
                 />
               </Route>
@@ -575,73 +577,77 @@ class App extends React.Component<props, state> {
 
   // in app purchase stuff
   pullInApp = () => {
-    //this.platform.ready().then(() => {
-    this.InAppPurchase2 = CdvPurchase.store;
     callServer("loadInAppItems", "", this.state.user.ID)
       ?.then((resp) => {
         return resp.json();
       })
       .then((json) => {
         if (json.length > 0) {
-          const items = json;
-          const regArray: Array<any> = [];
-          items.forEach((item: any) => {
-            regArray.push(this.registerAppStoreProduct(item.ID));
-          });
-          Promise.all(regArray).then((resp) => {
-            this.InAppPurchase2?.update();
+          const { store, ProductType, Platform } = CdvPurchase;
+          store.ready(() => {
+            this.InAppPurchase2 = store;
+
+            const items = json;
+            items.forEach((item: any) => {
+              store.register({
+                id: item.ID,
+                platform: Platform.GOOGLE_PLAY,
+                type: ProductType.CONSUMABLE,
+              });
+            });
+            store
+              .when()
+              .approved((p: any) => p.verify())
+              .verified((p: any) => {
+                let value = 0;
+                if (p.id.indexOf("25k") > -1) {
+                  value = 25000;
+                } else if (p.id.indexOf("100k") > -1) {
+                  value = 100000;
+                } else if (p.id.indexOf("250k") > -1) {
+                  value = 250000;
+                } else if (p.id.indexOf("500k") > -1) {
+                  value = 500000;
+                } else if (p.id.indexOf("750k") > -1) {
+                  value = 750000;
+                } else if (p.id.indexOf("1m") > -1) {
+                  value = 1000000;
+                } else {
+                  value = 0;
+                }
+                callServer(
+                  "updateCredit",
+                  { credit: value },
+                  this.state.user.ID
+                )?.then((result: any) => {
+                  this.setState({
+                    showCoinMessage: true,
+                    coinPurchaseMsg:
+                      "Thank you. Account updated by " + value + " credit",
+                  });
+                  this.fnCallbackRefreshTime(Date.now());
+                });
+
+                p.finish();
+              });
+            store.initialize([Platform.TEST]);
           });
         }
       })
       .catch((err: any) => {
         console.log(err);
       });
+    //this.platform.ready().then(() => {
     //});
   };
 
   registerAppStoreProduct = (productId: any) => {
-    new Promise((resolve, reject) => {
+    return new Promise((resolve, reject) => {
       this.InAppPurchase2?.register({
         id: productId,
         platform: this.InAppPlatform!,
         type: this.InAppProductType!,
       });
-
-      this.InAppPurchase2?.when()
-        .approved((p: any) => p.verify())
-        .verified((p: any) => {
-          let value = 0;
-          if (p.id.indexOf("25k") > -1) {
-            value = 25000;
-          } else if (p.id.indexOf("100k") > -1) {
-            value = 100000;
-          } else if (p.id.indexOf("250k") > -1) {
-            value = 250000;
-          } else if (p.id.indexOf("500k") > -1) {
-            value = 500000;
-          } else if (p.id.indexOf("750k") > -1) {
-            value = 750000;
-          } else if (p.id.indexOf("1m") > -1) {
-            value = 1000000;
-          } else {
-            value = 0;
-          }
-          callServer(
-            "updateCredit",
-            { credit: value },
-            this.state.user.ID
-          )?.then((result: any) => {
-            this.setState({
-              showCoinMessage: true,
-              coinPurchaseMsg:
-                "Thank you. Account updated by " + value + " credit",
-            });
-            this.fnCallbackRefreshTime(Date.now());
-          });
-
-          p.finish();
-        });
-      //InAppPurchase2.refresh();
       resolve(true);
     });
   };
