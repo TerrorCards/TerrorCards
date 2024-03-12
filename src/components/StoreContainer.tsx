@@ -24,8 +24,6 @@ import { callServer } from "./ajaxcalls";
 
 import "cordova-plugin-purchase";
 //import "cordova-plugin-purchase/www/store";
-import { Plugins } from "@capacitor/core";
-const { App } = Plugins;
 
 interface props {
   storeProps: any;
