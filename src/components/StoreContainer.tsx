@@ -146,9 +146,9 @@ class StoreContainer extends React.Component<props, state> {
               //do something
               p.finish();
             });
-          store.initialize([Platform.TEST]);
-
-          console.log(store.products);
+          store.initialize([Platform.TEST]).then(() => {
+            alert(store.products);
+          });
           //}
           //});
         }
