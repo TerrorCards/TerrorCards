@@ -20,6 +20,7 @@ import {
 } from "@ionic/react";
 import "./StoreContainer.css";
 import { callServer } from "./ajaxcalls";
+//import { App } from "@capacitor/app";
 //import { InAppPurchase2 } from "@awesome-cordova-plugins/in-app-purchase-2";
 
 import "cordova-plugin-purchase";
@@ -48,6 +49,7 @@ interface state {
   targetType: any;
   showCoinMessage: boolean;
   coinPurchaseMsg: any;
+  inAppProducts: any;
 }
 
 class StoreContainer extends React.Component<props, state> {
@@ -69,6 +71,7 @@ class StoreContainer extends React.Component<props, state> {
       targetType: null,
       showCoinMessage: false,
       coinPurchaseMsg: null,
+      inAppProducts: [],
     };
   }
 
@@ -82,9 +85,10 @@ class StoreContainer extends React.Component<props, state> {
   };
 
   componentDidMount() {
-    //used when in a tab nav
     this.pullPacks();
-    this.pullInApp();
+    setTimeout(() => {
+      this.pullInApp();
+    }, 2000);
   }
 
   ionViewWillEnter() {
@@ -128,16 +132,16 @@ class StoreContainer extends React.Component<props, state> {
       })
       .then((json) => {
         if (json.length > 0) {
-          //App.addListener("appStateChange", (state: any) => {
-          //if (state.isActive) {
           const { store, ProductType, Platform } = CdvPurchase;
           const items = json;
           items.forEach((item: any) => {
-            store.register({
-              id: item.ID,
-              platform: Platform.TEST,
-              type: ProductType.CONSUMABLE,
-            });
+            store.register([
+              {
+                id: item.ID,
+                platform: Platform.TEST,
+                type: ProductType.CONSUMABLE,
+              },
+            ]);
           });
           store
             .when()
@@ -147,10 +151,12 @@ class StoreContainer extends React.Component<props, state> {
               p.finish();
             });
           store.initialize([Platform.TEST]).then(() => {
-            alert(store.products);
+            if (store.isReady) {
+              store.update().then(() => {
+                alert(store.products);
+              });
+            }
           });
-          //}
-          //});
         }
       })
       .catch((err: any) => {
@@ -254,8 +260,8 @@ class StoreContainer extends React.Component<props, state> {
 
   renderCoinsList = () => {
     let items: Array<any> = [];
-    if (this.state.allCoinList.length > 0) {
-      this.state.allCoinList.forEach((p: any) => {
+    if (this.state.inAppProducts.length > 0) {
+      this.state.inAppProducts.forEach((p: any) => {
         if (p.title !== "") {
           items.push(
             <IonCard key={p.title}>
