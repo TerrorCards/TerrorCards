@@ -16,22 +16,18 @@ import {
   IonGrid,
   IonRow,
   IonCol,
+  IonSpinner,
+  IonItem,
   withIonLifeCycle,
 } from "@ionic/react";
 import "./StoreContainer.css";
 import { callServer } from "./ajaxcalls";
-//import { App } from "@capacitor/app";
-//import { InAppPurchase2 } from "@awesome-cordova-plugins/in-app-purchase-2";
-
-import "cordova-plugin-purchase";
-//import "cordova-plugin-purchase/www/store";
+import { InAppPurchase2 } from "@awesome-cordova-plugins/in-app-purchase-2";
 
 interface props {
   storeProps: any;
   user: any;
   callbackPackOpenTimer: any;
-  inAppPurchaseObject: any;
-  coinBuyAction: any;
 }
 
 interface state {
@@ -49,7 +45,8 @@ interface state {
   targetType: any;
   showCoinMessage: boolean;
   coinPurchaseMsg: any;
-  inAppProducts: any;
+  isInAppLoaded: boolean;
+  isIAPActiveBuy: boolean;
 }
 
 class StoreContainer extends React.Component<props, state> {
@@ -58,7 +55,7 @@ class StoreContainer extends React.Component<props, state> {
 
     this.state = {
       allItemsList: [],
-      allCoinList: this.props.inAppPurchaseObject,
+      allCoinList: [],
       packItems: [],
       storeType: "regular",
       showCards: false,
@@ -71,7 +68,8 @@ class StoreContainer extends React.Component<props, state> {
       targetType: null,
       showCoinMessage: false,
       coinPurchaseMsg: null,
-      inAppProducts: [],
+      isInAppLoaded: false,
+      isIAPActiveBuy: false,
     };
   }
 
@@ -85,10 +83,9 @@ class StoreContainer extends React.Component<props, state> {
   };
 
   componentDidMount() {
+    //used when in a tab nav
     this.pullPacks();
-    setTimeout(() => {
-      this.pullInApp();
-    }, 2000);
+    //this.pullInApp();
   }
 
   ionViewWillEnter() {
@@ -98,7 +95,9 @@ class StoreContainer extends React.Component<props, state> {
     //}
   }
 
-  componentWillMount() {}
+  componentWillMount() {
+    this.pullInApp();
+  }
 
   ionViewWillLeave() {}
 
@@ -124,7 +123,6 @@ class StoreContainer extends React.Component<props, state> {
       });
   };
 
-  // in app purchase stuff
   pullInApp = () => {
     callServer("loadInAppItems", "", this.props.user.ID)
       ?.then((resp) => {
@@ -132,30 +130,19 @@ class StoreContainer extends React.Component<props, state> {
       })
       .then((json) => {
         if (json.length > 0) {
-          const { store, ProductType, Platform } = CdvPurchase;
           const items = json;
+          const regArray: Array<any> = [];
           items.forEach((item: any) => {
-            store.register([
-              {
-                id: item.ID,
-                platform: Platform.TEST,
-                type: ProductType.CONSUMABLE,
-              },
-            ]);
+            regArray.push(this.registerAppStoreProduct(item.ID));
           });
-          store
-            .when()
-            .approved((p: any) => p.verify())
-            .verified((p: any) => {
-              //do something
-              p.finish();
-            });
-          store.initialize([Platform.TEST]).then(() => {
-            if (store.isReady) {
-              store.update().then(() => {
-                alert(store.products);
-              });
-            }
+          Promise.all(regArray).then((resp) => {
+            InAppPurchase2.refresh();
+            this.setState(
+              { allCoinList: InAppPurchase2.products, isInAppLoaded: true },
+              () => {
+                //do nothing
+              }
+            );
           });
         }
       })
@@ -260,8 +247,16 @@ class StoreContainer extends React.Component<props, state> {
 
   renderCoinsList = () => {
     let items: Array<any> = [];
-    if (this.state.inAppProducts.length > 0) {
-      this.state.inAppProducts.forEach((p: any) => {
+    if (this.state.allCoinList.length > 0) {
+      if (this.state.isIAPActiveBuy) {
+        items.push(
+          <IonItem>
+            <IonLabel>Processing, please wait </IonLabel>
+            <IonSpinner></IonSpinner>
+          </IonItem>
+        );
+      }
+      this.state.allCoinList.forEach((p: any) => {
         if (p.title !== "") {
           items.push(
             <IonCard key={p.title}>
@@ -286,11 +281,12 @@ class StoreContainer extends React.Component<props, state> {
                                 showConfirmPurchase: true,
                                 targetItem: p,
                                 targetType: "coin",
+                                isIAPActiveBuy: true,
                               });
                               //this.canBuyCoins(p.ID);
                             }}
                           >
-                            {p.pricing.price} {p.pricing.currency}
+                            {p.price} {p.currency}
                           </IonButton>
                         </div>
                       </div>
@@ -322,7 +318,9 @@ class StoreContainer extends React.Component<props, state> {
   changeStoreType = (value: string) => {
     this.setState({ storeType: value }, () => {
       if (value === "coins") {
-        this.renderCoinsList();
+        if (this.state.isInAppLoaded) {
+          this.renderCoinsList();
+        }
       } else {
         this.filterPacks();
       }
@@ -419,13 +417,6 @@ class StoreContainer extends React.Component<props, state> {
         </IonSegment>
 
         <IonList>{this.state.packItems}</IonList>
-        <IonGrid>
-          <IonRow>
-            <IonCol>
-              <div style={{ height: 75 }}></div>
-            </IonCol>
-          </IonRow>
-        </IonGrid>
 
         <IonModal
           isOpen={this.state.showCards}
@@ -472,6 +463,20 @@ class StoreContainer extends React.Component<props, state> {
           message={"Are you sure you want to purchase?"}
           buttons={[
             {
+              text: "Yes",
+              role: "ok",
+              cssClass: "secondary",
+              handler: (blah: any) => {
+                this.setState({ showConfirmPurchase: false }, () => {
+                  if (this.state.targetType === "coin") {
+                    this.canBuyCoins();
+                  } else {
+                    this._canBuy();
+                  }
+                });
+              },
+            },
+            {
               text: "No",
               role: "ok",
               cssClass: "secondary",
@@ -479,18 +484,23 @@ class StoreContainer extends React.Component<props, state> {
                 this.setState({ showConfirmPurchase: false });
               },
             },
+          ]}
+        />
+
+        <IonAlert
+          isOpen={this.state.showCoinMessage}
+          onDidDismiss={() => {
+            this.setState({ showCoinMessage: false });
+          }}
+          header="Message"
+          message={this.state.coinPurchaseMsg}
+          buttons={[
             {
-              text: "Yes",
-              role: "ok",
+              text: "Ok",
+              role: "cancel",
               cssClass: "secondary",
               handler: (blah: any) => {
-                this.setState({ showConfirmPurchase: false }, () => {
-                  if (this.state.targetType === "coin") {
-                    this.props.coinBuyAction(this.state.targetItem);
-                  } else {
-                    this._canBuy();
-                  }
-                });
+                this.setState({ showCoinMessage: false });
               },
             },
           ]}
@@ -500,7 +510,6 @@ class StoreContainer extends React.Component<props, state> {
   }
 
   //In app purchase code
-  /*
   registerAppStoreProduct = (productId: any) => {
     new Promise((resolve, reject) => {
       InAppPurchase2.register({
@@ -549,7 +558,6 @@ class StoreContainer extends React.Component<props, state> {
       resolve(true);
     });
   };
-  */
 
   /*
   registerAppStoreProduct = (productId: any) => {
@@ -572,12 +580,10 @@ class StoreContainer extends React.Component<props, state> {
   };
   */
 
-  /*
   canBuyCoins = () => {
     const item = this.state.targetItem;
     InAppPurchase2.order(item);
   };
-  */
 }
 
 export default withIonLifeCycle(StoreContainer);

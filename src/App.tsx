@@ -143,10 +143,6 @@ class App extends React.Component<props, state> {
   };
   tradesExist = false;
 
-  InAppPurchase2!: CdvPurchase.Store;
-  InAppProductType!: CdvPurchase.ProductType.CONSUMABLE;
-  InAppPlatform!: CdvPurchase.Platform.TEST;
-
   componentDidMount() {
     //console.log("componet did mount event fired");
     this.getUserStorage();
