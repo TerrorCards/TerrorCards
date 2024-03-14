@@ -22,7 +22,8 @@ import {
 } from "@ionic/react";
 import "./StoreContainer.css";
 import { callServer } from "./ajaxcalls";
-import { InAppPurchase2 } from "@awesome-cordova-plugins/in-app-purchase-2";
+import { Capacitor } from "@capacitor/core";
+import "cordova-plugin-purchase/www/store";
 
 interface props {
   storeProps: any;
@@ -85,7 +86,9 @@ class StoreContainer extends React.Component<props, state> {
   componentDidMount() {
     //used when in a tab nav
     this.pullPacks();
-    //this.pullInApp();
+    setTimeout(() => {
+      this.pullInApp();
+    }, 2000);
   }
 
   ionViewWillEnter() {
@@ -96,7 +99,7 @@ class StoreContainer extends React.Component<props, state> {
   }
 
   componentWillMount() {
-    this.pullInApp();
+    //this.pullInApp();
   }
 
   ionViewWillLeave() {}
@@ -130,19 +133,31 @@ class StoreContainer extends React.Component<props, state> {
       })
       .then((json) => {
         if (json.length > 0) {
+          const { store, ProductType, Platform } = window.CdvPurchase;
           const items = json;
-          const regArray: Array<any> = [];
           items.forEach((item: any) => {
-            regArray.push(this.registerAppStoreProduct(item.ID));
+            store.register([
+              {
+                id: item.ID,
+                platform: Platform.TEST,
+                type: ProductType.CONSUMABLE,
+              },
+            ]);
           });
-          Promise.all(regArray).then((resp) => {
-            InAppPurchase2.refresh();
-            this.setState(
-              { allCoinList: InAppPurchase2.products, isInAppLoaded: true },
-              () => {
-                //do nothing
-              }
-            );
+          store
+            .when()
+            .approved((p: any) => p.verify())
+            .verified((p: any) => {
+              //do something
+              p.finish();
+            });
+          store.initialize([Platform.TEST]).then(() => {
+            store.update().then(() => {
+              //@ts-ignore
+              alert(store.registeredProducts);
+              alert(store.products);
+              alert(store.get(items[0].ID, Platform.TEST));
+            });
           });
         }
       })
@@ -510,6 +525,7 @@ class StoreContainer extends React.Component<props, state> {
   }
 
   //In app purchase code
+  /*
   registerAppStoreProduct = (productId: any) => {
     new Promise((resolve, reject) => {
       InAppPurchase2.register({
@@ -558,6 +574,7 @@ class StoreContainer extends React.Component<props, state> {
       resolve(true);
     });
   };
+  */
 
   /*
   registerAppStoreProduct = (productId: any) => {
@@ -582,7 +599,7 @@ class StoreContainer extends React.Component<props, state> {
 
   canBuyCoins = () => {
     const item = this.state.targetItem;
-    InAppPurchase2.order(item);
+    //InAppPurchase2.order(item);
   };
 }
 
