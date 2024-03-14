@@ -22,7 +22,7 @@ import {
 } from "@ionic/react";
 import "./StoreContainer.css";
 import { callServer } from "./ajaxcalls";
-import { Capacitor } from "@capacitor/core";
+//import { Capacitor } from "@capacitor/core";
 import "cordova-plugin-purchase/www/store";
 
 interface props {
@@ -598,7 +598,7 @@ class StoreContainer extends React.Component<props, state> {
   */
 
   canBuyCoins = () => {
-    const item = this.state.targetItem;
+    //const item = this.state.targetItem;
     //InAppPurchase2.order(item);
   };
 }
