@@ -50,6 +50,8 @@ interface state {
   isIAPActiveBuy: boolean;
 }
 
+const { store, ProductType, Platform } = window.CdvPurchase;
+
 class StoreContainer extends React.Component<props, state> {
   constructor(props: any) {
     super(props);
@@ -133,17 +135,17 @@ class StoreContainer extends React.Component<props, state> {
       })
       .then((json) => {
         if (json.length > 0) {
-          const { store, ProductType, Platform } = window.CdvPurchase;
+          //const store: any = new window.CdvPurchase.Store();
           const items = json;
+          const productList: any[] = [];
           items.forEach((item: any) => {
-            store.register([
-              {
-                id: item.ID,
-                platform: Platform.TEST,
-                type: ProductType.CONSUMABLE,
-              },
-            ]);
+            productList.push({
+              id: item.ID,
+              platform: Platform.GOOGLE_PLAY,
+              type: ProductType.CONSUMABLE,
+            });
           });
+          store.register(productList);
           store
             .when()
             .approved((p: any) => p.verify())
@@ -151,12 +153,11 @@ class StoreContainer extends React.Component<props, state> {
               //do something
               p.finish();
             });
-          store.initialize([Platform.TEST]).then(() => {
-            store.update().then(() => {
-              //@ts-ignore
-              alert(store.registeredProducts);
+
+          store.initialize([Platform.GOOGLE_PLAY]).then(() => {
+            store.ready(() => {
+              //alert(store.registeredProducts);
               alert(store.products);
-              alert(store.get(items[0].ID, Platform.TEST));
             });
           });
         }
