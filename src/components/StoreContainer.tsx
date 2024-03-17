@@ -319,6 +319,7 @@ class StoreContainer extends React.Component<props, state> {
         );
       }
       this.state.allCoinList.forEach((p: any) => {
+        alert(p.title);
         if (p.title !== "") {
           const pricing = p.pricing();
           items.push(
