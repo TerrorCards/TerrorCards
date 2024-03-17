@@ -24,6 +24,7 @@ import "./StoreContainer.css";
 import { callServer } from "./ajaxcalls";
 //import { Capacitor } from "@capacitor/core";
 import "cordova-plugin-purchase/www/store";
+import { Device } from "@capacitor/device";
 
 interface props {
   storeProps: any;
@@ -85,12 +86,19 @@ class StoreContainer extends React.Component<props, state> {
     centeredSlides: true,
   };
 
+  deviceInfo: any = {
+    platform: null,
+  };
+
   componentDidMount() {
     //used when in a tab nav
     this.pullPacks();
-    setTimeout(() => {
-      this.pullInApp();
-    }, 2000);
+    Device.getInfo().then((d: any) => {
+      this.deviceInfo.platform = d.platform;
+      if (!d.isVirtual) {
+        this.pullInApp();
+      }
+    });
   }
 
   ionViewWillEnter() {
@@ -136,12 +144,16 @@ class StoreContainer extends React.Component<props, state> {
       .then((json) => {
         if (json.length > 0) {
           //const store: any = new window.CdvPurchase.Store();
+          const whatPlatform =
+            this.deviceInfo.platform === "android"
+              ? Platform.GOOGLE_PLAY
+              : Platform.APPLE_APPSTORE;
           const items = json;
           const productList: any[] = [];
           items.forEach((item: any) => {
             productList.push({
               id: item.ID,
-              platform: Platform.GOOGLE_PLAY,
+              platform: whatPlatform,
               type: ProductType.CONSUMABLE,
             });
           });
@@ -150,14 +162,43 @@ class StoreContainer extends React.Component<props, state> {
             .when()
             .approved((p: any) => p.verify())
             .verified((p: any) => {
-              //do something
+              let value = 0;
+              if (p.id.indexOf("25k") > -1) {
+                value = 25000;
+              } else if (p.id.indexOf("100k") > -1) {
+                value = 100000;
+              } else if (p.id.indexOf("250k") > -1) {
+                value = 250000;
+              } else if (p.id.indexOf("500k") > -1) {
+                value = 500000;
+              } else if (p.id.indexOf("750k") > -1) {
+                value = 750000;
+              } else if (p.id.indexOf("1m") > -1) {
+                value = 1000000;
+              } else {
+                value = 0;
+              }
+              callServer(
+                "updateCredit",
+                { credit: value },
+                this.props.user.ID
+              )?.then((result: any) => {
+                this.setState({
+                  targetItem: null,
+                  targetType: null,
+                  showCoinMessage: true,
+                  coinPurchaseMsg:
+                    "Thank you. Account updated by " + value + " credit",
+                  isIAPActiveBuy: false,
+                });
+                this.props.callbackPackOpenTimer(Date.now());
+              });
               p.finish();
             });
 
-          store.initialize([Platform.GOOGLE_PLAY]).then(() => {
+          store.initialize([whatPlatform]).then(() => {
             store.ready(() => {
-              //alert(store.registeredProducts);
-              alert(store.products);
+              this.setState({ allCoinList: store.products });
             });
           });
         }
@@ -274,6 +315,7 @@ class StoreContainer extends React.Component<props, state> {
       }
       this.state.allCoinList.forEach((p: any) => {
         if (p.title !== "") {
+          const pricing = p.pricing();
           items.push(
             <IonCard key={p.title}>
               <IonCardHeader>
@@ -302,7 +344,7 @@ class StoreContainer extends React.Component<props, state> {
                               //this.canBuyCoins(p.ID);
                             }}
                           >
-                            {p.price} {p.currency}
+                            {pricing.price} {pricing.currency}
                           </IonButton>
                         </div>
                       </div>
@@ -599,8 +641,12 @@ class StoreContainer extends React.Component<props, state> {
   */
 
   canBuyCoins = () => {
-    //const item = this.state.targetItem;
-    //InAppPurchase2.order(item);
+    const product = store.get(
+      this.state.targetItem.id,
+      this.deviceInfo.platform
+    );
+    const offer = product?.getOffer();
+    if (offer) offer.order();
   };
 }
 
