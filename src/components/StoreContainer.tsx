@@ -651,6 +651,7 @@ class StoreContainer extends React.Component<props, state> {
   */
 
   canBuyCoins = () => {
+    /*
     const product = store.get(
       this.state.targetItem.id,
       this.deviceInfo.platform
@@ -661,6 +662,17 @@ class StoreContainer extends React.Component<props, state> {
     alert("offer");
     alert(JSON.stringify(offer));
     if (offer) offer.order();
+    */
+    const foundProduct = this.state.allCoinList.filter((coins) => {
+      return coins.id === this.state.targetItem.id;
+    });
+    alert(JSON.stringify(foundProduct));
+    if (foundProduct.length > 0) {
+      const offer = foundProduct[0].getOffer();
+      alert("offer");
+      alert(JSON.stringify(offer));
+      if (offer) offer.order();
+    }
   };
 }
 
