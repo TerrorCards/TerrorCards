@@ -319,7 +319,7 @@ class StoreContainer extends React.Component<props, state> {
         );
       }
       this.state.allCoinList.forEach((p: any) => {
-        alert(p.title);
+        alert(JSON.stringify(p));
         if (p.title !== "") {
           const pricing = p.pricing();
           items.push(
@@ -341,16 +341,19 @@ class StoreContainer extends React.Component<props, state> {
                           <IonButton
                             expand="block"
                             onClick={() => {
+                              /*
                               this.setState({
                                 showConfirmPurchase: true,
                                 targetItem: p,
                                 targetType: "coin",
                                 isIAPActiveBuy: true,
                               });
+                              */
+                              alert(JSON.stringify(p));
                               //this.canBuyCoins(p.ID);
                             }}
                           >
-                            {pricing.price} {pricing.currency}
+                            {p.title}
                           </IonButton>
                         </div>
                       </div>
