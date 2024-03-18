@@ -321,7 +321,7 @@ class StoreContainer extends React.Component<props, state> {
       this.state.allCoinList.forEach((p: any) => {
         alert(JSON.stringify(p));
         if (p.title !== "") {
-          const pricing = p.pricing();
+          //const pricing = p.pricing();
           items.push(
             <IonCard key={p.title}>
               <IonCardHeader>
