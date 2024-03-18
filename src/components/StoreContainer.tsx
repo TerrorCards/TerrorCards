@@ -321,7 +321,7 @@ class StoreContainer extends React.Component<props, state> {
       this.state.allCoinList.forEach((p: any) => {
         alert(JSON.stringify(p));
         if (p.title !== "") {
-          //const pricing = p.pricing();
+          const pricing = p.offers[0].pricingPhases[0];
           items.push(
             <IonCard key={p.title}>
               <IonCardHeader>
@@ -341,19 +341,18 @@ class StoreContainer extends React.Component<props, state> {
                           <IonButton
                             expand="block"
                             onClick={() => {
-                              /*
                               this.setState({
                                 showConfirmPurchase: true,
                                 targetItem: p,
                                 targetType: "coin",
                                 isIAPActiveBuy: true,
                               });
-                              */
-                              alert(JSON.stringify(p));
+
+                              //alert(JSON.stringify(p));
                               //this.canBuyCoins(p.ID);
                             }}
                           >
-                            {p.title}
+                            {pricing.price} {pricing.currency}
                           </IonButton>
                         </div>
                       </div>
