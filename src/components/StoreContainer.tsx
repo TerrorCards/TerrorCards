@@ -162,6 +162,7 @@ class StoreContainer extends React.Component<props, state> {
             .when()
             .approved((p: any) => p.verify())
             .verified((p: any) => {
+              alert("verifed");
               alert(JSON.stringify(p));
               let value = 0;
               if (p.id.indexOf("25k") > -1) {
@@ -654,7 +655,10 @@ class StoreContainer extends React.Component<props, state> {
       this.state.targetItem.id,
       this.deviceInfo.platform
     );
+    alert("product");
+    alert(JSON.stringify(product));
     const offer = product?.getOffer();
+    alert("offer");
     alert(JSON.stringify(offer));
     if (offer) offer.order();
   };
