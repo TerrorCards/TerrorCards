@@ -162,19 +162,20 @@ class StoreContainer extends React.Component<props, state> {
             .when()
             .approved((p: any) => p.verify())
             .verified((p: any) => {
+              const productId = p.sourceReceipt.transactions[0].products[0].id;
               alert(JSON.stringify(p.productId));
               let value = 0;
-              if (p.productId.indexOf("25k") > -1) {
+              if (productId.indexOf("25k") > -1) {
                 value = 25000;
-              } else if (p.productId.indexOf("100k") > -1) {
+              } else if (productId.indexOf("100k") > -1) {
                 value = 100000;
-              } else if (p.productId.indexOf("250k") > -1) {
+              } else if (productId.indexOf("250k") > -1) {
                 value = 250000;
-              } else if (p.productId.indexOf("500k") > -1) {
+              } else if (productId.indexOf("500k") > -1) {
                 value = 500000;
-              } else if (p.productId.indexOf("750k") > -1) {
+              } else if (productId.indexOf("750k") > -1) {
                 value = 750000;
-              } else if (p.productId.indexOf("1m") > -1) {
+              } else if (productId.indexOf("1m") > -1) {
                 value = 1000000;
               } else {
                 value = 0;
