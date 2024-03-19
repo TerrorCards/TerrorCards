@@ -270,15 +270,21 @@ class StatsContainer extends React.Component<props, state> {
     });
 
     justUser.forEach((card: any, i: number) => {
+      const currImg = card.CardImage.replace(/full/g, "thumbs");
       userList.push(
         <IonCol key={i}>
-          <img src={card.CardImage} width="80%" alt=""></img>
+          <img
+            src={currImg}
+            width={justUser.length >= 2 ? "75%" : "50%"}
+            alt=""
+          ></img>
           <br></br>
           <IonText color="dark"> </IonText>
         </IonCol>
       );
     });
     justSystem.forEach((card: any, i: number) => {
+      const currImg = card.CardImage.replace(/full/g, "thumbs");
       systemList.push(
         <IonCol
           key={i}
@@ -288,7 +294,11 @@ class StatsContainer extends React.Component<props, state> {
             }
           }}
         >
-          <img src={card.CardImage} width="75%" alt=""></img>
+          <img
+            src={currImg}
+            width={justSystem.length >= 2 ? "75%" : "50%"}
+            alt=""
+          ></img>
           <br></br>
           <IonText color="dark">
             {card.CardOwner.length > 7
@@ -341,7 +351,7 @@ class StatsContainer extends React.Component<props, state> {
       </IonCard>
     );
   }
-
+  /*
   renderBoostCheck() {
     return (
       <IonCard>
@@ -361,6 +371,7 @@ class StatsContainer extends React.Component<props, state> {
       </IonCard>
     );
   }
+  */
   renderPandoraAccess() {
     return (
       <IonCard>
@@ -448,15 +459,17 @@ class StatsContainer extends React.Component<props, state> {
             <IonCol>{this.renderTradeList()}</IonCol>
           </IonRow>
           <IonRow>
-            <IonCol>Information</IonCol>
+            <IonCol>
+              {this.state.pandoraExpires !== null ? "Information" : ""}
+            </IonCol>
           </IonRow>
           <IonRow>
-            <IonCol color="dark">{this.renderBoostCheck()}</IonCol>
             <IonCol color="dark">
               {this.state.pandoraExpires !== null
                 ? this.renderPandoraAccess()
                 : ""}
             </IonCol>
+            <IonCol color="dark"></IonCol>
           </IonRow>
           <IonRow>
             <IonCol>
