@@ -162,8 +162,7 @@ class StoreContainer extends React.Component<props, state> {
             .when()
             .approved((p: any) => p.verify())
             .verified((p: any) => {
-              alert("verifed");
-              alert(JSON.stringify(p));
+              alert(JSON.stringify(p.productId));
               let value = 0;
               if (p.productId.indexOf("25k") > -1) {
                 value = 25000;
@@ -180,6 +179,7 @@ class StoreContainer extends React.Component<props, state> {
               } else {
                 value = 0;
               }
+              alert(value);
               callServer(
                 "updateCredit",
                 { credit: value },
@@ -321,7 +321,7 @@ class StoreContainer extends React.Component<props, state> {
         );
       }
       this.state.allCoinList.forEach((p: any) => {
-        alert(JSON.stringify(p));
+        //alert(JSON.stringify(p));
         if (p.title !== "") {
           const pricing = p.offers[0].pricingPhases[0];
           items.push(
@@ -666,11 +666,11 @@ class StoreContainer extends React.Component<props, state> {
     const foundProduct = this.state.allCoinList.filter((coins) => {
       return coins.id === this.state.targetItem.id;
     });
-    alert(JSON.stringify(foundProduct));
+    //alert(JSON.stringify(foundProduct));
     if (foundProduct.length > 0) {
       const offer = foundProduct[0].getOffer();
-      alert("offer");
-      alert(JSON.stringify(offer));
+      //alert("offer");
+      //alert(JSON.stringify(offer));
       if (offer) offer.order();
     }
   };
