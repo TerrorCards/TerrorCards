@@ -165,17 +165,17 @@ class StoreContainer extends React.Component<props, state> {
               alert("verifed");
               alert(JSON.stringify(p));
               let value = 0;
-              if (p.id.indexOf("25k") > -1) {
+              if (p.productId.indexOf("25k") > -1) {
                 value = 25000;
-              } else if (p.id.indexOf("100k") > -1) {
+              } else if (p.productId.indexOf("100k") > -1) {
                 value = 100000;
-              } else if (p.id.indexOf("250k") > -1) {
+              } else if (p.productId.indexOf("250k") > -1) {
                 value = 250000;
-              } else if (p.id.indexOf("500k") > -1) {
+              } else if (p.productId.indexOf("500k") > -1) {
                 value = 500000;
-              } else if (p.id.indexOf("750k") > -1) {
+              } else if (p.productId.indexOf("750k") > -1) {
                 value = 750000;
-              } else if (p.id.indexOf("1m") > -1) {
+              } else if (p.productId.indexOf("1m") > -1) {
                 value = 1000000;
               } else {
                 value = 0;
