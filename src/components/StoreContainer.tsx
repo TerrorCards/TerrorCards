@@ -163,7 +163,7 @@ class StoreContainer extends React.Component<props, state> {
             .approved((p: any) => p.verify())
             .verified((p: any) => {
               const productId = p.sourceReceipt.transactions[0].products[0].id;
-              alert(JSON.stringify(p.productId));
+              //alert(JSON.stringify(p.productId));
               let value = 0;
               if (productId.indexOf("25k") > -1) {
                 value = 25000;
@@ -180,7 +180,7 @@ class StoreContainer extends React.Component<props, state> {
               } else {
                 value = 0;
               }
-              alert(value);
+              //alert(value);
               callServer(
                 "updateCredit",
                 { credit: value },
