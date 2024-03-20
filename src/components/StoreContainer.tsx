@@ -162,8 +162,18 @@ class StoreContainer extends React.Component<props, state> {
             .when()
             .approved((p: any) => p.verify())
             .verified((p: any) => {
-              const productId = p.sourceReceipt.transactions[0].products[0].id;
-              alert(JSON.stringify(p));
+              let productId = null;
+              if (this.deviceInfo.platform === "android") {
+                productId = p.sourceReceipt.transactions[0].products[0].id;
+              } else {
+                const trans = p.sourceReceipt.transactions;
+                trans.forEach((tran: any) => {
+                  if (tran.products[0].id === this.state.targetItem.id) {
+                    productId = tran.products[0].id;
+                  }
+                });
+              }
+              alert(JSON.stringify(p.sourceReceipt.transactions));
               let value = 0;
               if (productId.indexOf("25k") > -1) {
                 value = 25000;
