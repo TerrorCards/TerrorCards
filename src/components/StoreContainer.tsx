@@ -198,7 +198,6 @@ class StoreContainer extends React.Component<props, state> {
                   { credit: value },
                   this.props.user.ID
                 )?.then((result: any) => {
-                  inAppControl = 0;
                   this.setState({
                     targetItem: null,
                     targetType: null,
@@ -209,6 +208,7 @@ class StoreContainer extends React.Component<props, state> {
                   });
                   this.props.callbackPackOpenTimer(Date.now());
                 });
+                inAppControl = 0;
               }
               p.finish();
             });
