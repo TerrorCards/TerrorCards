@@ -52,6 +52,7 @@ interface state {
 }
 
 const { store, ProductType, Platform } = window.CdvPurchase;
+let inAppControl = 0;
 
 class StoreContainer extends React.Component<props, state> {
   constructor(props: any) {
@@ -173,7 +174,7 @@ class StoreContainer extends React.Component<props, state> {
                   }
                 });
               }
-              alert(JSON.stringify(p.sourceReceipt.transactions));
+              //alert(JSON.stringify(p.sourceReceipt.transactions));
               let value = 0;
               if (productId.indexOf("25k") > -1) {
                 value = 25000;
@@ -191,21 +192,24 @@ class StoreContainer extends React.Component<props, state> {
                 value = 0;
               }
               //alert(value);
-              callServer(
-                "updateCredit",
-                { credit: value },
-                this.props.user.ID
-              )?.then((result: any) => {
-                this.setState({
-                  targetItem: null,
-                  targetType: null,
-                  showCoinMessage: true,
-                  coinPurchaseMsg:
-                    "Thank you. Account updated by " + value + " credit",
-                  isIAPActiveBuy: false,
+              if (inAppControl === 1) {
+                callServer(
+                  "updateCredit",
+                  { credit: value },
+                  this.props.user.ID
+                )?.then((result: any) => {
+                  inAppControl = 0;
+                  this.setState({
+                    targetItem: null,
+                    targetType: null,
+                    showCoinMessage: true,
+                    coinPurchaseMsg:
+                      "Thank you. Account updated by " + value + " credit",
+                    isIAPActiveBuy: false,
+                  });
+                  this.props.callbackPackOpenTimer(Date.now());
                 });
-                this.props.callbackPackOpenTimer(Date.now());
-              });
+              }
               p.finish();
             });
 
@@ -682,6 +686,7 @@ class StoreContainer extends React.Component<props, state> {
       const offer = foundProduct[0].getOffer();
       //alert("offer");
       //alert(JSON.stringify(offer));
+      inAppControl = 1;
       if (offer) offer.order();
     }
   };
