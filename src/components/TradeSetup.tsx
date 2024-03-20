@@ -689,6 +689,7 @@ class TradeSetup extends React.Component<props, state> {
               width: cardWidth + "%",
               position: "relative",
               margin: "auto",
+              padding: "3px",
             }}
           >
             <IonImg
