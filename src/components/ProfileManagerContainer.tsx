@@ -411,7 +411,7 @@ class ProfileManagerContainer extends React.Component<props, state> {
                             :null 
                         }                             
                         </IonLabel>
-                        <IonItem fill="solid">
+                        <IonItem>
                         <IonInput color="dark" value={this.state.currUserName} placeholder="Your user name" onIonChange={(e) => {
                             this.setState({currUserName: e.detail.value!})
                         }}
@@ -432,7 +432,7 @@ class ProfileManagerContainer extends React.Component<props, state> {
                             :null 
                         }                             
                         </IonLabel>
-                        <IonItem fill="solid">
+                        <IonItem>
                         <IonInput value={this.state.currEmail} placeholder="Your contact email" onIonChange={(e) => {
                             this.setState({currEmail: e.detail.value!})
                         }}
@@ -453,7 +453,7 @@ class ProfileManagerContainer extends React.Component<props, state> {
                             :null 
                         } 
                         </IonLabel>
-                        <IonItem fill="solid">
+                        <IonItem>
                         <IonInput type="password" value={this.state.currPassword} placeholder="Enter a password"  onIonChange={(e) => {
                             this.setState({currPassword: e.detail.value!})
                         }}></IonInput>
@@ -491,7 +491,7 @@ class ProfileManagerContainer extends React.Component<props, state> {
                                 :null 
                             }                                  
                             </IonLabel>
-                            <IonItem fill="solid">
+                            <IonItem>
                             <IonTextarea value={this.state.currDescription} placeholder="About yourself" onIonChange={(e:any) => {
                                 this.setState({currDescription: e.detail.value!})
                             }}
@@ -513,8 +513,8 @@ class ProfileManagerContainer extends React.Component<props, state> {
                                 :null 
                             }                                
                             </IonLabel>
-                            <IonItem fill="solid">
-                                <IonInput size={50} value={this.state.currEmail} placeholder="Your contact email" onIonChange={(e) => {
+                            <IonItem>
+                                <IonInput value={this.state.currEmail} placeholder="Your contact email" onIonChange={(e) => {
                                     this.setState({currEmail: e.detail.value!})
                                 }}
                                 onIonBlur={(e) => {
@@ -534,7 +534,7 @@ class ProfileManagerContainer extends React.Component<props, state> {
                                 :null 
                             }                                    
                             </IonLabel>
-                            <IonItem fill="solid">
+                            <IonItem>
                             <IonInput type="password" value={this.state.currPassword} placeholder="Enter a new password"  onIonChange={(e) => {
                                 this.setState({currPassword: e.detail.value!})
                             }}
@@ -556,7 +556,7 @@ class ProfileManagerContainer extends React.Component<props, state> {
                                 :null 
                             }                                 
                             </IonLabel>
-                            <IonItem fill="solid">
+                            <IonItem>
                             <IonInput type="text" value={this.state.currWallet} placeholder="Enter your wallet"  onIonChange={(e:any) => {
                                 this.setState({currWallet: e.detail.value!})
                             }}
@@ -569,7 +569,7 @@ class ProfileManagerContainer extends React.Component<props, state> {
                         </IonCol>
                         <IonCol>
                         <IonLabel position="stacked">Mint community token</IonLabel> 
-                        <IonItem fill="solid">                           
+                        <IonItem>                           
                                 <IonButton expand="block" onClick={() => {this.mintCommunityToken()}}>{"Mint Token"}</IonButton>
                             </IonItem> 
                         </IonCol>
@@ -587,7 +587,7 @@ class ProfileManagerContainer extends React.Component<props, state> {
                                 :null 
                             }                                  
                             </IonLabel>
-                            <IonItem fill="solid">
+                            <IonItem>
                             <IonTextarea value={this.state.currContactUs} placeholder="Your message" onIonChange={(e:any) => {
                                 this.setState({currContactUs: e.detail.value!})
                             }}

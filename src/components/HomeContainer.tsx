@@ -1,8 +1,6 @@
 import React from "react";
 import {
   withIonLifeCycle,
-  IonSlides,
-  IonSlide,
   IonContent,
   IonCol,
   IonRow,
@@ -25,6 +23,7 @@ import {
   IonLoading,
   IonAlert,
 } from "@ionic/react";
+import { Swiper, SwiperSlide } from "swiper/react";
 import {
   listCircle,
   create,
@@ -38,6 +37,8 @@ import {
   statsChartOutline,
 } from "ionicons/icons";
 import "./HomeContainer.css";
+import "swiper/css";
+import "@ionic/react/css/ionic-swiper.css";
 import StatsContainer from "./StatsContainer";
 import NewsContainer from "./NewsContainer";
 import { callServer } from "./ajaxcalls";
@@ -373,29 +374,29 @@ class HomeContainer extends React.Component<props, state> {
     return (
       <IonContent>
         {this.state.newBannerState.length > 0 && (
-          <IonSlides pager={true} options={slideOpts}>
-            <IonSlide>
+          <Swiper pager={true} options={slideOpts}>
+            <SwiperSlide>
               <img
                 src={this.state.newBannerState[0].Banner}
                 width="100%"
                 alt="banner 1"
               />
-            </IonSlide>
-            <IonSlide>
+            </SwiperSlide>
+            <SwiperSlide>
               <img
                 src={this.state.newBannerState[1].Banner}
                 width="100%"
                 alt="banner 2"
               />
-            </IonSlide>
-            <IonSlide>
+            </SwiperSlide>
+            <SwiperSlide>
               <img
                 src={this.state.newBannerState[2].Banner}
                 width="100%"
                 alt="banner 3"
               />
-            </IonSlide>
-          </IonSlides>
+            </SwiperSlide>
+          </Swiper>
         )}
 
         <IonGrid>
@@ -445,6 +446,8 @@ class HomeContainer extends React.Component<props, state> {
           <IonItem color="light">
             <IonButton
               fill="clear"
+              expand="full"
+              size="default"
               onClick={() => {
                 this.pullMessages();
               }}
@@ -460,6 +463,8 @@ class HomeContainer extends React.Component<props, state> {
             ></IonSearchbar>
             <IonButton
               fill="clear"
+              expand="full"
+              size="default"
               onClick={(e: any) => {
                 this.setState({ showNewMsg: true, event: e });
               }}

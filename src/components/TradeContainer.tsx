@@ -23,7 +23,12 @@ import {
 } from "@ionic/react";
 import "./TradeContainer.css";
 import { callServer } from "./ajaxcalls";
-import { informationCircle, closeCircleOutline } from "ionicons/icons";
+import {
+  closeCircleOutline,
+  mailUnreadOutline,
+  mailOpenOutline,
+  chatboxOutline,
+} from "ionicons/icons";
 
 interface props {
   user: any;
@@ -327,7 +332,11 @@ class TradeContainer extends React.Component<props, state> {
         <IonPopover
           isOpen={this.state.showInfoPopover}
           onDidDismiss={() =>
-            this.setState({ showInfoPopover: false, event: undefined })
+            this.setState({ showInfoPopover: false, event: undefined }, () => {
+              this.pullTrades(this.props.user.ID).then((result: any) => {
+                this.groupTradesById(result);
+              });
+            })
           }
           className={"popover-message-size-height"}
         >
@@ -537,13 +546,29 @@ class TradeContainer extends React.Component<props, state> {
               )}
               <IonCol class="ion-text-center" size="4">
                 <IonButton
-                  color="medium"
+                  color={
+                    this.state.filteredTradeList[key][0].TradeHasNewMessage > 0
+                      ? "danger"
+                      : "medium"
+                  }
+                  size="large"
                   onClick={(e: any) => {
                     e.persist();
                     this.displayTradeMessages(key);
                   }}
                 >
-                  <IonIcon slot="icon-only" icon={informationCircle} />
+                  <IonIcon
+                    slot="icon-only"
+                    size="large"
+                    icon={
+                      this.state.filteredTradeList[key][0].TradeHasMessages
+                        ? this.state.filteredTradeList[key][0]
+                            .TradeHasNewMessage > 0
+                          ? mailUnreadOutline
+                          : mailOpenOutline
+                        : chatboxOutline
+                    }
+                  />
                 </IonButton>
               </IonCol>
               {this.state.tradeStatus === "PENDING" ? (

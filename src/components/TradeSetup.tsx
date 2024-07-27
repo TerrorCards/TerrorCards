@@ -636,12 +636,13 @@ class TradeSetup extends React.Component<props, state> {
           <IonCol class="ion-text-center" size="4">
             <IonButton
               color="medium"
+              size="large"
               onClick={(e: any) => {
                 e.persist();
                 this.setState({ showInfoPopover: true, event: e });
               }}
             >
-              <IonIcon slot="icon-only" icon={informationCircle} />
+              <IonIcon slot="icon-only" icon={informationCircle} size="large" />
             </IonButton>
           </IonCol>
           <IonCol class="ion-text-center" size="4">
@@ -702,7 +703,7 @@ class TradeSetup extends React.Component<props, state> {
             <div className="trade-button-add">
               <IonButton
                 strong={true}
-                class="trade-button-add"
+                className="trade-button-add"
                 size="small"
                 color={c.Count <= 0 ? "danger" : "success"}
                 disabled={c.Count <= 0 ? true : false}
@@ -716,7 +717,7 @@ class TradeSetup extends React.Component<props, state> {
             <div className="trade-button-cc">
               <IonButton
                 strong={true}
-                class="trade-button-cc"
+                className="trade-button-cc"
                 size="small"
                 fill="clear"
                 onClick={(e: any) => {
