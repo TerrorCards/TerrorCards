@@ -232,11 +232,15 @@ class ProfileContainer extends React.Component<props, state> {
   };
 
   renderProfileItem(j: any) {
+    //for iOS
+    //const devicePadding = 25;
+    //for android
+    const devicePadding = 0;
     return (
       <IonGrid>
         <IonRow>
           <IonCol>
-            <div style={{ height: 25 }}></div>
+            <div style={{ height: devicePadding }}></div>
           </IonCol>
         </IonRow>
         <IonRow>

@@ -90,7 +90,8 @@ interface state {
 const store = new Storage();
 store.create();
 
-setupIonicReact({ mode: "ios" });
+//setupIonicReact({ mode: "ios" });
+setupIonicReact({ mode: "md" });
 
 class App extends React.Component<props, state> {
   constructor(props: any) {

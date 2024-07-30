@@ -158,7 +158,7 @@ class StoreContainer extends React.Component<props, state> {
               type: ProductType.CONSUMABLE,
             });
           });
-          alert(productList.toString());
+          //alert(productList.toString());
           store.register(productList);
           store
             .when()
@@ -215,9 +215,9 @@ class StoreContainer extends React.Component<props, state> {
             });
 
           store.initialize([whatPlatform]).then(() => {
-            alert(this.deviceInfo.platform);
+            //alert(this.deviceInfo.platform);
             store.ready(() => {
-              alert(store.products);
+              //alert(store.products);
               this.setState({
                 allCoinList: store.products,
                 isInAppLoaded: true,
