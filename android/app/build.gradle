@@ -15,6 +15,7 @@ android {
             ignoreAssetsPattern '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
         }
     }
+    namespace "com.gisgames.terrorcards"  // Add this line
     buildTypes {
         release {
             minifyEnabled false
