@@ -172,7 +172,7 @@ class SignInContainer extends React.Component<props, state> {
               <IonInput
                 value={this.state.userName}
                 placeholder="Your username"
-                onIonChange={(e: any) =>
+                onIonInput={(e: any) =>
                   this.setState({ userName: e.detail.value })
                 }
               ></IonInput>
@@ -187,7 +187,7 @@ class SignInContainer extends React.Component<props, state> {
                 type="password"
                 value={this.state.userPassword}
                 placeholder="Your password"
-                onIonChange={(e: any) =>
+                onIonInput={(e: any) =>
                   this.setState({ userPassword: e.detail.value })
                 }
               ></IonInput>
@@ -255,7 +255,7 @@ class SignInContainer extends React.Component<props, state> {
               <IonInput
                 value={this.state.userEmail}
                 placeholder="Your email"
-                onIonChange={(e: any) =>
+                onIonInput={(e: any) =>
                   this.setState({ userEmail: e.detail.value })
                 }
               ></IonInput>

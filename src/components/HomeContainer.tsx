@@ -456,7 +456,7 @@ class HomeContainer extends React.Component<props, state> {
             </IonButton>
             <IonSearchbar
               value={this.state.value}
-              onIonChange={(e: any) => {
+              onIonInput={(e: any) => {
                 this.searchMessages(e.detail.value);
               }}
               placeholder="Search Post"
@@ -627,7 +627,7 @@ class HomeContainer extends React.Component<props, state> {
             cols={20}
             placeholder="Post message here"
             value={this.state.txtMessage}
-            onIonChange={(e: any) => {
+            onIonInput={(e: any) => {
               this.setState({ txtMessage: e.currentTarget.value });
             }}
           ></IonTextarea>

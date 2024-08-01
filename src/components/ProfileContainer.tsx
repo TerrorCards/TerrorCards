@@ -390,7 +390,7 @@ class ProfileContainer extends React.Component<props, state> {
       <IonSearchbar
         key="searchBar"
         value={this.state.searchValue}
-        onIonChange={(e: any) => {
+        onIonInput={(e: any) => {
           this.searchPlayers(e.detail.value);
         }}
         placeholder="Type atleast 3 characters"

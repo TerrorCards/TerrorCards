@@ -196,7 +196,7 @@ class HuntContainer extends React.Component<props, state> {
       <IonSearchbar
         key="searchBar"
         value={this.state.playerSearch}
-        onIonChange={(e: any) => {
+        onIonInput={(e: any) => {
           this.setState({ playerSearch: e.detail.value }, () => {
             this.pullBattleList();
           });

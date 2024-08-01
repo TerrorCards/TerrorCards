@@ -412,7 +412,7 @@ class ProfileManagerContainer extends React.Component<props, state> {
                         }                             
                         </IonLabel>
                         <IonItem>
-                        <IonInput color="dark" value={this.state.currUserName} placeholder="Your user name" onIonChange={(e) => {
+                        <IonInput color="dark" value={this.state.currUserName} placeholder="Your user name" onIonInput={(e) => {
                             this.setState({currUserName: e.detail.value!})
                         }}
                         onIonBlur={(e) => {
@@ -433,7 +433,7 @@ class ProfileManagerContainer extends React.Component<props, state> {
                         }                             
                         </IonLabel>
                         <IonItem>
-                        <IonInput value={this.state.currEmail} placeholder="Your contact email" onIonChange={(e) => {
+                        <IonInput value={this.state.currEmail} placeholder="Your contact email" onIonInput={(e) => {
                             this.setState({currEmail: e.detail.value!})
                         }}
                         onIonBlur={(e) => {
@@ -454,7 +454,7 @@ class ProfileManagerContainer extends React.Component<props, state> {
                         } 
                         </IonLabel>
                         <IonItem>
-                        <IonInput type="password" value={this.state.currPassword} placeholder="Enter a password"  onIonChange={(e) => {
+                        <IonInput type="password" value={this.state.currPassword} placeholder="Enter a password"  onIonInput={(e) => {
                             this.setState({currPassword: e.detail.value!})
                         }}></IonInput>
                         </IonItem>
@@ -492,7 +492,7 @@ class ProfileManagerContainer extends React.Component<props, state> {
                             }                                  
                             </IonLabel>
                             <IonItem>
-                            <IonTextarea value={this.state.currDescription} placeholder="About yourself" onIonChange={(e:any) => {
+                            <IonTextarea value={this.state.currDescription} placeholder="About yourself" onIonInput={(e:any) => {
                                 this.setState({currDescription: e.detail.value!})
                             }}
                             onIonBlur={() => {
@@ -514,7 +514,7 @@ class ProfileManagerContainer extends React.Component<props, state> {
                             }                                
                             </IonLabel>
                             <IonItem>
-                                <IonInput value={this.state.currEmail} placeholder="Your contact email" onIonChange={(e) => {
+                                <IonInput value={this.state.currEmail} placeholder="Your contact email" onIonInput={(e) => {
                                     this.setState({currEmail: e.detail.value!})
                                 }}
                                 onIonBlur={(e) => {
@@ -535,7 +535,7 @@ class ProfileManagerContainer extends React.Component<props, state> {
                             }                                    
                             </IonLabel>
                             <IonItem>
-                            <IonInput type="password" value={this.state.currPassword} placeholder="Enter a new password"  onIonChange={(e) => {
+                            <IonInput type="password" value={this.state.currPassword} placeholder="Enter a new password"  onIonInput={(e) => {
                                 this.setState({currPassword: e.detail.value!})
                             }}
                             onIonBlur={(e) => {
@@ -557,7 +557,7 @@ class ProfileManagerContainer extends React.Component<props, state> {
                             }                                 
                             </IonLabel>
                             <IonItem>
-                            <IonInput type="text" value={this.state.currWallet} placeholder="Enter your wallet"  onIonChange={(e:any) => {
+                            <IonInput type="text" value={this.state.currWallet} placeholder="Enter your wallet"  onIonInput={(e:any) => {
                                 this.setState({currWallet: e.detail.value!})
                             }}
                             onIonBlur={() => {
@@ -588,7 +588,7 @@ class ProfileManagerContainer extends React.Component<props, state> {
                             }                                  
                             </IonLabel>
                             <IonItem>
-                            <IonTextarea value={this.state.currContactUs} placeholder="Your message" onIonChange={(e:any) => {
+                            <IonTextarea value={this.state.currContactUs} placeholder="Your message" onIonInput={(e:any) => {
                                 this.setState({currContactUs: e.detail.value!})
                             }}
                             onIonBlur={() => {

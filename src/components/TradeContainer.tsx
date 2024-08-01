@@ -352,7 +352,7 @@ class TradeContainer extends React.Component<props, state> {
                       placeholder="type here"
                       rows={2}
                       value={this.state.messageText}
-                      onIonChange={(e: any) => {
+                      onIonInput={(e: any) => {
                         this.updateTextMessage(e);
                       }}
                     ></IonTextarea>
@@ -647,6 +647,7 @@ class TradeContainer extends React.Component<props, state> {
   };
 
   updateTextMessage = (e: any) => {
+    console.log(e.detail.value);
     this.setState({ messageText: e.detail.value });
   };
 

@@ -260,11 +260,13 @@ body {
 
 .popover-message-size {
   --width: 75%;
+  top: -10%;
 }
 
 .popover-message-size-height {
   --width: 75%;
   --height: 500;
+  top: -10%;
 }
 
 .modal-size-override {

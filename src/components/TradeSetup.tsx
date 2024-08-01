@@ -613,7 +613,7 @@ class TradeSetup extends React.Component<props, state> {
                 placeholder="type here"
                 rows={5}
                 value={this.state.tradeMessage}
-                onIonChange={(e: any) => {
+                onIonInput={(e: any) => {
                   this.setState({ tradeMessage: e.currentTarget.value });
                 }}
               ></IonTextarea>
