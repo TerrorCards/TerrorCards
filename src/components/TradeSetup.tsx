@@ -968,7 +968,7 @@ class TradeSetup extends React.Component<props, state> {
           itemsList.push(
             <IonCol class="ion-text-center" key={i}>
               <img
-                src="http://TerrorCards.com/images/banners/waitSmall.png"
+                src="https://TerrorCards.com/images/banners/waitSmall.png"
                 alt=""
               />
             </IonCol>
@@ -980,7 +980,7 @@ class TradeSetup extends React.Component<props, state> {
         itemsList.push(
           <IonCol class="ion-text-center" key={i}>
             <img
-              src="http://TerrorCards.com/images/banners/waitSmall.png"
+              src="https://TerrorCards.com/images/banners/waitSmall.png"
               alt=""
             />
           </IonCol>

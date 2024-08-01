@@ -153,7 +153,7 @@ class SignInContainer extends React.Component<props, state> {
         <IonRow class="ion-align-items-center">
           <IonCol class="ion-text-center">
             <img
-              src="http://TerrorCards.com/images/banners/app_banner.jpg"
+              src="https://TerrorCards.com/images/banners/app_banner.jpg"
               alt=""
               width="100%"
               height={75}
