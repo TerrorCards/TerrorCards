@@ -300,7 +300,7 @@ class ProfileContainer extends React.Component<props, state> {
           }
           className={"modal-size-menu-override"}
         >
-          <IonContent>
+          <IonContent className="ion-popover-content">
             <IonGrid>
               <IonRow>
                 <IonCol>Player Search</IonCol>

@@ -624,7 +624,7 @@ class HomeContainer extends React.Component<props, state> {
         >
           <IonTextarea
             rows={10}
-            cols={20}
+            cols={25}
             placeholder="Post message here"
             value={this.state.txtMessage}
             onIonInput={(e: any) => {

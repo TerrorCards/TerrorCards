@@ -277,4 +277,12 @@ body {
 .modal-size-menu-override {
   --height: 75% !important;
   --width: 75% !important;
+  pointer-events: auto;
+}
+
+.modal-size-menu-override .ion-popover-content {
+  --height: 100% !important;
+  --width: 100% !important;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }

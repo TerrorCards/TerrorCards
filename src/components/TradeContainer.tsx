@@ -269,7 +269,7 @@ class TradeContainer extends React.Component<props, state> {
 
   render() {
     return (
-      <IonContent style={{ height: "85%" }}>
+      <IonContent style={{ height: "85%" }} id="tradeContent">
         <IonSegment
           value={this.state.tradeStatus}
           onIonChange={(e: any) => {
@@ -277,7 +277,7 @@ class TradeContainer extends React.Component<props, state> {
           }}
           color="dark"
         >
-          <IonSegmentButton value="PENDING">
+          <IonSegmentButton value="PENDING" id="pendingButton">
             <IonLabel>Pending</IonLabel>
           </IonSegmentButton>
           <IonSegmentButton value="ACCEPTED">
@@ -331,6 +331,9 @@ class TradeContainer extends React.Component<props, state> {
 
         <IonPopover
           isOpen={this.state.showInfoPopover}
+          side="top"
+          alignment="center"
+          ref={this.state.event}
           onDidDismiss={() =>
             this.setState({ showInfoPopover: false, event: undefined }, () => {
               this.pullTrades(this.props.user.ID).then((result: any) => {
@@ -554,7 +557,9 @@ class TradeContainer extends React.Component<props, state> {
                   size="large"
                   onClick={(e: any) => {
                     e.persist();
-                    this.displayTradeMessages(key);
+                    this.setState({ event: e }, () => {
+                      this.displayTradeMessages(key);
+                    });
                   }}
                 >
                   <IonIcon

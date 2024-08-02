@@ -670,7 +670,7 @@ class GalleryContainer extends React.Component<props, state> {
                 expand="full"
                 size="small"
                 onClick={(e: any) => {
-                  this.setState({ showSettingPopover: true });
+                  this.setState({ showSettingPopover: true, event: e });
                 }}
               >
                 <IonIcon slot="start" icon={settingsOutline} color="dark" />
@@ -690,6 +690,9 @@ class GalleryContainer extends React.Component<props, state> {
 
         <IonPopover
           isOpen={this.state.showSettingPopover}
+          side="bottom"
+          alignment="center"
+          ref={this.state.event}
           onDidDismiss={() =>
             this.setState({ showSettingPopover: false, event: undefined })
           }
