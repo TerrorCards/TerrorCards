@@ -251,6 +251,9 @@ body {
 }
 
 /*}*/
+ion-popover > * {
+  overflow-y: auto;
+}
 
 /* custom app css */
 .popper-custom-menu-size .popover-content {
@@ -260,13 +263,13 @@ body {
 
 .popover-message-size {
   --width: 75%;
-  top: -10%;
+  top: -15%;
 }
 
 .popover-message-size-height {
   --width: 75%;
   --height: 500;
-  top: -10%;
+  top: -15%;
 }
 
 .modal-size-override {
@@ -277,12 +280,10 @@ body {
 .modal-size-menu-override {
   --height: 75% !important;
   --width: 75% !important;
-  pointer-events: auto;
 }
 
-.modal-size-menu-override .ion-popover-content {
-  --height: 100% !important;
-  --width: 100% !important;
+.friends-list {
+  height: 100%;
+  max-height: 400px; /* Adjust the height as needed */
   overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
 }

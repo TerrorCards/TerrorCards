@@ -300,7 +300,7 @@ class ProfileContainer extends React.Component<props, state> {
           }
           className={"modal-size-menu-override"}
         >
-          <IonContent className="ion-popover-content">
+          <IonContent>
             <IonGrid>
               <IonRow>
                 <IonCol>Player Search</IonCol>
@@ -337,7 +337,13 @@ class ProfileContainer extends React.Component<props, state> {
               </IonRow>
               <IonRow>
                 <IonCol>
-                  {this.state.showFriendsList ? this.renderFriendsList() : ""}
+                  {this.state.showFriendsList ? (
+                    <div className="friends-list">
+                      {this.renderFriendsList()}
+                    </div>
+                  ) : (
+                    ""
+                  )}
                 </IonCol>
               </IonRow>
               <IonRow>
@@ -364,7 +370,11 @@ class ProfileContainer extends React.Component<props, state> {
               </IonRow>
               <IonRow>
                 <IonCol>
-                  {this.state.showBlockList ? this.renderBlockList() : ""}
+                  {this.state.showBlockList ? (
+                    <div className="friends-list">{this.renderBlockList()}</div>
+                  ) : (
+                    ""
+                  )}
                 </IonCol>
               </IonRow>
             </IonGrid>
