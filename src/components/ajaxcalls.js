@@ -1553,6 +1553,30 @@ export function callServer(pTask, pData, pUserId) {
       break;
     }
 
+    case "wax_api_link": {
+      jsonstr = prepData(pData);
+      formData = new FormData();
+      formData.append("uUserId", pUserId);
+      /*
+            test = fetch(serverpath + "cards_players.php", {
+              method: 'POST',
+              headers: {
+                "Content-Type": 'multipart/form-data'
+              },
+              body: formData
+            });
+            */
+
+      test = fetch(
+        serverpath +
+          "wax_api_link.php?" +
+          new URLSearchParams({
+            uUserId: pUserId,
+          })
+      );
+      break;
+    }
+
     default:
       break;
   }

@@ -58,6 +58,7 @@ interface state {
   showMintConfirm: boolean;
   showMintButton: boolean;
   mintButtonHelp: string;
+  wax_api_link: string;
 }
 
 class GalleryContainer extends React.Component<props, state> {
@@ -88,11 +89,13 @@ class GalleryContainer extends React.Component<props, state> {
       showMintConfirm: false,
       showMintButton: false,
       mintButtonHelp: "",
+      wax_api_link: "",
     };
   }
 
   componentDidMount() {
     this.pullCards();
+    this.pullWaxLink();
     //console.log("component did mount event fired");
   }
 
@@ -299,6 +302,25 @@ class GalleryContainer extends React.Component<props, state> {
     });
   };
 
+  pullWaxLink = () => {
+    callServer(
+      "wax_api_link",
+      {},
+      this.props.user.ID
+    )
+      ?.then((resp) => {
+        ////console.log(resp);
+        return resp.text();
+      })
+      .then((text) => {
+        this.setState({ wax_api_link: text });
+      })
+      .catch((err: any) => {
+        console.log(err);
+      });
+  };
+
+
   pullCards = () => {
     callServer(
       "cards",
@@ -428,7 +450,8 @@ class GalleryContainer extends React.Component<props, state> {
   pullNFTs = () => {
     //https://wax.api.atomicassets.io/atomicassets/v1/assets?collection_name=terrorcards1&schema_name=bodh&page=1&limit=100&order=desc&sort=asset_id
     let url =
-      "https://wax.api.atomicassets.io/atomicassets/v1/assets?collection_name=" +
+      this.state.wax_api_link +
+      "collection_name=" + 
       this.props.nftProps.collection +
       "&owner=" +
       this.state.nftAccount +
@@ -538,7 +561,7 @@ class GalleryContainer extends React.Component<props, state> {
                   height: "100px",
                   objectFit: "contain",
                 }}
-                src={"https://atomichub-ipfs.com/ipfs/" + imgSrc}
+                src={"https://ipfs.io/ipfs/" + imgSrc}
               ></IonImg>
               {
                 <IonBadge class="message-badge-left">
