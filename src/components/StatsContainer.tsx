@@ -487,7 +487,7 @@ class StatsContainer extends React.Component<props, state> {
         </IonCardHeader>
         <IonCardContent>
           <textarea id="userInput" rows={2} placeholder="Type here..." 
-          style={{ width: '100%', boxSizing: 'border-box', color:'#fff' }}
+          style={{ width: '100%', boxSizing: 'border-box' }}
           value={this.state.triviaAnswerText}
           onChange={(e) => this.setState({ triviaAnswerText: e.target.value })}
           >
