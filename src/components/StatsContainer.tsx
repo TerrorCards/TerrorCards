@@ -481,11 +481,8 @@ class StatsContainer extends React.Component<props, state> {
     return (
       <IonCard>
         <IonCardHeader>
-          <IonCardTitle class="ion-text-center">
-            <IonText color="dark">{"Trivia"}</IonText>
-          </IonCardTitle>
           <IonCardSubtitle>
-            <IonText color="dark">{this.state.triviaQuestion}</IonText>
+            <IonText color="dark">TRIVIA: {this.state.triviaQuestion}</IonText>
           </IonCardSubtitle>
         </IonCardHeader>
         <IonCardContent>
