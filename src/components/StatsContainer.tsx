@@ -35,6 +35,9 @@ interface state {
   showCardOwners: boolean;
   cardNumber: number;
   cardYear: number;
+  triviaQuestion: string;
+  triviaAnswerText: string;
+  triviaAnswerStatus: string;
 }
 
 class StatsContainer extends React.Component<props, state> {
@@ -65,6 +68,9 @@ class StatsContainer extends React.Component<props, state> {
       showCardOwners: false,
       cardNumber: 0,
       cardYear: 0,
+      triviaQuestion: "",
+      triviaAnswerText: "",
+      triviaAnswerStatus: ""
     };
   }
 
@@ -74,6 +80,7 @@ class StatsContainer extends React.Component<props, state> {
     this.pullCardCounts();
     this.pullLatestCards();
     this.pullTradeList();
+    this.pullTriviaQuestion();
     //console.log("ionViewDidEnter event fired");
   }
 
@@ -101,7 +108,6 @@ class StatsContainer extends React.Component<props, state> {
     return window.innerHeight / offset;
   };
 
-  //BEGIN BANNER CODE
   pullLoginCheck() {
     callServer("stat_loginCheck", "", this.props.user.ID)
       ?.then((resp) => {
@@ -198,6 +204,39 @@ class StatsContainer extends React.Component<props, state> {
         console.log(err);
       });
   }
+
+  pullTriviaQuestion() {
+    callServer("trivia_pullTriviaQuestion", "", this.props.user.ID)
+      ?.then((resp) => {
+        return resp.json();
+      })
+      .then((json) => {
+        if (json) {
+          this.setState({ triviaQuestion: json.triviaQuestion });
+        }
+      })
+      .catch((err: any) => {
+        console.log(err);
+      });
+  }
+
+  sendTriviaAnswer() {
+    this.setState({ triviaAnswerStatus: "" }, ()=> {
+      callServer("trivia_answerTriviaQuestion", this.state.triviaAnswerText, this.props.user.ID)
+        ?.then((resp) => {
+          return resp.text();
+        })
+        .then((json) => {
+          if (json.length > 0) {
+            this.setState({ triviaAnswerStatus: json });
+          }
+        })
+        .catch((err: any) => {
+          console.log(err);
+        });
+    });
+  }
+
 
   closeTradeOwners = () => {
     this.setState({ showCardOwners: false, cardNumber: 0, cardYear: 0 });
@@ -438,10 +477,44 @@ class StatsContainer extends React.Component<props, state> {
     );
   }
 
+  renderTriviaBlock() {
+    return (
+      <IonCard>
+        <IonCardHeader>
+          <IonCardTitle class="ion-text-center">
+            <IonText color="dark">{"Trivia"}</IonText>
+          </IonCardTitle>
+          <IonCardSubtitle>
+            <IonText color="dark">{this.state.triviaQuestion}</IonText>
+          </IonCardSubtitle>
+        </IonCardHeader>
+        <IonCardContent>
+          <textarea id="userInput" rows={2} placeholder="Type here..." 
+          style={{ width: '100%', boxSizing: 'border-box', color:'#fff' }}
+          value={this.state.triviaAnswerText}
+          onChange={(e) => this.setState({ triviaAnswerText: e.target.value })}
+          >
+          </textarea>
+          <br></br>
+          <IonButton onClick={() => {this.sendTriviaAnswer()}}>Send Answer</IonButton>
+          <div>
+            {this.state.triviaAnswerStatus}
+          </div>
+        </IonCardContent>
+      </IonCard>
+    );
+  }
+
   render() {
     return (
       <IonContent>
         <IonGrid>
+          {
+            this.state.triviaQuestion !== "" && 
+            <IonRow>
+              <IonCol>{this.renderTriviaBlock()}</IonCol>
+            </IonRow>
+          }
           <IonRow>
             <IonCol>Collection (Current Year)</IonCol>
           </IonRow>

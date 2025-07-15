@@ -66,6 +66,8 @@ interface state {
   txtMessage: string;
   showPlayerInfoAlert: boolean;
   otherPlayerInfo: any;
+  showDeletePopover: boolean;
+  deleteMessageId: number;
 }
 
 const slideOpts = {
@@ -94,6 +96,8 @@ class HomeContainer extends React.Component<props, state> {
       txtMessage: "",
       showPlayerInfoAlert: false,
       otherPlayerInfo: null,
+      showDeletePopover: false,
+      deleteMessageId: -1,
     };
   }
 
@@ -261,6 +265,27 @@ class HomeContainer extends React.Component<props, state> {
       });
   };
 
+  deleteMessage = (id: any) => {
+    callServer("deleteBoardMessage", { message_id: id }, this.props.user.ID)
+      ?.then((resp) => {
+        return resp.json();
+      })
+      .then((json) => {
+        //console.log(json);
+        if (json.length > 0) {
+          this.setState(
+            { showAlert: true, alertMsg: "Message has been deleted", showDeletePopover: false, deleteMessageId: -1, event: undefined},
+            () => {
+              this.pullMessages();
+            }
+          );
+        }
+      })
+      .catch((err: any) => {
+        console.log(err);
+      });
+  };  
+
   renderMsgItem = (j: any, i: number) => {
     return (
       <IonCard key={j.ID + i}>
@@ -278,13 +303,19 @@ class HomeContainer extends React.Component<props, state> {
             <IonIcon
               icon={listCircle}
               onClick={(e: any) => {
+                e.persist();
                 if (j.ID !== this.props.user.ID) {
-                  e.persist();
                   this.setState({
                     showPopover: true,
                     event: e,
                     tradePartner: j.ID,
                   });
+                } else {
+                  this.setState({
+                    showDeletePopover: true,
+                    event: e,
+                    deleteMessageId: j.MessageID,
+                  });                  
                 }
               }}
             />
@@ -610,6 +641,7 @@ class HomeContainer extends React.Component<props, state> {
                 Block
               </IonLabel>
             </IonItem>
+
           </IonList>
         </IonPopover>
 
@@ -649,6 +681,39 @@ class HomeContainer extends React.Component<props, state> {
               }}
             >
               Close
+            </IonButton>
+          </IonItem>
+        </IonPopover>
+
+        <IonPopover
+          event={this.state.event}
+          isOpen={this.state.showDeletePopover}
+          onDidDismiss={() =>
+            this.setState({ showDeletePopover: false, event: undefined })
+          }
+          side="left"
+          className={"popover-message-size"}
+        >
+          <div className="padding_15">{"Delete this message?"}</div>
+          <IonItem>
+            <IonButton
+              onClick={() => {
+                this.deleteMessage(this.state.deleteMessageId);
+              }}
+            >
+              Yes
+            </IonButton>
+            <div className="spacer25"></div>
+            <IonButton
+              onClick={() => {
+                this.setState({
+                  showDeletePopover: false,
+                  event: undefined,
+                  deleteMessageId: -1,
+                });
+              }}
+            >
+              No
             </IonButton>
           </IonItem>
         </IonPopover>

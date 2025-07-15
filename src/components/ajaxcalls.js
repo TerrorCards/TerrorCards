@@ -207,6 +207,31 @@ export function callServer(pTask, pData, pUserId) {
 
       break;
     }
+    case "deleteBoardMessage": {
+      jsonstr = prepData(pData);
+      formData = new FormData();
+      formData.append("uUserId", pUserId);
+      formData.append("uContent", jsonstr);
+      /*
+            test = fetch(serverpath + "messagesPost.php", {
+              method: 'POST',
+              headers: {
+                "Content-Type": 'multipart/form-data'
+              },
+              body: formData
+            });
+            */
+      test = fetch(
+        serverpath +
+          "messagesDelete.php?" +
+          new URLSearchParams({
+            uUserId: pUserId,
+            uContent: jsonstr,
+          })
+      );
+
+      break;
+    }    
     case "packs": {
       jsonstr = prepData(pData);
       formData = new FormData();
@@ -1552,6 +1577,46 @@ export function callServer(pTask, pData, pUserId) {
       );
       break;
     }
+
+    case "trivia_pullTriviaQuestion": {
+      jsonstr = prepData(pData);
+      formData = new FormData();
+      formData.append("uUserId", pUserId);
+      /*
+            test = fetch(serverpath + "cards_players.php", {
+              method: 'POST',
+              headers: {
+                "Content-Type": 'multipart/form-data'
+              },
+              body: formData
+            });
+            */
+
+      test = fetch(
+        serverpath +
+          "trivia_pullTrivia.php?" +
+          new URLSearchParams({
+            uUserId: pUserId,
+          })
+      );
+      break;
+    }
+
+    case "trivia_answerTriviaQuestion": {
+      jsonstr = prepData(pData);
+      formData = new FormData();
+      formData.append("uUserId", pUserId);
+      formData.append("uContent", pData);
+      test = fetch(
+        serverpath +
+          "trivia_answerTrivia.php?" +
+          new URLSearchParams({
+            uUserId: pUserId,
+            uContent: pData
+          })
+      );      
+      break;
+    }    
 
     case "wax_api_link": {
       jsonstr = prepData(pData);

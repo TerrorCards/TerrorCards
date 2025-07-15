@@ -22,4 +22,13 @@
   width: 600px;
 }
 
+.padding_15 {
+  padding: 15px;
+}
+
+.spacer25 {
+  padding-left: 12px;
+  padding-right: 12px;
+}
+
 .contact-popover .popover-content{ width: 95%; }
