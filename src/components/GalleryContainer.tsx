@@ -422,6 +422,7 @@ class GalleryContainer extends React.Component<props, state> {
             <img
               style={{ width: "100%" }}
               src={imgSrc}
+              alt={c.Name ? c.Name : "Gallery card"}
               className={c.UserID === null ? "need-card-alpha" : ""}
               loading="lazy"
               onClick={() => {
