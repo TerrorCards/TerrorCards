@@ -419,14 +419,15 @@ class GalleryContainer extends React.Component<props, state> {
         }
         item.push(
           <IonCol key={c.ID}>
-            <IonImg
+            <img
               style={{ width: "100%" }}
               src={imgSrc}
-              class={c.UserID === null ? "need-card-alpha" : ""}
+              className={c.UserID === null ? "need-card-alpha" : ""}
+              loading="lazy"
               onClick={() => {
                 this.showCardetails(c, true, false);
               }}
-            ></IonImg>
+            ></img>
             {c.Count !== null && c.Count > 1 && (
               <IonBadge class="quantity-badge">{c.Count}</IonBadge>
             )}

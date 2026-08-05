@@ -28,6 +28,7 @@ interface state {
   availableSets: Array<any>;
   availableYears: Array<any>;
   availableViews: Array<any>;
+  wax_api_link: string;
 }
 
 class GalleryMenu extends React.Component<props, state> {
@@ -43,6 +44,7 @@ class GalleryMenu extends React.Component<props, state> {
       availableSets: [],
       availableYears: [],
       availableViews: [],
+      wax_api_link: "",
     };
   }
   TCYearStart: number = 2017;
@@ -70,8 +72,7 @@ class GalleryMenu extends React.Component<props, state> {
       });
     } else {
       if (this.props.type === "nft") {
-        this.pullNFTSchemas();
-        this.pullNFTTemplates();
+        this.pullWaxLink();
       }
     }
   }
@@ -103,17 +104,38 @@ class GalleryMenu extends React.Component<props, state> {
       });
   };
 
+  pullWaxLink = () => {
+    callServer(
+      "wax_api_link",
+      {},
+      this.props.user.ID
+    )
+      ?.then((resp) => {
+        ////console.log(resp);
+        return resp.text();
+      })
+      .then((text) => {
+        this.setState({ wax_api_link: text }, () => {
+          this.pullNFTSchemas();
+          this.pullNFTTemplates();
+        });
+      })
+      .catch((err: any) => {
+        console.log(err);
+      });
+  };
+
   pullNFTTemplates = () => {
-    //https://wax.api.atomicassets.io/atomicassets/v1/templates?collection_name=terrorcards1&schema_name=bodh&page=1&limit=100&order=desc&sort=created
-    //https://wax.api.atomicassets.io/atomicassets/v1/templates?collection_name=terrorcards1&page=1&limit=100&order=desc&sort=created
-    //https://wax.api.atomicassets.io/atomicassets/v1/templates?collection_name=terrorcards1&page=1&limit=100&order=desc&sort=created
+    //https://aa-api-wax-mainnet-1.eu.aws.pink.gg/atomicassets/v1/schemas?burned=false&collection_name=terrorcards1&limit=12&order=desc&page=1&sort=created
+    const baseURL = this.state.wax_api_link.replace("assets?","");
+    
     let url =
-      "https://wax.api.atomicassets.io/atomicassets/v1/templates?collection_name=" +
+      baseURL + "schemas?collection_name=" +
       this.props.nftProps.collection +
       "&page=1&limit=1000&order=desc&sort=created";
     if (this.props.nftProps.schema !== "all") {
       url =
-        "https://wax.api.atomicassets.io/atomicassets/v1/templates?collection_name=" +
+        baseURL + "schemas?collection_name=" +
         this.props.nftProps.collection +
         "&schema_name=" +
         this.props.nftProps.schema +
@@ -140,9 +162,10 @@ class GalleryMenu extends React.Component<props, state> {
   };
 
   pullNFTSchemas = () => {
+    const baseURL = this.state.wax_api_link.replace("assets?","");
     //https://wax.api.atomicassets.io/atomicassets/v1/schemas?collection_name=terrorcards1&page=1&limit=1000&order=desc&sort=created
     let url =
-      "https://wax.api.atomicassets.io/atomicassets/v1/schemas?collection_name=" +
+      baseURL + "schemas?collection_name=" +
       this.props.nftProps.collection +
       "&page=1&limit=1000&order=desc&sort=created";
 
