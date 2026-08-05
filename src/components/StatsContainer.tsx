@@ -326,6 +326,7 @@ class StatsContainer extends React.Component<props, state> {
       const currImg = card.CardImage.replace(/full/g, "thumbs");
       systemList.push(
         <IonCol
+          className="latest-system-card-col"
           key={i}
           onClick={() => {
             if (card.CardOwner !== this.props.user.ID) {
@@ -339,11 +340,13 @@ class StatsContainer extends React.Component<props, state> {
             alt=""
           ></img>
           <br></br>
-          <IonText color="dark">
-            {card.CardOwner.length > 7
-              ? card.CardOwner.substring(0, 5) + "..."
-              : card.CardOwner}
-          </IonText>
+          <div className="latest-system-card-owner">
+            <IonText color="dark">
+              {card.CardOwner.length > 7
+                ? card.CardOwner.substring(0, 5) + "..."
+                : card.CardOwner}
+            </IonText>
+          </div>
         </IonCol>
       );
     });
@@ -505,7 +508,7 @@ class StatsContainer extends React.Component<props, state> {
   render() {
     return (
       <IonContent>
-        <IonGrid>
+        <IonGrid className="stats-cards-grid">
           {
             this.state.triviaQuestion !== "" && 
             <IonRow>

@@ -30,3 +30,23 @@
   left: 0px;
   border-radius: 5%;
 }
+
+.stats-cards-grid ion-card {
+  margin-top: 6px;
+  margin-bottom: 6px;
+}
+
+.latest-system-card-col {
+  text-align: center;
+}
+
+.latest-system-card-owner {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  line-height: 1.1;
+  font-size: 12px;
+}
