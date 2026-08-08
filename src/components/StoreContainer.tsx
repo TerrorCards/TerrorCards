@@ -609,6 +609,10 @@ class StoreContainer extends React.Component<props, state> {
         </IonSegment>
 
         <IonList>{this.state.packItems}</IonList>
+        <br></br>
+        <br></br>
+        <br></br>
+        <br></br>        
 
         <IonModal
           isOpen={this.state.showCards}

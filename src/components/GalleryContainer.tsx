@@ -322,11 +322,19 @@ class GalleryContainer extends React.Component<props, state> {
 
 
   pullCards = () => {
+    const categoryValue = Array.isArray(this.props.galleryProps.set)
+      ? this.props.galleryProps.set.length > 0
+        ? this.props.galleryProps.set.join(",")
+        : "all"
+      : this.props.galleryProps.set === "All" || this.props.galleryProps.set === ""
+      ? "all"
+      : this.props.galleryProps.set || "all";
+
     callServer(
       "cards",
       {
         year: this.props.galleryProps.year,
-        category: this.props.galleryProps.set,
+        category: categoryValue,
         view: this.props.galleryProps.view,
         viewSortField: this.props.galleryProps.viewSortField,
         viewSortDirection: this.props.galleryProps.viewSortDirection,
@@ -361,7 +369,15 @@ class GalleryContainer extends React.Component<props, state> {
     const newDataList = [...this.state.dataList];
     let param = "SetName";
     if (this.props.galleryProps.viewSortField === "duplicates") {
-      param = "-Count";
+      newDataList.sort((a: any, b: any) => {
+        const aCount = Number(a.Count ?? 0);
+        const bCount = Number(b.Count ?? 0);
+        return bCount - aCount;
+      });
+      this.setState({ dataList: newDataList }, () => {
+        this.resetChunks();
+      });
+      return;
     }
     if (this.props.galleryProps.viewSortField === "acquired") {
       param = "-Date";
