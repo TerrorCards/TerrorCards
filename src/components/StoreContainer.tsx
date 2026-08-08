@@ -49,12 +49,15 @@ interface state {
   coinPurchaseMsg: any;
   isInAppLoaded: boolean;
   isIAPActiveBuy: boolean;
+  isPackLoading: boolean;
 }
 
 const { store, ProductType, Platform } = window.CdvPurchase;
 let inAppControl = 0;
 
 class StoreContainer extends React.Component<props, state> {
+  private packPurchaseLock = false;
+
   constructor(props: any) {
     super(props);
 
@@ -75,8 +78,22 @@ class StoreContainer extends React.Component<props, state> {
       coinPurchaseMsg: null,
       isInAppLoaded: false,
       isIAPActiveBuy: false,
+      isPackLoading: false,
     };
   }
+
+  acquirePackPurchaseLock = () => {
+    if (this.packPurchaseLock) return false;
+    this.packPurchaseLock = true;
+    return true;
+  };
+
+  releasePackPurchaseLock = () => {
+    this.packPurchaseLock = false;
+    if (this.state.isPackLoading) {
+      this.setState({ isPackLoading: false });
+    }
+  };
 
   slideOpts = {
     //slidesPerView: 1,
@@ -250,6 +267,9 @@ class StoreContainer extends React.Component<props, state> {
       filtered.forEach((p: any) => {
         const packOddsPack = parseInt(p.Ratio) > 1 ? " Packs" : " Pack";
         let packMsg = "";
+        const isPackDisabled =
+          this.state.isPackLoading ||
+          parseInt(this.props.user.credit) < parseInt(p.Cost);
         if (parseInt(p.Ratio) === 1) {
           packMsg = "1 per pack";
         } else {
@@ -281,19 +301,22 @@ class StoreContainer extends React.Component<props, state> {
                       >
                         <IonButton
                           expand="block"
+                          className={
+                            isPackDisabled
+                              ? "pack-buy-btn pack-buy-btn-disabled"
+                              : "pack-buy-btn"
+                          }
                           onClick={() => {
+                            if (!this.acquirePackPurchaseLock()) return;
                             this.setState({
                               showConfirmPurchase: true,
                               targetItem: p,
                               targetType: "pack",
+                              isPackLoading: true,
                             });
                             //this._canBuy(p);
                           }}
-                          disabled={
-                            parseInt(this.props.user.credit) >= parseInt(p.Cost)
-                              ? false
-                              : true
-                          }
+                          disabled={isPackDisabled}
                         >
                           {p.Cost}
                         </IonButton>
@@ -437,13 +460,18 @@ class StoreContainer extends React.Component<props, state> {
               this.renderCards(json);
               this.props.callbackPackOpenTimer(Date.now());
               this.setState({ targetItem: null, targetType: null });
+            } else {
+              this.setState({ targetItem: null, targetType: null });
+              this.releasePackPurchaseLock();
             }
           })
           .catch((err: any) => {
             console.log(err);
+            this.releasePackPurchaseLock();
           });
       } else {
         this.setState({ showNoCoinAlert: true });
+        this.releasePackPurchaseLock();
         //warn not enough credit
       }
     }
@@ -464,6 +492,7 @@ class StoreContainer extends React.Component<props, state> {
     }
     this.setState({ cardsResult: items }, () => {
       this.setState({ showCards: true });
+      this.releasePackPurchaseLock();
     });
   };
 
@@ -540,6 +569,7 @@ class StoreContainer extends React.Component<props, state> {
 
         <IonAlert
           isOpen={this.state.showConfirmPurchase}
+          backdropDismiss={false}
           onDidDismiss={() => {
             this.setState({ showConfirmPurchase: false });
           }}
@@ -565,7 +595,12 @@ class StoreContainer extends React.Component<props, state> {
               role: "ok",
               cssClass: "secondary",
               handler: (blah: any) => {
-                this.setState({ showConfirmPurchase: false });
+                this.setState({ showConfirmPurchase: false }, () => {
+                  if (this.state.targetType === "pack") {
+                    this.setState({ targetItem: null, targetType: null });
+                    this.releasePackPurchaseLock();
+                  }
+                });
               },
             },
           ]}
