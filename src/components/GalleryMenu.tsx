@@ -79,12 +79,62 @@ class GalleryMenu extends React.Component<props, state> {
 
   componentDidUpdate(prevProps: any) {}
 
+  getSelectedSets = () => {
+    const currentSet = this.props.layoutProps.set;
+    if (Array.isArray(currentSet)) {
+      return currentSet.filter(
+        (setName: string) =>
+          setName !== "all" && setName !== "All" && setName !== ""
+      );
+    }
+    if (currentSet === "all" || currentSet === "All" || !currentSet) {
+      return [];
+    }
+    return [currentSet];
+  };
+
+  handleSetSelection = (value: any) => {
+    const selected = Array.isArray(value) ? value : [];
+
+    if (selected.includes("__clear__") || selected.length === 0) {
+      this.updateSettings("set", "All", "cards");
+      return;
+    }
+
+    const cleaned = selected
+      .filter((setName: string) => setName !== "all" && setName !== "All")
+      .slice(0, 5);
+
+    if (cleaned.length === 0) {
+      this.updateSettings("set", "All", "cards");
+      return;
+    }
+
+    this.updateSettings("set", cleaned, "cards");
+  };
+
+  getCategoryValueForRequest = () => {
+    const currentSet = this.props.layoutProps.set;
+    if (Array.isArray(currentSet)) {
+      if (currentSet.length === 0) {
+        return "All";
+      }
+      return currentSet
+        .map((setName: string) => `'${String(setName).replace(/'/g, "\\'")}'`)
+        .join(",");
+    }
+    if (currentSet === "all" || currentSet === "All" || currentSet === "") {
+      return "All";
+    }
+    return currentSet || "All";
+  };
+
   pullSets = () => {
     callServer(
       "sets",
       {
         year: this.props.layoutProps.year,
-        category: this.props.layoutProps.set,
+        category: this.getCategoryValueForRequest(),
         view: this.props.layoutProps.view,
       },
       this.props.user.ID
@@ -224,27 +274,14 @@ class GalleryMenu extends React.Component<props, state> {
 
   setRenderSets = (data: any) => {
     const availableSets: any = [];
-    availableSets.push(
-      <IonSelectOption key={"all"} value={"All"}>
-        {"All"}
-      </IonSelectOption>
-    );
     data.forEach((d: any, i: number) => {
       if (d.Year === this.props.layoutProps.year) {
         const cleanName = d.SetName.replace(/_/g, " ");
-        if (d.SetName === this.props.layoutProps.set) {
-          availableSets.push(
-            <IonSelectOption key={i} value={d.SetName}>
-              {cleanName}
-            </IonSelectOption>
-          );
-        } else {
-          availableSets.push(
-            <IonSelectOption key={i} value={d.SetName}>
-              {cleanName}
-            </IonSelectOption>
-          );
-        }
+        availableSets.push(
+          <IonSelectOption key={i} value={d.SetName}>
+            {cleanName}
+          </IonSelectOption>
+        );
       }
     });
     this.setState({ availableSets: availableSets, setList: data });
@@ -312,12 +349,14 @@ class GalleryMenu extends React.Component<props, state> {
         <IonItem>
           <IonLabel>Set</IonLabel>
           <IonSelect
-            value={this.props.layoutProps.set}
+            value={this.getSelectedSets()}
+            multiple={true}
             placeholder=""
             onIonChange={(e: any) => {
-              this.updateSettings("set", e.detail.value, "cards");
+              this.handleSetSelection(e.detail.value);
             }}
           >
+            <IonSelectOption value={"__clear__"}>Clear (All)</IonSelectOption>
             {this.state.availableSets}
           </IonSelect>
         </IonItem>

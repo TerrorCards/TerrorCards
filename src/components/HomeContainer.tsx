@@ -405,7 +405,7 @@ class HomeContainer extends React.Component<props, state> {
     return (
       <IonContent>
         {this.state.newBannerState.length > 0 && (
-          <Swiper pager={true} options={slideOpts}>
+          <Swiper options={slideOpts}>
             <SwiperSlide>
               <img
                 src={this.state.newBannerState[0].Banner}

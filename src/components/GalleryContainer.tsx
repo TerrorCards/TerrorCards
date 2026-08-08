@@ -324,11 +324,15 @@ class GalleryContainer extends React.Component<props, state> {
   pullCards = () => {
     const categoryValue = Array.isArray(this.props.galleryProps.set)
       ? this.props.galleryProps.set.length > 0
-        ? this.props.galleryProps.set.join(",")
-        : "all"
+        ? this.props.galleryProps.set
+            .map((setName: string) =>
+              `'${String(setName).replace(/'/g, "\\'")}'`
+            )
+            .join(",")
+        : "All"
       : this.props.galleryProps.set === "All" || this.props.galleryProps.set === ""
-      ? "all"
-      : this.props.galleryProps.set || "all";
+      ? "All"
+      : this.props.galleryProps.set || "All";
 
     callServer(
       "cards",
@@ -346,7 +350,7 @@ class GalleryContainer extends React.Component<props, state> {
         return resp.json();
       })
       .then((json) => {
-        if (json.length > 0) {
+        if (Array.isArray(json) && json.length > 0) {
           //dataList = json;
           ////console.log(json);
           const chunkedList = this.chunkVersions(json);
@@ -357,11 +361,12 @@ class GalleryContainer extends React.Component<props, state> {
           });
           //updateMessages({msg: msgList, controlList: json});
         } else {
-          this.setState({ imgList: [] });
+          this.setState({ imgList: [], dataList: [], chunkedList: [] });
         }
       })
       .catch((err: any) => {
         console.log(err);
+        this.setState({ imgList: [], dataList: [], chunkedList: [] });
       });
   };
 
@@ -451,15 +456,18 @@ class GalleryContainer extends React.Component<props, state> {
             {<IonBadge class="message-badge ">{message}</IonBadge>}
           </IonCol>
         );
-        if (i === this.state.chunkedList.length - 1) {
-          if (ch.length < this.props.galleryProps.layoutCount) {
-            const remainder = this.props.galleryProps.layoutCount - ch.length;
-            for (let a = 0; a < remainder; a++) {
-              item.push(<IonCol key={a + "_" + z}></IonCol>);
-            }
-          }
-        }
       });
+
+      if (
+        i === this.state.chunkedList.length - 1 &&
+        ch.length < this.props.galleryProps.layoutCount
+      ) {
+        const remainder = this.props.galleryProps.layoutCount - ch.length;
+        for (let a = 0; a < remainder; a++) {
+          item.push(<IonCol key={`pad_${i}_${a}`}></IonCol>);
+        }
+      }
+
       list.push(<IonRow key={i}>{item}</IonRow>);
     });
     this.setState({ imgList: list });
