@@ -31,9 +31,24 @@
   border-radius: 5%;
 }
 
+.stats-cards-grid {
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+.stats-cards-grid ion-row {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.stats-cards-grid ion-col {
+  padding-top: 3px;
+  padding-bottom: 3px;
+}
+
 .stats-cards-grid ion-card {
-  margin-top: 6px;
-  margin-bottom: 6px;
+  margin-top: 3px;
+  margin-bottom: 3px;
 }
 
 .latest-system-card-col {

@@ -16,6 +16,7 @@ import {
 } from "@ionic/react";
 import { callServer } from "./ajaxcalls";
 import CardOwnerMenu from "./CardOwnerMenu";
+import "./StatsContainer.css";
 
 interface props {
   user: any;
