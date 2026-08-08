@@ -57,6 +57,7 @@ let inAppControl = 0;
 
 class StoreContainer extends React.Component<props, state> {
   private packPurchaseLock = false;
+  private coinPurchaseLock = false;
   private iapHandlersBound = false;
   private iapProductsRegistered = false;
   private iapStoreInitialized = false;
@@ -97,6 +98,16 @@ class StoreContainer extends React.Component<props, state> {
     if (this.state.isPackLoading) {
       this.setState({ isPackLoading: false });
     }
+  };
+
+  acquireCoinPurchaseLock = () => {
+    if (this.coinPurchaseLock) return false;
+    this.coinPurchaseLock = true;
+    return true;
+  };
+
+  releaseCoinPurchaseLock = () => {
+    this.coinPurchaseLock = false;
   };
 
   slideOpts = {
@@ -158,7 +169,11 @@ class StoreContainer extends React.Component<props, state> {
         //console.log(json);
         if (json.length > 0) {
           this.setState({ allItemsList: json }, () => {
-            this.filterPacks();
+            if (this.state.storeType === "coins") {
+              this.renderCoinsList();
+            } else {
+              this.filterPacks();
+            }
           });
         }
       })
@@ -239,13 +254,25 @@ class StoreContainer extends React.Component<props, state> {
                     this.setState({
                       targetItem: null,
                       targetType: null,
+                      storeType: "pandora",
                       showCoinMessage: true,
                       coinPurchaseMsg:
                         "Thank you. Account updated by " + value + " credit",
                       isIAPActiveBuy: false,
+                    }, () => {
+                      this.releaseCoinPurchaseLock();
+                      this.pullPacks();
                     });
-                    this.pullPacks();
                     this.props.callbackPackOpenTimer(Date.now());
+                  }).catch((err: any) => {
+                    console.log(err);
+                    this.setState({
+                      targetItem: null,
+                      targetType: null,
+                      isIAPActiveBuy: false,
+                    });
+                    inAppControl = 0;
+                    this.releaseCoinPurchaseLock();
                   });
                   inAppControl = 0;
                 }
@@ -429,7 +456,9 @@ class StoreContainer extends React.Component<props, state> {
                         >
                           <IonButton
                             expand="block"
+                            disabled={this.state.isIAPActiveBuy}
                             onClick={() => {
+                              if (!this.acquireCoinPurchaseLock()) return;
                               this.setState({
                                 showConfirmPurchase: true,
                                 targetItem: p,
@@ -649,6 +678,14 @@ class StoreContainer extends React.Component<props, state> {
                   if (this.state.targetType === "pack") {
                     this.setState({ targetItem: null, targetType: null });
                     this.releasePackPurchaseLock();
+                  } else if (this.state.targetType === "coin") {
+                    this.setState({
+                      targetItem: null,
+                      targetType: null,
+                      isIAPActiveBuy: false,
+                    });
+                    inAppControl = 0;
+                    this.releaseCoinPurchaseLock();
                   }
                 });
               },
@@ -773,7 +810,35 @@ class StoreContainer extends React.Component<props, state> {
       //alert("offer");
       //alert(JSON.stringify(offer));
       inAppControl = 1;
-      if (offer) offer.order();
+      if (offer) {
+        offer.order().then((error: any) => {
+          if (error) {
+            inAppControl = 0;
+            this.setState({
+              targetItem: null,
+              targetType: null,
+              isIAPActiveBuy: false,
+            });
+            this.releaseCoinPurchaseLock();
+          }
+        });
+      } else {
+        inAppControl = 0;
+        this.setState({
+          targetItem: null,
+          targetType: null,
+          isIAPActiveBuy: false,
+        });
+        this.releaseCoinPurchaseLock();
+      }
+    } else {
+      inAppControl = 0;
+      this.setState({
+        targetItem: null,
+        targetType: null,
+        isIAPActiveBuy: false,
+      });
+      this.releaseCoinPurchaseLock();
     }
   };
 }
