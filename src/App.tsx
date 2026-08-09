@@ -69,6 +69,9 @@ interface props {}
 
 interface state {
   appReady: boolean;
+  appYear: number;
+  appVersion: any;
+  waxURL: string;
   showPopover: boolean;
   galleryDigitalSettings: any;
   galleryNFTSettings: any;
@@ -99,6 +102,9 @@ class App extends React.Component<props, state> {
 
     this.state = {
       appReady: false,
+      appYear: new Date().getFullYear(),
+      appVersion: "",
+      waxURL: "",
       showPopover: false,
       galleryDigitalSettings: {
         isInitialize: false,
@@ -146,7 +152,9 @@ class App extends React.Component<props, state> {
 
   componentDidMount() {
     //console.log("componet did mount event fired");
-    this.getUserStorage();
+    this.getAppConfig().finally(() => {
+      this.getUserStorage();
+    });
   }
 
   componentWillMount() {
@@ -224,6 +232,36 @@ class App extends React.Component<props, state> {
         //load login/sign up modal
         this.setState({ appReady: true });
       }
+    });
+  };
+
+  getAppConfig = () => {
+    return new Promise<void>((resolve) => {
+      callServer("appConfig", {}, "")
+        ?.then((resp) => {
+          return resp.json();
+        })
+        .then((json) => {
+          if (json && typeof json.appYear !== "undefined") {
+            const parsedYear = Number(json.appYear);
+            if (!Number.isNaN(parsedYear) && parsedYear > 0) {
+              this.setState((prevState) => ({
+                appYear: parsedYear,
+                appVersion: json.appVersion,
+                waxURL: json.waxURL || "",
+                galleryDigitalSettings: {
+                  ...prevState.galleryDigitalSettings,
+                  year: parsedYear,
+                },
+              }));
+            }
+          }
+          resolve();
+        })
+        .catch((err: any) => {
+          console.log(err);
+          resolve();
+        });
     });
   };
 
@@ -359,6 +397,7 @@ class App extends React.Component<props, state> {
                 <GalleryContainer
                   galleryProps={this.state.galleryDigitalSettings}
                   nftProps={this.state.galleryNFTSettings}
+                  appYear={this.state.appYear}
                   settingsCallback={this.setGallerySettingsStorage}
                   key={this.state.galleryDigitalSettings.layoutCount}
                   user={this.state.user}
@@ -387,7 +426,7 @@ class App extends React.Component<props, state> {
                   lastRefreshed={this.state.refreshTime}
                   tradeCallback={this.showTradeModal}
                 />
-                <TradeContainer user={this.state.user} />
+                <TradeContainer user={this.state.user} appYear={this.state.appYear} />
               </Route>
               <Route exact path="/">
                 <ProfileContainer
@@ -470,6 +509,7 @@ class App extends React.Component<props, state> {
             <TradeSetup
               otherUser={this.state.tradeUser}
               user={this.state.user}
+              appYear={this.state.appYear}
               closePanel={this.showTradeModal}
             />
           </IonModal>

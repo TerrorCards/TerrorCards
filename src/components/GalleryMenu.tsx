@@ -15,6 +15,7 @@ interface props {
   layoutAction: any;
   layoutProps: any;
   nftProps: any;
+  appYear: number;
   user: any;
   type: string;
 }
@@ -48,14 +49,14 @@ class GalleryMenu extends React.Component<props, state> {
     };
   }
   TCYearStart: number = 2017;
-  currYear = new Date().getFullYear();
-  diffYear = this.currYear - this.TCYearStart;
   viewOptions = ["active", "all", "needs", "owned"];
 
   componentDidMount() {
     if (this.props.type === "cards") {
+      const currYear = Number(this.props.appYear || new Date().getFullYear());
+      const diffYear = currYear - this.TCYearStart;
       let years: Array<any> = [];
-      for (let i = 0; i <= this.diffYear; i++) {
+      for (let i = 0; i <= diffYear; i++) {
         years.push(
           <IonSelectOption
             key={this.TCYearStart + i}

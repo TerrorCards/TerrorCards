@@ -29,6 +29,7 @@ import { callServer } from "./ajaxcalls";
 interface props {
   galleryProps: any;
   nftProps: any;
+  appYear: number;
   settingsCallback: any;
   user: any;
   tradeCallback: any;
@@ -751,6 +752,7 @@ class GalleryContainer extends React.Component<props, state> {
             layoutAction={this.props.settingsCallback}
             layoutProps={this.props.galleryProps}
             nftProps={this.props.nftProps}
+            appYear={this.props.appYear}
             user={this.props.user}
             type={this.state.viewState}
           />

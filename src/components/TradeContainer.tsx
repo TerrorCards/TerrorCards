@@ -32,6 +32,7 @@ import {
 
 interface props {
   user: any;
+  appYear: number;
 }
 
 interface state {
@@ -75,7 +76,7 @@ class TradeContainer extends React.Component<props, state> {
 
       layoutState: {
         layoutCount: 3,
-        year: new Date().getFullYear(),
+        year: Number(this.props.appYear || new Date().getFullYear()),
         set: "All",
         view: "needs",
         viewOptions: "owned,needs",

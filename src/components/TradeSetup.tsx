@@ -34,6 +34,7 @@ import {
 interface props {
   otherUser: string;
   user: any;
+  appYear: number;
   closePanel: any;
 }
 
@@ -78,7 +79,7 @@ class TradeSetup extends React.Component<props, state> {
 
       layoutState: {
         layoutCount: 3,
-        year: new Date().getFullYear(),
+        year: Number(this.props.appYear || new Date().getFullYear()),
         set: "All",
         view: "needs",
         viewOptions: "owned,needs",
@@ -525,6 +526,8 @@ class TradeSetup extends React.Component<props, state> {
             <GalleryMenu
               layoutAction={this.processCardListFilters}
               layoutProps={this.state.layoutState}
+              nftProps={{}}
+              appYear={this.props.appYear}
               user={this.props.user}
               type={"cards"}
             />

@@ -1642,6 +1642,11 @@ export function callServer(pTask, pData, pUserId) {
       break;
     }
 
+    case "appConfig": {
+      test = fetch(serverpath + "appConfig.php");
+      break;
+    }
+
     default:
       break;
   }
