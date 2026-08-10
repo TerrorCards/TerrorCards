@@ -33,6 +33,8 @@ import {
 interface props {
   user: any;
   appYear: number;
+  tradeCallback?: any;
+  tradeRefreshTime?: number;
 }
 
 interface state {
@@ -120,7 +122,13 @@ class TradeContainer extends React.Component<props, state> {
     //console.log("Ion view did enter");
   }
 
-  componentDidUpdate() {}
+  componentDidUpdate(prevProps: any) {
+    if (prevProps.tradeRefreshTime !== this.props.tradeRefreshTime) {
+      this.pullTrades(this.props.user.ID).then((result: any) => {
+        this.groupTradesById(result);
+      });
+    }
+  }
 
   ionViewDidLeave() {}
 
@@ -137,6 +145,50 @@ class TradeContainer extends React.Component<props, state> {
       showAlert: true,
       alertType: action,
       activeTradeID: tradeID,
+    });
+  };
+
+  reviseTradeRequest = (tradeID: any) => {
+    const tradeRows = this.state.filteredTradeList[tradeID] || [];
+    if (tradeRows.length <= 0 || !this.props.tradeCallback) {
+      return;
+    }
+
+    const currentUser = this.props.user.ID;
+    const tradePartnerRow = tradeRows.find((card: any) => {
+      return card.UserID !== currentUser;
+    });
+    const otherUser = tradePartnerRow ? tradePartnerRow.UserID : tradeRows[0].TradeOwner;
+
+    const normalizeTradeCard = (card: any) => {
+      const normalizedCard = { ...card };
+      if (normalizedCard.CardYear === undefined && normalizedCard.Card_Year !== undefined) {
+        normalizedCard.CardYear = normalizedCard.Card_Year;
+      }
+      if (normalizedCard.Card_Year === undefined && normalizedCard.CardYear !== undefined) {
+        normalizedCard.Card_Year = normalizedCard.CardYear;
+      }
+      return normalizedCard;
+    };
+
+    const currentUserCards = tradeRows
+      .filter((card: any) => card.UserID === currentUser)
+      .map(normalizeTradeCard);
+    const otherUserCards = tradeRows
+      .filter((card: any) => card.UserID !== currentUser)
+      .map(normalizeTradeCard);
+
+    const preloadedTradeCards = [...currentUserCards, ...otherUserCards];
+
+    this.props.tradeCallback({
+      otherUser,
+      initialTradeData: {
+        tradeCardsList: preloadedTradeCards,
+        tradeMessage: tradeRows[0]?.Message || "",
+        step: "summary",
+        reviseFlag: true,
+        tradeID,
+      },
     });
   };
 
@@ -534,7 +586,7 @@ class TradeContainer extends React.Component<props, state> {
               {this.state.tradeStatus === "PENDING" &&
               this.state.filteredTradeList[key][0].TradeOwner !==
                 this.props.user.ID ? (
-                <IonCol class="ion-text-center" size="4">
+                <IonCol class="ion-text-center" size="3">
                   <IonButton
                     color="success"
                     expand="block"
@@ -546,9 +598,39 @@ class TradeContainer extends React.Component<props, state> {
                   </IonButton>
                 </IonCol>
               ) : (
-                <IonCol class="ion-text-center" size="4"></IonCol>
+                <IonCol class="ion-text-center" size="3"></IonCol>
               )}
-              <IonCol class="ion-text-center" size="4">
+              {this.state.tradeStatus === "PENDING" ? (
+                <IonCol class="ion-text-center" size="3">
+                  <IonButton
+                    color="tertiary"
+                    expand="block"
+                    onClick={() => {
+                      this.reviseTradeRequest(key);
+                    }}
+                  >
+                    Revise
+                  </IonButton>
+                </IonCol>
+              ) : (
+                <IonCol class="ion-text-center" size="3"></IonCol>
+              )}
+              {this.state.tradeStatus === "PENDING" ? (
+                <IonCol class="ion-text-center" size="3">
+                  <IonButton
+                    color="danger"
+                    expand="block"
+                    onClick={() => {
+                      this.showAlertPrompt("cancel", key);
+                    }}
+                  >
+                    Cancel
+                  </IonButton>
+                </IonCol>
+              ) : (
+                <IonCol class="ion-text-center" size="3"></IonCol>
+              )}
+              <IonCol class="ion-text-center" size="3">
                 <IonButton
                   color={
                     this.state.filteredTradeList[key][0].TradeHasNewMessage > 0
@@ -577,21 +659,6 @@ class TradeContainer extends React.Component<props, state> {
                   />
                 </IonButton>
               </IonCol>
-              {this.state.tradeStatus === "PENDING" ? (
-                <IonCol class="ion-text-center" size="4">
-                  <IonButton
-                    color="danger"
-                    expand="block"
-                    onClick={() => {
-                      this.showAlertPrompt("cancel", key);
-                    }}
-                  >
-                    Cancel
-                  </IonButton>
-                </IonCol>
-              ) : (
-                <IonCol class="ion-text-center" size="4"></IonCol>
-              )}
             </IonRow>
           </IonGrid>
         </IonCard>

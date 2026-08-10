@@ -36,6 +36,7 @@ interface props {
   user: any;
   appYear: number;
   closePanel: any;
+  initialTradeData?: any;
 }
 
 interface state {
@@ -60,6 +61,8 @@ interface state {
   selectionCardList: Array<any>;
   tradeMessage: string;
   cardCount: any;
+  reviseFlag: boolean;
+  reviseTradeID: any;
 }
 
 class TradeSetup extends React.Component<props, state> {
@@ -96,6 +99,8 @@ class TradeSetup extends React.Component<props, state> {
       selectionCardList: [],
       tradeMessage: "",
       cardCount: 0,
+      reviseFlag: false,
+      reviseTradeID: null,
     };
   }
 
@@ -107,6 +112,7 @@ class TradeSetup extends React.Component<props, state> {
         }
       );
     });
+    this.applyInitialTradeData(this.props.initialTradeData);
     //console.log("comp did mount");
   }
 
@@ -164,7 +170,25 @@ class TradeSetup extends React.Component<props, state> {
     ) {
       this.generateImageSelectionList();
     }
+
+    if (prevProps.initialTradeData !== this.props.initialTradeData) {
+      this.applyInitialTradeData(this.props.initialTradeData);
+    }
   }
+
+  applyInitialTradeData = (tradeData: any) => {
+    if (!tradeData || !tradeData.tradeCardsList) {
+      return;
+    }
+
+    this.setState({
+      tradeCardsList: [...tradeData.tradeCardsList],
+      tradeMessage: tradeData.tradeMessage || "",
+      step: tradeData.reviseFlag ? "you" : (tradeData.step || "summary"),
+      reviseFlag: tradeData.reviseFlag || false,
+      reviseTradeID: tradeData.tradeID || null,
+    });
+  };
 
   ionViewDidLeave() {}
 
@@ -242,51 +266,64 @@ class TradeSetup extends React.Component<props, state> {
 
   sendTradeToServer = () => {
     if (this.state.tradeCardsList.length > 0) {
-      let yourList: Array<any> = [];
-      let otherList: Array<any> = [];
-      this.state.tradeCardsList.forEach((cl: any) => {
-        if (cl.UserID === this.props.user.ID) {
-          yourList.push(cl.ID + "_" + cl.Card_Year + "_" + cl.Count);
-        } else {
-          otherList.push(cl.ID + "_" + cl.Card_Year + "_" + cl.Count);
-        }
-      });
-      //console.log(this.state.tradeMessage);
-      callServer(
-        "saveTrade",
-        {
-          uContent1: { cards: yourList.join(","), userId: this.props.user.ID },
-          uContent2: {
-            cards: otherList.join(","),
-            userId: this.props.otherUser,
-          },
-          msg: this.state.tradeMessage,
-        },
-        this.props.user.ID
-      )
-        ?.then((resp) => {
-          //console.log(resp);
-          return resp.json();
-        })
-        .then((json) => {
-          if (json === "Saved") {
-            //console.log(json);
-            this.setState({ showAlert: false, alertType: "" }, () => {
-              this.setState({
-                showTradeSaveResult: true,
-                showTradeSaveResultMessage:
-                  "Trade saved. Other party has 24 hours to respond.",
-              });
-            });
+      const doSave = () => {
+        let yourList: Array<any> = [];
+        let otherList: Array<any> = [];
+        this.state.tradeCardsList.forEach((cl: any) => {
+          if (cl.UserID === this.props.user.ID) {
+            yourList.push(cl.ID + "_" + cl.Card_Year + "_" + cl.Count);
           } else {
-            this.setState({ showAlert: false, alertType: "" }, () => {
-              this.setState({
-                showTradeSaveResult: true,
-                showTradeSaveResultMessage: json,
-              });
-            });
+            otherList.push(cl.ID + "_" + cl.Card_Year + "_" + cl.Count);
           }
         });
+        //console.log(this.state.tradeMessage);
+        callServer(
+          "saveTrade",
+          {
+            uContent1: { cards: yourList.join(","), userId: this.props.user.ID },
+            uContent2: {
+              cards: otherList.join(","),
+              userId: this.props.otherUser,
+            },
+            msg: this.state.tradeMessage,
+          },
+          this.props.user.ID
+        )
+          ?.then((resp) => {
+            return resp.json();
+          })
+          .then((json) => {
+            if (json === "Saved") {
+              this.setState({ showAlert: false, alertType: "" }, () => {
+                this.setState({
+                  showTradeSaveResult: true,
+                  showTradeSaveResultMessage:
+                    "Trade saved. Other party has 24 hours to respond.",
+                });
+              });
+            } else {
+              this.setState({ showAlert: false, alertType: "" }, () => {
+                this.setState({
+                  showTradeSaveResult: true,
+                  showTradeSaveResultMessage: json,
+                });
+              });
+            }
+          });
+      };
+
+      if (this.state.reviseFlag && this.state.reviseTradeID) {
+        callServer("cancelTrade", this.state.reviseTradeID, this.props.user.ID)
+          ?.then((resp) => resp.json())
+          .then(() => {
+            doSave();
+          })
+          .catch(() => {
+            doSave();
+          });
+      } else {
+        doSave();
+      }
     }
   };
 

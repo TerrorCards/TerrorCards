@@ -79,6 +79,8 @@ interface state {
   user: any;
   showTradeSetupModel: boolean;
   tradeUser: string;
+  tradeSetupData: any;
+  tradeRefreshTime: number;
   showProfileManageModel: boolean;
   showFactorySetupModel: boolean;
   showHuntModel: boolean;
@@ -132,6 +134,8 @@ class App extends React.Component<props, state> {
       },
       showTradeSetupModel: false,
       tradeUser: "",
+      tradeSetupData: null,
+      tradeRefreshTime: 0,
       showProfileManageModel: false,
       showFactorySetupModel: false,
       showHuntModel: false,
@@ -337,10 +341,25 @@ class App extends React.Component<props, state> {
   };
 
   showTradeModal = (e: any) => {
-    if (this.state.showTradeSetupModel) {
-      this.setState({ showTradeSetupModel: false, tradeUser: "" });
+    if (e && typeof e === "object" && e.otherUser) {
+      this.setState({
+        showTradeSetupModel: true,
+        tradeUser: e.otherUser,
+        tradeSetupData: e.initialTradeData || null,
+      });
+    } else if (this.state.showTradeSetupModel) {
+      this.setState({
+        showTradeSetupModel: false,
+        tradeUser: "",
+        tradeSetupData: null,
+        tradeRefreshTime: this.state.tradeRefreshTime + 1,
+      });
     } else {
-      this.setState({ showTradeSetupModel: true, tradeUser: e });
+      this.setState({
+        showTradeSetupModel: true,
+        tradeUser: e,
+        tradeSetupData: null,
+      });
     }
   };
 
@@ -426,7 +445,12 @@ class App extends React.Component<props, state> {
                   lastRefreshed={this.state.refreshTime}
                   tradeCallback={this.showTradeModal}
                 />
-                <TradeContainer user={this.state.user} appYear={this.state.appYear} />
+                <TradeContainer
+                  user={this.state.user}
+                  appYear={this.state.appYear}
+                  tradeCallback={this.showTradeModal}
+                  tradeRefreshTime={this.state.tradeRefreshTime}
+                />
               </Route>
               <Route exact path="/">
                 <ProfileContainer
@@ -510,6 +534,7 @@ class App extends React.Component<props, state> {
               otherUser={this.state.tradeUser}
               user={this.state.user}
               appYear={this.state.appYear}
+              initialTradeData={this.state.tradeSetupData}
               closePanel={this.showTradeModal}
             />
           </IonModal>
