@@ -36,6 +36,7 @@ interface state {
   allItemsList: Array<any>;
   allCoinList: Array<any>;
   packItems: Array<any>;
+  packHitIndicators: Record<string, number>;
   storeType: string;
   showCards: boolean;
   cardsResult: Array<any>;
@@ -70,6 +71,7 @@ class StoreContainer extends React.Component<props, state> {
       allItemsList: [],
       allCoinList: [],
       packItems: [],
+      packHitIndicators: {},
       storeType: "regular",
       showCards: false,
       cardsResult: [],
@@ -169,17 +171,122 @@ class StoreContainer extends React.Component<props, state> {
         //console.log(json);
         if (json.length > 0) {
           this.setState({ allItemsList: json }, () => {
+            this.refreshAllPackHitIndicators(json);
             if (this.state.storeType === "coins") {
               this.renderCoinsList();
             } else {
               this.filterPacks();
             }
           });
+        } else {
+          this.setState({ packHitIndicators: {} });
         }
       })
       .catch((err: any) => {
         console.log(err);
       });
+  };
+
+  normalizeHitPercentage = (value: any) => {
+    const parsed = Number(value);
+    if (Number.isNaN(parsed)) {
+      return 0;
+    }
+    if (parsed < 0) {
+      return 0;
+    }
+    if (parsed > 100) {
+      return 100;
+    }
+    return parsed;
+  };
+
+  refreshPackHitIndicator = (packId: any) => {
+    const parsedPackId = parseInt(packId, 10);
+    if (!parsedPackId) return;
+
+    callServer("packsPlayer", { packId: parsedPackId }, this.props.user.ID)
+      ?.then((resp) => {
+        return resp.json();
+      })
+      .then((json) => {
+        const percentage = this.normalizeHitPercentage(json?.percentage);
+        this.setState(
+          (prevState) => ({
+            packHitIndicators: {
+              ...prevState.packHitIndicators,
+              [String(parsedPackId)]: percentage,
+            },
+          }),
+          () => {
+            if (this.state.storeType === "pandora") {
+              this.filterPacks();
+            }
+          }
+        );
+      })
+      .catch((err: any) => {
+        console.log(err);
+      });
+  };
+
+  refreshAllPackHitIndicators = (packs: Array<any>) => {
+    if (!packs || packs.length === 0) {
+      this.setState({ packHitIndicators: {} });
+      return;
+    }
+
+    const indicatorRequests = packs.map((pack: any) => {
+      const parsedPackId = parseInt(pack.ID, 10);
+      if (!parsedPackId) return Promise.resolve(null);
+
+      const req = callServer(
+        "packsPlayer",
+        { packId: parsedPackId },
+        this.props.user.ID
+      );
+      if (!req) return Promise.resolve(null);
+
+      return req
+        .then((resp) => {
+          return resp.json();
+        })
+        .then((json) => {
+          return {
+            packId: String(parsedPackId),
+            percentage: this.normalizeHitPercentage(json?.percentage),
+          };
+        })
+        .catch((err: any) => {
+          console.log(err);
+          return null;
+        });
+    });
+
+    Promise.all(indicatorRequests).then((results) => {
+      const updatedIndicators: Record<string, number> = {};
+      results.forEach((entry: any) => {
+        if (entry && entry.packId) {
+          updatedIndicators[entry.packId] = entry.percentage;
+        }
+      });
+
+      this.setState({ packHitIndicators: updatedIndicators }, () => {
+        if (this.state.storeType === "pandora") {
+          this.filterPacks();
+        }
+      });
+    });
+  };
+
+  getHitIndicatorColor = (percentage: number) => {
+    if (percentage <= 33) {
+      return "#d32f2f";
+    }
+    if (percentage < 66) {
+      return "#f9a825";
+    }
+    return "#2e7d32";
   };
 
   pullInApp = () => {
@@ -348,8 +455,13 @@ class StoreContainer extends React.Component<props, state> {
         if (parseInt(p.Ratio) === 1) {
           packMsg = "1 per pack";
         } else {
-          packMsg = "1 in " + p.Ratio + packOddsPack;
+          if (parseInt(p.ID, 10) !== 291) {
+            packMsg = "1 in " + p.Ratio + packOddsPack;
+          }
         }
+        const parsedPackId = parseInt(p.ID, 10);
+        const hitPercentage = this.state.packHitIndicators[String(parsedPackId)] || 0;
+        const hitIndicatorColor = this.getHitIndicatorColor(hitPercentage);
         items.push(
           <IonCard key={p.Name}>
             <IonCardHeader>
@@ -367,6 +479,29 @@ class StoreContainer extends React.Component<props, state> {
                       <p></p>
                       <div style={{ display: "flex", flex: 2 }}>{packMsg}</div>
                       <p></p>
+                      <br></br>
+                      {this.state.storeType === "pandora" && parsedPackId !== 291 && (
+                        <div
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 8,
+                            marginBottom: 8,
+                          }}
+                        >
+                          <div>Hit indicator</div>
+                          <div
+                            style={{
+                              paddingTop: 10,
+                              width: 12,
+                              height: 12,
+                              borderRadius: "50%",
+                              backgroundColor: hitIndicatorColor,
+                              border: "1px solid rgba(0,0,0,0.35)",
+                            }}
+                          ></div>
+                        </div>
+                      )}
                       <div
                         style={{
                           display: "flex",
@@ -518,6 +653,7 @@ class StoreContainer extends React.Component<props, state> {
     //call server to get latest credit and see if user can buy
     if (this.state.targetItem !== null) {
       const p = this.state.targetItem;
+      const openedPackId = p.ID;
       if (parseInt(this.props.user.credit) >= parseInt(p.Cost)) {
         //call to pull packs.
         let packOrder = {
@@ -537,6 +673,7 @@ class StoreContainer extends React.Component<props, state> {
           .then((json) => {
             if (json.length > 0) {
               this.renderCards(json);
+              this.refreshPackHitIndicator(openedPackId);
               this.props.callbackPackOpenTimer(Date.now());
               this.setState({ targetItem: null, targetType: null });
             } else {

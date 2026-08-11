@@ -286,6 +286,23 @@ export function callServer(pTask, pData, pUserId) {
 
       break;
     }
+    case "packsPlayer": {
+      jsonstr = prepData(pData);
+      formData = new FormData();
+      formData.append("uUserId", pUserId);
+      formData.append("uContent", jsonstr);
+
+      test = fetch(
+        serverpath +
+          "packsPlayer.php?" +
+          new URLSearchParams({
+            uUserId: pUserId,
+            uContent: jsonstr,
+          })
+      );
+
+      break;
+    }
     case "showTrades": {
       jsonstr = prepData(pData);
       formData = new FormData();
