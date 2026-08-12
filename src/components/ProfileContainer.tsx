@@ -16,6 +16,7 @@ import {
   IonSearchbar,
   withIonLifeCycle,
 } from "@ionic/react";
+import { Capacitor } from "@capacitor/core";
 import {
   aperture,
   repeat,
@@ -232,10 +233,7 @@ class ProfileContainer extends React.Component<props, state> {
   };
 
   renderProfileItem(j: any) {
-    //for iOS
-    //const devicePadding = 25;
-    //for android
-    const devicePadding = 0;
+    const devicePadding = Capacitor.getPlatform() === "ios" ? 25 : 0;
     return (
       <IonGrid>
         <IonRow>

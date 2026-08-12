@@ -1664,6 +1664,19 @@ export function callServer(pTask, pData, pUserId) {
       break;
     }
 
+    case "chaseProgress": {
+      jsonstr = prepData(pData);
+      test = fetch(
+        serverpath +
+          "cards_chase_progress.php?" +
+          new URLSearchParams({
+            uUserId: pUserId,
+            uContent: jsonstr,
+          })
+      );
+      break;
+    }
+
     default:
       break;
   }

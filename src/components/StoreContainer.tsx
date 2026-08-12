@@ -51,6 +51,8 @@ interface state {
   isInAppLoaded: boolean;
   isIAPActiveBuy: boolean;
   isPackLoading: boolean;
+  expandedChasePanel: Record<string, boolean>;
+  chaseProgress: Record<string, { CurrentReleaseCompletion: number; AllReleaseCompletion: number } | null>;
 }
 
 const { store, ProductType, Platform } = window.CdvPurchase;
@@ -86,6 +88,8 @@ class StoreContainer extends React.Component<props, state> {
       isInAppLoaded: false,
       isIAPActiveBuy: false,
       isPackLoading: false,
+      expandedChasePanel: {},
+      chaseProgress: {},
     };
   }
 
@@ -279,6 +283,36 @@ class StoreContainer extends React.Component<props, state> {
     });
   };
 
+  fetchChaseProgress = (packId: string, chase: string) => {
+    callServer("chaseProgress", { chase: [chase] }, this.props.user.ID)
+      ?.then((resp) => resp.json())
+      .then((json) => {
+        this.setState(
+          (prevState) => ({
+            chaseProgress: { ...prevState.chaseProgress, [packId]: json },
+          }),
+          () => this.filterPacks()
+        );
+      })
+      .catch((err: any) => console.log(err));
+  };
+
+  toggleChasePanel = (packId: string, chase: string) => {
+    const isOpen = !!this.state.expandedChasePanel[packId];
+    this.setState(
+      (prevState) => ({
+        expandedChasePanel: { ...prevState.expandedChasePanel, [packId]: !isOpen },
+      }),
+      () => {
+        if (!isOpen) {
+          this.fetchChaseProgress(packId, chase);
+        } else {
+          this.filterPacks();
+        }
+      }
+    );
+  };
+
   getHitIndicatorColor = (percentage: number) => {
     if (percentage <= 33) {
       return "#d32f2f";
@@ -462,6 +496,9 @@ class StoreContainer extends React.Component<props, state> {
         const parsedPackId = parseInt(p.ID, 10);
         const hitPercentage = this.state.packHitIndicators[String(parsedPackId)] || 0;
         const hitIndicatorColor = this.getHitIndicatorColor(hitPercentage);
+        const packIdStr = String(parsedPackId);
+        const isChaseOpen = !!this.state.expandedChasePanel[packIdStr];
+        const chaseData = this.state.chaseProgress[packIdStr] ?? null;
         items.push(
           <IonCard key={p.Name}>
             <IonCardHeader>
@@ -531,6 +568,37 @@ class StoreContainer extends React.Component<props, state> {
                           {p.Cost}
                         </IonButton>
                       </div>
+                      {parsedPackId !== 291 && <div style={{ paddingTop: 12 }}>
+                        <div
+                          onClick={() => this.toggleChasePanel(packIdStr, p.Chase)}
+                          style={{ cursor: "pointer", fontSize: 12, color: "#888", userSelect: "none" }}
+                        >
+                          {isChaseOpen ? "▲ Hide progress" : "▼ Show progress"}
+                        </div>
+                        {isChaseOpen && (
+                          <div style={{ marginTop: 6 }}>
+                            {chaseData === null ? (
+                              <div style={{ fontSize: 12, color: "#aaa" }}>Loading...</div>
+                            ) : (
+                              <>
+                                <div style={{ fontSize: 12, marginBottom: 4 }}>
+                                  <div>Current release: {Math.round(chaseData.CurrentReleaseCompletion)}%</div>
+                                  <div style={{ height: 6, background: "#e0e0e0", borderRadius: 3, overflow: "hidden" }}>
+                                    <div style={{ width: `${chaseData.CurrentReleaseCompletion}%`, height: "100%", background: "#1976d2", borderRadius: 3 }} />
+                                  </div>
+                                </div>
+                                <div style={{ fontSize: 12 }}>
+                                  <div>All releases: {Math.round(chaseData.AllReleaseCompletion)}%</div>
+                                  <div style={{ height: 6, background: "#e0e0e0", borderRadius: 3, overflow: "hidden" }}>
+                                    <div style={{ width: `${chaseData.AllReleaseCompletion}%`, height: "100%", background: "#388e3c", borderRadius: 3 }} />
+                                  </div>
+                                </div>
+                                {this.state.storeType !== "pandora" && <div style={{ fontSize: 10, paddingTop:10 }}>* Does not include Pandora exclusive sets (if any).</div>}
+                              </>
+                            )}
+                          </div>
+                        )}
+                      </div>}
                     </div>
                   </IonCol>
                 </IonRow>
@@ -675,6 +743,10 @@ class StoreContainer extends React.Component<props, state> {
               this.renderCards(json);
               this.refreshPackHitIndicator(openedPackId);
               this.props.callbackPackOpenTimer(Date.now());
+              const openedPackIdStr = String(parseInt(openedPackId, 10));
+              if (this.state.expandedChasePanel[openedPackIdStr] && p.Chase) {
+                this.fetchChaseProgress(openedPackIdStr, p.Chase);
+              }
               this.setState({ targetItem: null, targetType: null });
             } else {
               this.setState({ targetItem: null, targetType: null });

@@ -22,6 +22,7 @@ import {
 } from "@ionic/react";
 import React from "react";
 import { IonReactRouter } from "@ionic/react-router";
+import { Capacitor } from "@capacitor/core";
 import {
   cart,
   home,
@@ -95,8 +96,9 @@ interface state {
 const store = new Storage();
 store.create();
 
-//setupIonicReact({ mode: "ios" });
-setupIonicReact({ mode: "md" });
+setupIonicReact({
+  mode: Capacitor.getPlatform() === "ios" ? "ios" : "md",
+});
 
 class App extends React.Component<props, state> {
   constructor(props: any) {
