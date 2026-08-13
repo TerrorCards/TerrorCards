@@ -1026,9 +1026,23 @@ class StoreContainer extends React.Component<props, state> {
         console.log("IAP: offer:", offer);
         inAppControl = 1;
         if (offer && typeof offer.order === "function") {
-          offer.order().then((error: any) => {
-            if (error) {
-              console.warn("IAP: offer.order returned error", error);
+          offer
+            .order()
+            .then((error: any) => {
+              if (error) {
+                console.warn("IAP: offer.order returned error", error);
+                inAppControl = 0;
+                this.setState({
+                  targetItem: null,
+                  targetType: null,
+                  isIAPActiveBuy: false,
+                });
+                this.releaseCoinPurchaseLock();
+              }
+            })
+            .catch((err: any) => {
+              // handle promise rejection (user cancelled or other failure)
+              console.warn("IAP: offer.order rejected", err);
               inAppControl = 0;
               this.setState({
                 targetItem: null,
@@ -1036,8 +1050,7 @@ class StoreContainer extends React.Component<props, state> {
                 isIAPActiveBuy: false,
               });
               this.releaseCoinPurchaseLock();
-            }
-          });
+            });
         } else if (store && typeof (store as any).order === "function") {
           // fallback to store.order for platforms that don't expose an offer
           console.log("IAP: falling back to store.order for product id", product.id);
