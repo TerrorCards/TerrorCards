@@ -1019,83 +1019,11 @@ class StoreContainer extends React.Component<props, state> {
     });
     //alert(JSON.stringify(foundProduct));
     if (foundProduct.length > 0) {
-      const product = foundProduct[0];
-      try {
-        const offer = product.getOffer ? product.getOffer() : null;
-        inAppControl = 1;
-        if (offer && typeof offer.order === "function") {
-          offer
-            .order()
-            .then((error: any) => {
-              if (error) {
-                console.warn("IAP: offer.order returned error", error);
-                inAppControl = 0;
-                this.setState({
-                  targetItem: null,
-                  targetType: null,
-                  isIAPActiveBuy: false,
-                });
-                this.releaseCoinPurchaseLock();
-              }
-            })
-            .catch((err: any) => {
-              // handle promise rejection (user cancelled or other failure)
-              console.warn("IAP: offer.order rejected", err);
-              inAppControl = 0;
-              this.setState({
-                targetItem: null,
-                targetType: null,
-                isIAPActiveBuy: false,
-              });
-              this.releaseCoinPurchaseLock();
-            });
-        } else if (store && typeof (store as any).order === "function") {
-          // fallback to store.order for platforms that don't expose an offer
-          try {
-            (store as any).order(product.id).then((res: any) => {
-              // some implementations return a promise, others don't
-            }).catch((err: any) => {
-              console.warn("IAP: store.order failed", err);
-              inAppControl = 0;
-              this.setState({
-                targetItem: null,
-                targetType: null,
-                isIAPActiveBuy: false,
-              });
-              this.releaseCoinPurchaseLock();
-            });
-          } catch (e) {
-            // some store.order implementations are synchronous
-            console.warn("IAP: store.order threw", e);
-          }
-        } else {
-          console.warn("IAP: no offer and no store.order available for", product.id);
-          inAppControl = 0;
-          this.setState({
-            targetItem: null,
-            targetType: null,
-            isIAPActiveBuy: false,
-          });
-          this.releaseCoinPurchaseLock();
-        }
-      } catch (err) {
-        console.error("IAP: exception during canBuyCoins", err);
-        inAppControl = 0;
-        this.setState({
-          targetItem: null,
-          targetType: null,
-          isIAPActiveBuy: false,
-        });
-        this.releaseCoinPurchaseLock();
-      }
-    } else {
-      inAppControl = 0;
-      this.setState({
-        targetItem: null,
-        targetType: null,
-        isIAPActiveBuy: false,
-      });
-      this.releaseCoinPurchaseLock();
+      const offer = foundProduct[0].getOffer();
+      //alert("offer");
+      //alert(JSON.stringify(offer));
+      inAppControl = 1;
+      if (offer) offer.order();
     }
   };
 }
