@@ -17,7 +17,7 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>2.0.70</string>
+	<string>2.0.75</string>
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>
@@ -30,7 +30,7 @@
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>
-	<string>2.0.70</string>
+	<string>2.0.75</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSAppTransportSecurity</key>
@@ -40,12 +40,6 @@
 	</dict>
 	<key>NSCameraUsageDescription</key>
 	<string>To Take Photos for User Profile</string>
-	<key>NSLocationAlwaysUsageDescription</key>
-	<string>Always allow Geolocation?</string>
-	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>Allow Geolocation?</string>
-	<key>NSMicrophoneUsageDescription</key>
-	<string>To Record Audio With Video</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string>Select Photo for User Profile</string>
 	<key>NSPhotoLibraryUsageDescription</key>
