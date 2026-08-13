@@ -1022,8 +1022,6 @@ class StoreContainer extends React.Component<props, state> {
       const product = foundProduct[0];
       try {
         const offer = product.getOffer ? product.getOffer() : null;
-        console.log("IAP: attempting purchase for product:", product.id || product.title || product);
-        console.log("IAP: offer:", offer);
         inAppControl = 1;
         if (offer && typeof offer.order === "function") {
           offer
@@ -1053,7 +1051,6 @@ class StoreContainer extends React.Component<props, state> {
             });
         } else if (store && typeof (store as any).order === "function") {
           // fallback to store.order for platforms that don't expose an offer
-          console.log("IAP: falling back to store.order for product id", product.id);
           try {
             (store as any).order(product.id).then((res: any) => {
               // some implementations return a promise, others don't
