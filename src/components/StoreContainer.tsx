@@ -203,6 +203,12 @@ class StoreContainer extends React.Component<props, state> {
           this.renderCoinsList();
         }
       })
+      .cancelled((p: any) => {
+        console.log("purchase cancelled", p);
+        this.setState({ targetItem: null, targetType: null, isIAPActiveBuy: false });
+        inAppControl = 0;
+        this.releaseCoinPurchaseLock();
+      })
       .approved((p: any) => p.verify())
       .verified((p: any) => {
         let productId = null;
@@ -262,6 +268,14 @@ class StoreContainer extends React.Component<props, state> {
         }
         p.finish();
       });
+
+    // global error handler to ensure UI state and locks are released
+    store.error((err: any) => {
+      console.log("purchase error", err);
+      this.setState({ targetItem: null, targetType: null, isIAPActiveBuy: false });
+      inAppControl = 0;
+      this.releaseCoinPurchaseLock();
+    });
 
     this.iapHandlersBound = true;
   };
