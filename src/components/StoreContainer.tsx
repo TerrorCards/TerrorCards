@@ -55,8 +55,9 @@ interface state {
   chaseProgress: Record<string, { CurrentReleaseCompletion: number; AllReleaseCompletion: number } | null>;
 }
 
-const { store, ProductType, Platform } = window.CdvPurchase;
 let inAppControl = 0;
+
+const getPurchaseApi = () => (window as any).CdvPurchase || null;
 
 class StoreContainer extends React.Component<props, state> {
   private packPurchaseLock = false;
@@ -130,31 +131,211 @@ class StoreContainer extends React.Component<props, state> {
   };
 
   componentDidMount() {
-    //used when in a tab nav
     this.pullPacks();
-    Device.getInfo().then((d: any) => {
-      this.deviceInfo.platform = d.platform;
-      if (!d.isVirtual) {
-        this.pullInApp();
-      }
-    });
+    this.waitForDeviceReady();
   }
 
   ionViewWillEnter() {
     this.pullPacks();
-    if (!this.state.isInAppLoaded && !this.iapInitializing) {
-      if (this.deviceInfo.platform) {
-        this.pullInApp();
-      } else {
-        Device.getInfo().then((d: any) => {
-          this.deviceInfo.platform = d.platform;
-          if (!d.isVirtual) {
-            this.pullInApp();
-          }
-        });
-      }
-    }
+    this.waitForDeviceReady();
   }
+
+  waitForDeviceReady = () => {
+    const purchaseApi = getPurchaseApi();
+    if (purchaseApi?.store) {
+      this.initializePurchaseStore();
+      return;
+    }
+
+    const onReady = () => {
+      if (getPurchaseApi()?.store) {
+        this.initializePurchaseStore();
+      }
+    };
+
+    if (document.readyState === "complete") {
+      onReady();
+      return;
+    }
+
+    document.addEventListener("deviceready", onReady, { once: true });
+  };
+
+  resolveDevicePlatform = async (): Promise<string | null> => {
+    if (this.deviceInfo.platform) return this.deviceInfo.platform;
+
+    const devicePlatform = (window as any).device?.platform;
+    if (devicePlatform) {
+      this.deviceInfo.platform = devicePlatform;
+      return devicePlatform;
+    }
+
+    try {
+      const d = await Device.getInfo();
+      this.deviceInfo.platform = d?.platform || null;
+      return this.deviceInfo.platform;
+    } catch (err) {
+      console.log(err);
+      return null;
+    }
+  };
+
+  getStorePlatform = () => {
+    const purchaseApi = getPurchaseApi();
+    if (!purchaseApi) return null;
+
+    const platform = (this.deviceInfo.platform || (window as any).device?.platform || "android").toLowerCase();
+    if (platform === "android") return purchaseApi.Platform.GOOGLE_PLAY;
+    if (platform === "ios" || platform === "iphone" || platform === "ipad") {
+      return purchaseApi.Platform.APPLE_APPSTORE;
+    }
+    return purchaseApi.Platform.GOOGLE_PLAY;
+  };
+
+  bindStoreListeners = () => {
+    const purchaseApi = getPurchaseApi();
+    const store = purchaseApi?.store;
+    if (!store || this.iapHandlersBound) return;
+
+    store.when()
+      .productUpdated(() => {
+        if (this.state.storeType === "coins") {
+          this.renderCoinsList();
+        }
+      })
+      .approved((p: any) => p.verify())
+      .verified((p: any) => {
+        let productId = null;
+        if (this.deviceInfo.platform === "android") {
+          productId = p.sourceReceipt.transactions[0].products[0].id;
+        } else {
+          const trans = p.sourceReceipt.transactions;
+          trans.forEach((tran: any) => {
+            if (tran.products[0].id === this.state.targetItem?.id) {
+              productId = tran.products[0].id;
+            }
+          });
+        }
+
+        let value = 0;
+        if (productId?.indexOf("25k") > -1) {
+          value = 25000;
+        } else if (productId?.indexOf("100k") > -1) {
+          value = 100000;
+        } else if (productId?.indexOf("250k") > -1) {
+          value = 250000;
+        } else if (productId?.indexOf("500k") > -1) {
+          value = 500000;
+        } else if (productId?.indexOf("750k") > -1) {
+          value = 750000;
+        } else if (productId?.indexOf("1m") > -1) {
+          value = 1000000;
+        }
+
+        if (inAppControl === 1) {
+          callServer("updateCredit", { credit: value }, this.props.user.ID)
+            ?.then((result: any) => {
+              this.setState({
+                targetItem: null,
+                targetType: null,
+                storeType: "pandora",
+                showCoinMessage: true,
+                coinPurchaseMsg: "Thank you. Account updated by " + value + " credit",
+                isIAPActiveBuy: false,
+              }, () => {
+                this.releaseCoinPurchaseLock();
+                this.pullPacks();
+              });
+              this.props.callbackPackOpenTimer(Date.now());
+            })
+            .catch((err: any) => {
+              console.log(err);
+              this.setState({
+                targetItem: null,
+                targetType: null,
+                isIAPActiveBuy: false,
+              });
+              inAppControl = 0;
+              this.releaseCoinPurchaseLock();
+            });
+          inAppControl = 0;
+        }
+        p.finish();
+      });
+
+    this.iapHandlersBound = true;
+  };
+
+  initializePurchaseStore = async () => {
+    const purchaseApi = getPurchaseApi();
+    const store = purchaseApi?.store;
+    if (!purchaseApi || !store || this.iapInitializing || this.iapStoreInitialized) {
+      return;
+    }
+
+    this.iapInitializing = true;
+
+    try {
+      const platformName = await this.resolveDevicePlatform();
+      if (!platformName || platformName === "browser") {
+        this.iapInitializing = false;
+        return;
+      }
+
+      this.deviceInfo.platform = platformName;
+      this.bindStoreListeners();
+
+      const loadedInAppItems = await callServer("loadInAppItems", "", this.props.user.ID)?.then((resp) => resp.json());
+
+      if (!loadedInAppItems || loadedInAppItems.length === 0) {
+        this.iapInitializing = false;
+        return;
+      }
+
+      const targetPlatform = this.getStorePlatform();
+      const productList = loadedInAppItems.map((item: any) => ({
+        id: item.ID,
+        platform: targetPlatform,
+        type: purchaseApi.ProductType.CONSUMABLE,
+      }));
+
+      if (!this.iapProductsRegistered) {
+        store.register(productList);
+        this.iapProductsRegistered = true;
+      }
+
+      if (!this.iapStoreInitialized) {
+        await store.initialize([targetPlatform]);
+        store.ready(() => {
+          this.iapStoreInitialized = true;
+          this.iapInitializing = false;
+          this.setState(
+            {
+              allCoinList: store.products,
+              isInAppLoaded: true,
+            },
+            () => {
+              if (this.state.storeType === "coins") this.renderCoinsList();
+            }
+          );
+        });
+      } else {
+        this.iapInitializing = false;
+        this.setState(
+          {
+            allCoinList: store.products,
+            isInAppLoaded: true,
+          },
+          () => {
+            if (this.state.storeType === "coins") this.renderCoinsList();
+          }
+        );
+      }
+    } catch (err) {
+      console.log(err);
+      this.iapInitializing = false;
+    }
+  };
 
   componentWillMount() {
     //this.pullInApp();
@@ -324,144 +505,7 @@ class StoreContainer extends React.Component<props, state> {
   };
 
   pullInApp = () => {
-    if (this.state.isInAppLoaded || this.iapInitializing) return;
-    if (!this.deviceInfo.platform) return;
-
-    this.iapInitializing = true;
-
-    callServer("loadInAppItems", "", this.props.user.ID)
-      ?.then((resp) => {
-        return resp.json();
-      })
-      .then((json) => {
-        if (json.length > 0) {
-          const whatPlatform =
-            this.deviceInfo.platform === "android"
-              ? Platform.GOOGLE_PLAY
-              : Platform.APPLE_APPSTORE;
-          const items = json;
-          const productList: any[] = [];
-          items.forEach((item: any) => {
-            productList.push({
-              id: item.ID,
-              platform: whatPlatform,
-              type: ProductType.CONSUMABLE,
-            });
-          });
-
-          if (!this.iapProductsRegistered) {
-            store.register(productList);
-            this.iapProductsRegistered = true;
-          }
-
-          if (!this.iapHandlersBound) {
-            store
-              .when()
-              .approved((p: any) => p.verify())
-              .verified((p: any) => {
-                let productId = null;
-                if (this.deviceInfo.platform === "android") {
-                  productId = p.sourceReceipt.transactions[0].products[0].id;
-                } else {
-                  const trans = p.sourceReceipt.transactions;
-                  trans.forEach((tran: any) => {
-                    if (tran.products[0].id === this.state.targetItem.id) {
-                      productId = tran.products[0].id;
-                    }
-                  });
-                }
-                let value = 0;
-                if (productId.indexOf("25k") > -1) {
-                  value = 25000;
-                } else if (productId.indexOf("100k") > -1) {
-                  value = 100000;
-                } else if (productId.indexOf("250k") > -1) {
-                  value = 250000;
-                } else if (productId.indexOf("500k") > -1) {
-                  value = 500000;
-                } else if (productId.indexOf("750k") > -1) {
-                  value = 750000;
-                } else if (productId.indexOf("1m") > -1) {
-                  value = 1000000;
-                } else {
-                  value = 0;
-                }
-                if (inAppControl === 1) {
-                  callServer(
-                    "updateCredit",
-                    { credit: value },
-                    this.props.user.ID
-                  )?.then((result: any) => {
-                    this.setState({
-                      targetItem: null,
-                      targetType: null,
-                      storeType: "pandora",
-                      showCoinMessage: true,
-                      coinPurchaseMsg:
-                        "Thank you. Account updated by " + value + " credit",
-                      isIAPActiveBuy: false,
-                    }, () => {
-                      this.releaseCoinPurchaseLock();
-                      this.pullPacks();
-                    });
-                    this.props.callbackPackOpenTimer(Date.now());
-                  }).catch((err: any) => {
-                    console.log(err);
-                    this.setState({
-                      targetItem: null,
-                      targetType: null,
-                      isIAPActiveBuy: false,
-                    });
-                    inAppControl = 0;
-                    this.releaseCoinPurchaseLock();
-                  });
-                  inAppControl = 0;
-                }
-                p.finish();
-              });
-            this.iapHandlersBound = true;
-          }
-
-          const setLoadedProducts = () => {
-            this.setState(
-              {
-                allCoinList: store.products,
-                isInAppLoaded: true,
-              },
-              () => {
-                if (this.state.storeType === "coins") {
-                  this.renderCoinsList();
-                }
-              }
-            );
-          };
-
-          if (!this.iapStoreInitialized) {
-            store
-              .initialize([whatPlatform])
-              .then(() => {
-                store.ready(() => {
-                  this.iapStoreInitialized = true;
-                  setLoadedProducts();
-                  this.iapInitializing = false;
-                });
-              })
-              .catch((err: any) => {
-                console.log(err);
-                this.iapInitializing = false;
-              });
-          } else {
-            setLoadedProducts();
-            this.iapInitializing = false;
-          }
-        } else {
-          this.iapInitializing = false;
-        }
-      })
-      .catch((err: any) => {
-        console.log(err);
-        this.iapInitializing = false;
-      });
+    this.initializePurchaseStore();
   };
 
   filterPacks = () => {
