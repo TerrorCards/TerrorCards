@@ -53,6 +53,7 @@ interface state {
   isPackLoading: boolean;
   expandedChasePanel: Record<string, boolean>;
   chaseProgress: Record<string, { CurrentReleaseCompletion: number; AllReleaseCompletion: number } | null>;
+  packSelection?: Record<string, number>;
 }
 
 let inAppControl = 0;
@@ -91,6 +92,7 @@ class StoreContainer extends React.Component<props, state> {
       isPackLoading: false,
       expandedChasePanel: {},
       chaseProgress: {},
+      packSelection: {},
     };
   }
 
@@ -138,6 +140,12 @@ class StoreContainer extends React.Component<props, state> {
   ionViewWillEnter() {
     this.pullPacks();
     this.waitForDeviceReady();
+  }
+
+  componentDidUpdate(prevProps: props) {
+    if (prevProps.user?.credit !== this.props.user?.credit) {
+      this.reconcilePackSelections();
+    }
   }
 
   waitForDeviceReady = () => {
@@ -504,6 +512,42 @@ class StoreContainer extends React.Component<props, state> {
     return "#2e7d32";
   };
 
+  setPackQty = (packId: string, qty: number) => {
+    this.setState(
+      (prevState) => ({
+        packSelection: { ...prevState.packSelection, [packId]: qty },
+      }),
+      () => this.filterPacks()
+    );
+  };
+
+  // after credit changes (e.g. post-purchase), drop any pack selection that's no longer affordable
+  reconcilePackSelections = () => {
+    const credit = parseInt(this.props.user.credit);
+    const qtyOptions = [1, 3, 5];
+    const updatedSelection: Record<string, number> = { ...this.state.packSelection };
+    let changed = false;
+
+    this.state.allItemsList.forEach((p: any) => {
+      const packIdStr = String(parseInt(p.ID, 10));
+      const cost = parseInt(p.Cost);
+      const currentQty = updatedSelection[packIdStr] || 1;
+      if (credit < cost * currentQty) {
+        const affordableQty = [...qtyOptions].reverse().find((q) => credit >= cost * q) || 1;
+        if (affordableQty !== currentQty) {
+          updatedSelection[packIdStr] = affordableQty;
+          changed = true;
+        }
+      }
+    });
+
+    if (changed) {
+      this.setState({ packSelection: updatedSelection }, () => {
+        if (this.state.storeType !== "coins") this.filterPacks();
+      });
+    }
+  };
+
   pullInApp = () => {
     this.initializePurchaseStore();
   };
@@ -527,20 +571,23 @@ class StoreContainer extends React.Component<props, state> {
       filtered.forEach((p: any) => {
         const packOddsPack = parseInt(p.Ratio) > 1 ? " Packs" : " Pack";
         let packMsg = "";
-        const isPackDisabled =
-          this.state.isPackLoading ||
-          parseInt(this.props.user.credit) < parseInt(p.Cost);
+        const parsedPackId = parseInt(p.ID, 10);
+        const packIdStr = String(parsedPackId);
+        const packCost = parseInt(p.Cost);
+        const credit = parseInt(this.props.user.credit);
+        const qtyOptions = [1, 3, 5];
+        const qty = this.state.packSelection?.[packIdStr] || 1;
+        const totalCost = packCost * qty;
+        const isPackDisabled = this.state.isPackLoading || credit < totalCost;
         if (parseInt(p.Ratio) === 1) {
           packMsg = "1 per pack";
         } else {
-          if (parseInt(p.ID, 10) !== 291) {
+          if (parsedPackId !== 291) {
             packMsg = "1 in " + p.Ratio + packOddsPack;
           }
         }
-        const parsedPackId = parseInt(p.ID, 10);
         const hitPercentage = this.state.packHitIndicators[String(parsedPackId)] || 0;
         const hitIndicatorColor = this.getHitIndicatorColor(hitPercentage);
-        const packIdStr = String(parsedPackId);
         const isChaseOpen = !!this.state.expandedChasePanel[packIdStr];
         const chaseData = this.state.chaseProgress[packIdStr] ?? null;
         items.push(
@@ -583,6 +630,26 @@ class StoreContainer extends React.Component<props, state> {
                           ></div>
                         </div>
                       )}
+                      <div style={{ fontSize: 12, color: "#888", marginBottom: 4 }}>
+                        How many packs?
+                      </div>
+                      <IonSegment
+                        className="pack-qty-segment"
+                        value={String(qty)}
+                        onIonChange={(e: any) => {
+                          this.setPackQty(packIdStr, parseInt(e.detail.value, 10));
+                        }}
+                      >
+                        {qtyOptions.map((option) => (
+                          <IonSegmentButton
+                            key={option}
+                            value={String(option)}
+                            disabled={credit < packCost * option}
+                          >
+                            <IonLabel>{option}</IonLabel>
+                          </IonSegmentButton>
+                        ))}
+                      </IonSegment>
                       <div
                         style={{
                           display: "flex",
@@ -609,7 +676,7 @@ class StoreContainer extends React.Component<props, state> {
                           }}
                           disabled={isPackDisabled}
                         >
-                          {p.Cost}
+                          {totalCost}
                         </IonButton>
                       </div>
                       {parsedPackId !== 291 && <div style={{ paddingTop: 12 }}>
@@ -761,60 +828,78 @@ class StoreContainer extends React.Component<props, state> {
   };
 
   //Buying checks
-  _canBuy = () => {
-    //call server to get latest credit and see if user can buy
-    if (this.state.targetItem !== null) {
-      const p = this.state.targetItem;
-      const openedPackId = p.ID;
-      if (parseInt(this.props.user.credit) >= parseInt(p.Cost)) {
-        //call to pull packs.
-        let packOrder = {
-          packID: p.ID,
-          packName: p.Name,
-          userID: this.props.user.ID,
-          packSets: p.Set,
-          packChase: p.Chase,
-          packCost: p.Cost,
-          packPer: p.PerPack,
-        };
+  _canBuy = async () => {
+    if (this.state.targetItem === null) return;
 
-        callServer("packsOrder", packOrder, this.props.user.ID)
-          ?.then((resp) => {
-            return resp.json();
-          })
-          .then((json) => {
-            if (json.length > 0) {
-              this.renderCards(json);
-              this.refreshPackHitIndicator(openedPackId);
-              this.props.callbackPackOpenTimer(Date.now());
-              const openedPackIdStr = String(parseInt(openedPackId, 10));
-              if (this.state.expandedChasePanel[openedPackIdStr] && p.Chase) {
-                this.fetchChaseProgress(openedPackIdStr, p.Chase);
-              }
-              this.setState({ targetItem: null, targetType: null });
-            } else {
-              this.setState({ targetItem: null, targetType: null });
-              this.releasePackPurchaseLock();
-            }
-          })
-          .catch((err: any) => {
-            console.log(err);
-            this.releasePackPurchaseLock();
-          });
-      } else {
+    const p = this.state.targetItem;
+    const openedPackId = p.ID;
+    const openedPackIdStr = String(parseInt(openedPackId, 10));
+    const qty = this.state.packSelection?.[openedPackIdStr] || 1;
+    const costPer = parseInt(p.Cost);
+
+    for (let i = 0; i < qty; i++) {
+      // re-check affordability before each purchase
+      if (parseInt(this.props.user.credit) < costPer) {
         this.setState({ showNoCoinAlert: true });
-        this.releasePackPurchaseLock();
-        //warn not enough credit
+        break;
+      }
+
+      const packOrder = {
+        packID: p.ID,
+        packName: p.Name,
+        userID: this.props.user.ID,
+        packSets: p.Set,
+        packChase: p.Chase,
+        packCost: p.Cost,
+        packPer: p.PerPack,
+      };
+
+      try {
+        const resp = await callServer("packsOrder", packOrder, this.props.user.ID);
+        const json = resp ? await resp.json() : [];
+        if (json.length > 0) {
+          const append = i > 0;
+          this.renderCards(json, append, false, i, qty);
+          this.refreshPackHitIndicator(openedPackId);
+          this.props.callbackPackOpenTimer(Date.now());
+          if (this.state.expandedChasePanel[openedPackIdStr] && p.Chase) {
+            this.fetchChaseProgress(openedPackIdStr, p.Chase);
+          }
+          // refresh packs and availability
+          this.pullPacks();
+        } else {
+          break;
+        }
+      } catch (err: any) {
+        console.log(err);
+        break;
       }
     }
+
+    this.setState({ targetItem: null, targetType: null, isPackLoading: false }, () => {
+      this.releasePackPurchaseLock();
+    });
   };
 
-  renderCards = (cards: any) => {
+  renderCards = (
+    cards: any,
+    append: boolean = false,
+    releaseLock: boolean = true,
+    packIndex: number = 0,
+    totalPacks: number = 1
+  ) => {
     let items: Array<any> = [];
+    if (totalPacks > 1) {
+      items.push(
+        <div key={`subtitle-${packIndex}`} style={{ fontWeight: 600, margin: "8px 0 4px" }}>
+          {`Pack ${packIndex + 1} results`}
+        </div>
+      );
+    }
     if (cards.length > 0) {
       cards.forEach((c: any, i: number) => {
         items.push(
-          <IonCard key={i}>
+          <IonCard key={`${packIndex}-${i}`}>
             <IonCardContent>
               <IonImg src={c.Image} />
             </IonCardContent>
@@ -822,11 +907,26 @@ class StoreContainer extends React.Component<props, state> {
         );
       });
     }
-    this.setState({ cardsResult: items }, () => {
-      this.setState({ showCards: true });
-      this.releasePackPurchaseLock();
-    });
+
+    if (append && this.state.cardsResult && this.state.cardsResult.length > 0) {
+      const separator = (
+        <div key={"sep-" + Date.now()} style={{ height: 1, background: "#ddd", margin: "8px 0" }} />
+      );
+      this.setState(
+        (prevState) => ({ cardsResult: [...(prevState.cardsResult || []), separator, ...items] }),
+        () => {
+          this.setState({ showCards: true });
+          if (releaseLock) this.releasePackPurchaseLock();
+        }
+      );
+    } else {
+      this.setState({ cardsResult: items }, () => {
+        this.setState({ showCards: true });
+        if (releaseLock) this.releasePackPurchaseLock();
+      });
+    }
   };
+  
 
   _notSuspended = () => {
     //see if user is suspended, don't show anything
