@@ -228,8 +228,22 @@ class StoreContainer extends React.Component<props, state> {
   // Unlike purchaseId, productId is NOT safe here: it's identical across repeat buys of the
   // same pack, so using it (even as a fallback) would make the 2nd purchase look like a replay
   // of the 1st and get silently skipped without crediting.
-  extractVerifiedPurchaseId = (p: any): string | null => {
-    return p?.transactionId || p?.purchaseId || p?.sourceReceipt?.transactions?.[0]?.transactionId || null;
+  // "appstore.application" is a synthesized placeholder id this plugin build attaches to the
+  // app's own receipt entry (trans[0]) - it is NOT a real per-purchase transaction id, so a
+  // real coin purchase can collide with it (or with itself across repeat buys) if used as-is.
+  extractVerifiedPurchaseId = (p: any, productId: string | null): string | null => {
+    const PLACEHOLDER = "appstore.application";
+    const isUsable = (id: any) => !!id && id !== PLACEHOLDER;
+
+    if (isUsable(p?.transactionId)) return p.transactionId;
+    if (isUsable(p?.purchaseId)) return p.purchaseId;
+
+    const trans = p?.sourceReceipt?.transactions || [];
+    const matching = trans.find((tran: any) => (tran?.products || []).some((prod: any) => prod?.id === productId));
+    if (isUsable(matching?.transactionId)) return matching.transactionId;
+
+    const anyUsable = trans.find((tran: any) => isUsable(tran?.transactionId));
+    return anyUsable?.transactionId || null;
   };
 
   mapProductIdToCreditValue = (productId: string | null): number => {
@@ -287,8 +301,16 @@ class StoreContainer extends React.Component<props, state> {
           return; // don't finish() - that would discard the purchase without ever crediting it
         }
 
-        const purchaseId = this.extractVerifiedPurchaseId(p);
-        alert("IAP: resolved purchaseId=" + purchaseId + " (raw transactionId=" + p?.transactionId + ", purchaseId field=" + p?.purchaseId + ")");
+        const purchaseId = this.extractVerifiedPurchaseId(p, productId);
+        const transIds = (p?.sourceReceipt?.transactions || []).map((tran: any) => tran?.transactionId);
+        alert(
+          "IAP: resolved purchaseId=" + purchaseId +
+          " (p.transactionId=" + p?.transactionId +
+          ", p.purchaseId=" + p?.purchaseId +
+          ", receipt transactionIds=" + JSON.stringify(transIds) +
+          ", p.purchaseDate=" + p?.purchaseDate +
+          ", p.transactionDate=" + p?.transactionDate + ")"
+        );
         if (purchaseId && this.processedPurchaseIds.has(purchaseId)) {
           alert("IAP: transaction already credited earlier, just finishing - " + purchaseId);
           p.finish();
