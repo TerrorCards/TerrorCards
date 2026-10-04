@@ -206,7 +206,10 @@ class StoreContainer extends React.Component<props, state> {
   // against component state (targetItem), which can be stale/cleared by an overlapping purchase.
   // A transaction's products list can bundle the app's own receipt entry (id = bundle id, e.g.
   // "com.gisgames.terrocards") alongside the real coin SKU, so index [0] is not reliable - scan
-  // every candidate and prefer the one that actually maps to a known coin pack.
+  // every candidate and prefer the one that actually maps to a known coin pack. Receipts are
+  // cumulative and append new entries at the end, so walk from the newest (last) candidate
+  // backwards rather than taking the first match - repeat buys of the same pack would otherwise
+  // always resolve back to the oldest purchase.
   extractVerifiedProductId = (p: any): string | null => {
     const candidates: string[] = [];
 
@@ -220,8 +223,10 @@ class StoreContainer extends React.Component<props, state> {
       });
     });
 
-    const recognized = candidates.find((id) => this.mapProductIdToCreditValue(id) > 0);
-    return recognized || candidates[0] || null;
+    for (let i = candidates.length - 1; i >= 0; i--) {
+      if (this.mapProductIdToCreditValue(candidates[i]) > 0) return candidates[i];
+    }
+    return candidates[candidates.length - 1] || null;
   };
 
   // Must be unique per transaction, even for repeat purchases of the same consumable SKU.
@@ -229,8 +234,9 @@ class StoreContainer extends React.Component<props, state> {
   // same pack, so using it (even as a fallback) would make the 2nd purchase look like a replay
   // of the 1st and get silently skipped without crediting.
   // "appstore.application" is a synthesized placeholder id this plugin build attaches to the
-  // app's own receipt entry (trans[0]) - it is NOT a real per-purchase transaction id, so a
-  // real coin purchase can collide with it (or with itself across repeat buys) if used as-is.
+  // app's own receipt entry - it is NOT a real per-purchase transaction id. Also walk the
+  // receipt from newest (last) to oldest: repeat buys of the same SKU add multiple matching
+  // entries, and the one just verified is always the most recently appended, not the first.
   extractVerifiedPurchaseId = (p: any, productId: string | null): string | null => {
     const PLACEHOLDER = "appstore.application";
     const isUsable = (id: any) => !!id && id !== PLACEHOLDER;
@@ -239,11 +245,18 @@ class StoreContainer extends React.Component<props, state> {
     if (isUsable(p?.purchaseId)) return p.purchaseId;
 
     const trans = p?.sourceReceipt?.transactions || [];
-    const matching = trans.find((tran: any) => (tran?.products || []).some((prod: any) => prod?.id === productId));
-    if (isUsable(matching?.transactionId)) return matching.transactionId;
+    for (let i = trans.length - 1; i >= 0; i--) {
+      const tran = trans[i];
+      if ((tran?.products || []).some((prod: any) => prod?.id === productId) && isUsable(tran?.transactionId)) {
+        return tran.transactionId;
+      }
+    }
 
-    const anyUsable = trans.find((tran: any) => isUsable(tran?.transactionId));
-    return anyUsable?.transactionId || null;
+    for (let i = trans.length - 1; i >= 0; i--) {
+      if (isUsable(trans[i]?.transactionId)) return trans[i].transactionId;
+    }
+
+    return null;
   };
 
   mapProductIdToCreditValue = (productId: string | null): number => {
