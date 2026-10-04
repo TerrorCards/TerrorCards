@@ -204,12 +204,24 @@ class StoreContainer extends React.Component<props, state> {
 
   // Read the product straight off this specific transaction - never infer it by matching
   // against component state (targetItem), which can be stale/cleared by an overlapping purchase.
+  // A transaction's products list can bundle the app's own receipt entry (id = bundle id, e.g.
+  // "com.gisgames.terrocards") alongside the real coin SKU, so index [0] is not reliable - scan
+  // every candidate and prefer the one that actually maps to a known coin pack.
   extractVerifiedProductId = (p: any): string | null => {
-    const directId = p?.products?.[0]?.id;
-    if (directId) return directId;
+    const candidates: string[] = [];
 
-    const trans = p?.sourceReceipt?.transactions || [];
-    return trans[0]?.products?.[0]?.id || null;
+    (p?.products || []).forEach((prod: any) => {
+      if (prod?.id) candidates.push(prod.id);
+    });
+
+    (p?.sourceReceipt?.transactions || []).forEach((tran: any) => {
+      (tran?.products || []).forEach((prod: any) => {
+        if (prod?.id) candidates.push(prod.id);
+      });
+    });
+
+    const recognized = candidates.find((id) => this.mapProductIdToCreditValue(id) > 0);
+    return recognized || candidates[0] || null;
   };
 
   // Must be unique per transaction, even for repeat purchases of the same consumable SKU.
@@ -259,7 +271,11 @@ class StoreContainer extends React.Component<props, state> {
 
         const productId = this.extractVerifiedProductId(p);
         const value = this.mapProductIdToCreditValue(productId);
-        alert("IAP: verified fired - productId=" + productId + " value=" + value + " isActivePurchase=" + isActivePurchase);
+        const rawCandidates = [
+          ...(p?.products || []).map((prod: any) => prod?.id),
+          ...(p?.sourceReceipt?.transactions || []).flatMap((tran: any) => (tran?.products || []).map((prod: any) => prod?.id)),
+        ];
+        alert("IAP: verified fired - productId=" + productId + " value=" + value + " candidates=" + JSON.stringify(rawCandidates));
 
         if (!productId || value === 0) {
           alert("IAP: unrecognized product, leaving transaction unfinished for retry");
