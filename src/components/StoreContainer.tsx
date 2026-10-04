@@ -67,6 +67,8 @@ class StoreContainer extends React.Component<props, state> {
   private iapProductsRegistered = false;
   private iapStoreInitialized = false;
   private iapInitializing = false;
+  // guards against re-crediting a transaction the store replays before it's finished
+  private processedPurchaseIds = new Set<string>();
 
   constructor(props: any) {
     super(props);
@@ -200,6 +202,37 @@ class StoreContainer extends React.Component<props, state> {
     return purchaseApi.Platform.GOOGLE_PLAY;
   };
 
+  // Android receipts only ever contain the transaction just verified; iOS receipts can bundle
+  // older transactions too, so prefer the one matching the active purchase but fall back to the
+  // first product so replayed/background transactions (no active targetItem) can still be identified.
+  extractVerifiedProductId = (p: any): string | null => {
+    const trans = p?.sourceReceipt?.transactions || [];
+    if (trans.length === 0) return null;
+
+    if (this.deviceInfo.platform === "android") {
+      return trans[0]?.products?.[0]?.id || null;
+    }
+
+    let matched: string | null = null;
+    trans.forEach((tran: any) => {
+      if (tran.products[0].id === this.state.targetItem?.id) {
+        matched = tran.products[0].id;
+      }
+    });
+    return matched || trans[0]?.products?.[0]?.id || null;
+  };
+
+  mapProductIdToCreditValue = (productId: string | null): number => {
+    if (!productId) return 0;
+    if (productId.indexOf("25k") > -1) return 25000;
+    if (productId.indexOf("100k") > -1) return 100000;
+    if (productId.indexOf("250k") > -1) return 250000;
+    if (productId.indexOf("500k") > -1) return 500000;
+    if (productId.indexOf("750k") > -1) return 750000;
+    if (productId.indexOf("1m") > -1) return 1000000;
+    return 0;
+  };
+
   bindStoreListeners = () => {
     const purchaseApi = getPurchaseApi();
     const store = purchaseApi?.store;
@@ -211,38 +244,57 @@ class StoreContainer extends React.Component<props, state> {
           this.renderCoinsList();
         }
       })
-      .approved((p: any) => p.verify())
+      .approved((p: any) => {
+        alert("IAP: purchase approved, verifying receipt...");
+        p.verify();
+      })
       .verified((p: any) => {
-        let productId = null;
-        if (this.deviceInfo.platform === "android") {
-          productId = p.sourceReceipt.transactions[0].products[0].id;
-        } else {
-          const trans = p.sourceReceipt.transactions;
-          trans.forEach((tran: any) => {
-            if (tran.products[0].id === this.state.targetItem?.id) {
-              productId = tran.products[0].id;
+        // isActivePurchase tracks whether *this* JS session initiated the purchase, so we know
+        // whether to drive the confirmation UI. It must never gate whether we credit the
+        // account -- the store can replay an approved-but-unfinished transaction (app restart,
+        // crash, network retry) after this flag has already reset to 0, and every verified
+        // transaction represents money already taken from the user.
+        const isActivePurchase = inAppControl === 1;
+        if (isActivePurchase) {
+          inAppControl = 0;
+        }
+
+        const productId = this.extractVerifiedProductId(p);
+        const value = this.mapProductIdToCreditValue(productId);
+        alert("IAP: verified fired - productId=" + productId + " value=" + value + " isActivePurchase=" + isActivePurchase);
+
+        if (!productId || value === 0) {
+          alert("IAP: unrecognized product, leaving transaction unfinished for retry");
+          console.log("Unrecognized IAP product on verified transaction, leaving unfinished for retry", p);
+          if (isActivePurchase) {
+            this.setState({ targetItem: null, targetType: null, isIAPActiveBuy: false });
+            this.releaseCoinPurchaseLock();
+          }
+          return; // don't finish() - that would discard the purchase without ever crediting it
+        }
+
+        const purchaseId =
+          p.transactionId || p.purchaseId || p.sourceReceipt?.transactions?.[0]?.transactionId || productId;
+        if (this.processedPurchaseIds.has(purchaseId)) {
+          alert("IAP: transaction already credited earlier, just finishing - " + purchaseId);
+          p.finish();
+          return;
+        }
+
+        alert("IAP: calling server to credit " + value + " (purchaseId " + purchaseId + ")");
+        callServer("updateCredit", { credit: value }, this.props.user.ID)
+          ?.then((resp: any) => resp.json())
+          .then((json: any) => {
+            alert("IAP: server responded - " + JSON.stringify(json));
+            if (json?.Status !== "Success") {
+              throw new Error("Server rejected credit update: " + JSON.stringify(json));
             }
-          });
-        }
 
-        let value = 0;
-        if (productId?.indexOf("25k") > -1) {
-          value = 25000;
-        } else if (productId?.indexOf("100k") > -1) {
-          value = 100000;
-        } else if (productId?.indexOf("250k") > -1) {
-          value = 250000;
-        } else if (productId?.indexOf("500k") > -1) {
-          value = 500000;
-        } else if (productId?.indexOf("750k") > -1) {
-          value = 750000;
-        } else if (productId?.indexOf("1m") > -1) {
-          value = 1000000;
-        }
+            this.processedPurchaseIds.add(purchaseId);
+            p.finish();
+            this.props.callbackPackOpenTimer(Date.now());
 
-        if (inAppControl === 1) {
-          callServer("updateCredit", { credit: value }, this.props.user.ID)
-            ?.then((result: any) => {
+            if (isActivePurchase) {
               this.setState({
                 targetItem: null,
                 targetType: null,
@@ -254,21 +306,21 @@ class StoreContainer extends React.Component<props, state> {
                 this.releaseCoinPurchaseLock();
                 this.pullPacks();
               });
-              this.props.callbackPackOpenTimer(Date.now());
-            })
-            .catch((err: any) => {
-              console.log(err);
+            }
+          })
+          .catch((err: any) => {
+            alert("IAP: credit update failed, purchase left unfinished - " + (err?.message || err));
+            console.log(err);
+            // leave the transaction unfinished so the store retries delivery instead of losing the purchase
+            if (isActivePurchase) {
               this.setState({
                 targetItem: null,
                 targetType: null,
                 isIAPActiveBuy: false,
               });
-              inAppControl = 0;
               this.releaseCoinPurchaseLock();
-            });
-          inAppControl = 0;
-        }
-        p.finish();
+            }
+          });
       });
 
     this.iapHandlersBound = true;
@@ -296,6 +348,7 @@ class StoreContainer extends React.Component<props, state> {
       const loadedInAppItems = await callServer("loadInAppItems", "", this.props.user.ID)?.then((resp) => resp.json());
 
       if (!loadedInAppItems || loadedInAppItems.length === 0) {
+        alert("IAP: no in-app items loaded from server, store will not initialize");
         this.iapInitializing = false;
         return;
       }
@@ -317,6 +370,7 @@ class StoreContainer extends React.Component<props, state> {
         store.ready(() => {
           this.iapStoreInitialized = true;
           this.iapInitializing = false;
+          alert("IAP: store ready, product count = " + store.products.length);
           this.setState(
             {
               allCoinList: store.products,
@@ -340,6 +394,7 @@ class StoreContainer extends React.Component<props, state> {
         );
       }
     } catch (err) {
+      alert("IAP: store initialization threw an error - " + err);
       console.log(err);
       this.iapInitializing = false;
     }
@@ -773,6 +828,7 @@ class StoreContainer extends React.Component<props, state> {
                             disabled={this.state.isIAPActiveBuy}
                             onClick={() => {
                               if (!this.acquireCoinPurchaseLock()) return;
+                              alert("IAP: coin purchase tapped - " + p.id);
                               this.setState({
                                 showConfirmPurchase: true,
                                 targetItem: p,
@@ -1161,13 +1217,19 @@ class StoreContainer extends React.Component<props, state> {
     const foundProduct = this.state.allCoinList.filter((coins) => {
       return coins.id === this.state.targetItem.id;
     });
-    //alert(JSON.stringify(foundProduct));
+    alert("IAP: canBuyCoins - matched " + foundProduct.length + " product(s) for " + this.state.targetItem.id);
     if (foundProduct.length > 0) {
       const offer = foundProduct[0].getOffer();
-      //alert("offer");
-      //alert(JSON.stringify(offer));
+      if (!offer) {
+        alert("IAP: no offer available for this product, cannot order");
+      }
       inAppControl = 1;
-      if (offer) offer.order();
+      if (offer) {
+        alert("IAP: submitting order to store...");
+        offer.order();
+      }
+    } else {
+      alert("IAP: no matching product found, purchase cannot start");
     }
   };
 }
