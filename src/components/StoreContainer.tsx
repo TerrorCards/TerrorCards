@@ -202,24 +202,22 @@ class StoreContainer extends React.Component<props, state> {
     return purchaseApi.Platform.GOOGLE_PLAY;
   };
 
-  // Android receipts only ever contain the transaction just verified; iOS receipts can bundle
-  // older transactions too, so prefer the one matching the active purchase but fall back to the
-  // first product so replayed/background transactions (no active targetItem) can still be identified.
+  // Read the product straight off this specific transaction - never infer it by matching
+  // against component state (targetItem), which can be stale/cleared by an overlapping purchase.
   extractVerifiedProductId = (p: any): string | null => {
+    const directId = p?.products?.[0]?.id;
+    if (directId) return directId;
+
     const trans = p?.sourceReceipt?.transactions || [];
-    if (trans.length === 0) return null;
+    return trans[0]?.products?.[0]?.id || null;
+  };
 
-    if (this.deviceInfo.platform === "android") {
-      return trans[0]?.products?.[0]?.id || null;
-    }
-
-    let matched: string | null = null;
-    trans.forEach((tran: any) => {
-      if (tran.products[0].id === this.state.targetItem?.id) {
-        matched = tran.products[0].id;
-      }
-    });
-    return matched || trans[0]?.products?.[0]?.id || null;
+  // Must be unique per transaction, even for repeat purchases of the same consumable SKU.
+  // Unlike purchaseId, productId is NOT safe here: it's identical across repeat buys of the
+  // same pack, so using it (even as a fallback) would make the 2nd purchase look like a replay
+  // of the 1st and get silently skipped without crediting.
+  extractVerifiedPurchaseId = (p: any): string | null => {
+    return p?.transactionId || p?.purchaseId || p?.sourceReceipt?.transactions?.[0]?.transactionId || null;
   };
 
   mapProductIdToCreditValue = (productId: string | null): number => {
@@ -273,9 +271,9 @@ class StoreContainer extends React.Component<props, state> {
           return; // don't finish() - that would discard the purchase without ever crediting it
         }
 
-        const purchaseId =
-          p.transactionId || p.purchaseId || p.sourceReceipt?.transactions?.[0]?.transactionId || productId;
-        if (this.processedPurchaseIds.has(purchaseId)) {
+        const purchaseId = this.extractVerifiedPurchaseId(p);
+        alert("IAP: resolved purchaseId=" + purchaseId + " (raw transactionId=" + p?.transactionId + ", purchaseId field=" + p?.purchaseId + ")");
+        if (purchaseId && this.processedPurchaseIds.has(purchaseId)) {
           alert("IAP: transaction already credited earlier, just finishing - " + purchaseId);
           p.finish();
           return;
@@ -290,7 +288,8 @@ class StoreContainer extends React.Component<props, state> {
               throw new Error("Server rejected credit update: " + JSON.stringify(json));
             }
 
-            this.processedPurchaseIds.add(purchaseId);
+            // only track for dedup when we have a genuinely unique id - never key off productId
+            if (purchaseId) this.processedPurchaseIds.add(purchaseId);
             p.finish();
             this.props.callbackPackOpenTimer(Date.now());
 
