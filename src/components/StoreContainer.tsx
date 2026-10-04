@@ -330,6 +330,12 @@ class StoreContainer extends React.Component<props, state> {
           return;
         }
 
+        // mark as processed NOW, synchronously - if a duplicate verified() fires for the same
+        // transaction while this server call is still in flight, it must see this id as taken.
+        // Marking it only after the server responds leaves a race window where both calls pass
+        // the check above and both credit the account.
+        if (purchaseId) this.processedPurchaseIds.add(purchaseId);
+
         alert("IAP: calling server to credit " + value + " (purchaseId " + purchaseId + ")");
         callServer("updateCredit", { credit: value }, this.props.user.ID)
           ?.then((resp: any) => resp.json())
@@ -339,8 +345,6 @@ class StoreContainer extends React.Component<props, state> {
               throw new Error("Server rejected credit update: " + JSON.stringify(json));
             }
 
-            // only track for dedup when we have a genuinely unique id - never key off productId
-            if (purchaseId) this.processedPurchaseIds.add(purchaseId);
             p.finish();
             this.props.callbackPackOpenTimer(Date.now());
 
@@ -361,6 +365,8 @@ class StoreContainer extends React.Component<props, state> {
           .catch((err: any) => {
             alert("IAP: credit update failed, purchase left unfinished - " + (err?.message || err));
             console.log(err);
+            // the server call failed, so undo the synchronous mark above - allow a retry/replay to credit it
+            if (purchaseId) this.processedPurchaseIds.delete(purchaseId);
             // leave the transaction unfinished so the store retries delivery instead of losing the purchase
             if (isActivePurchase) {
               this.setState({
