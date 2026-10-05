@@ -57,18 +57,22 @@ interface state {
 }
 
 let inAppControl = 0;
+// store/CdvPurchase.store is a global singleton that outlives this component, so these guards
+// must be module-level, not instance fields - otherwise a remount (e.g. switching tabs away and
+// back) resets them and re-registers duplicate listeners on the same shared store, causing each
+// purchase to be credited once per registered listener.
+let iapHandlersBound = false;
+let iapProductsRegistered = false;
+let iapStoreInitialized = false;
+let iapInitializing = false;
+// guards against re-crediting a transaction the store replays before it's finished
+const processedPurchaseIds = new Set<string>();
 
 const getPurchaseApi = () => (window as any).CdvPurchase || null;
 
 class StoreContainer extends React.Component<props, state> {
   private packPurchaseLock = false;
   private coinPurchaseLock = false;
-  private iapHandlersBound = false;
-  private iapProductsRegistered = false;
-  private iapStoreInitialized = false;
-  private iapInitializing = false;
-  // guards against re-crediting a transaction the store replays before it's finished
-  private processedPurchaseIds = new Set<string>();
 
   constructor(props: any) {
     super(props);
@@ -273,7 +277,7 @@ class StoreContainer extends React.Component<props, state> {
   bindStoreListeners = () => {
     const purchaseApi = getPurchaseApi();
     const store = purchaseApi?.store;
-    if (!store || this.iapHandlersBound) return;
+    if (!store || iapHandlersBound) return;
 
     store.when()
       .productUpdated(() => {
@@ -324,7 +328,7 @@ class StoreContainer extends React.Component<props, state> {
           ", p.purchaseDate=" + p?.purchaseDate +
           ", p.transactionDate=" + p?.transactionDate + ")"
         );
-        if (purchaseId && this.processedPurchaseIds.has(purchaseId)) {
+        if (purchaseId && processedPurchaseIds.has(purchaseId)) {
           alert("IAP: transaction already credited earlier, just finishing - " + purchaseId);
           p.finish();
           return;
@@ -334,7 +338,7 @@ class StoreContainer extends React.Component<props, state> {
         // transaction while this server call is still in flight, it must see this id as taken.
         // Marking it only after the server responds leaves a race window where both calls pass
         // the check above and both credit the account.
-        if (purchaseId) this.processedPurchaseIds.add(purchaseId);
+        if (purchaseId) processedPurchaseIds.add(purchaseId);
 
         alert("IAP: calling server to credit " + value + " (purchaseId " + purchaseId + ")");
         callServer("updateCredit", { credit: value }, this.props.user.ID)
@@ -366,7 +370,7 @@ class StoreContainer extends React.Component<props, state> {
             alert("IAP: credit update failed, purchase left unfinished - " + (err?.message || err));
             console.log(err);
             // the server call failed, so undo the synchronous mark above - allow a retry/replay to credit it
-            if (purchaseId) this.processedPurchaseIds.delete(purchaseId);
+            if (purchaseId) processedPurchaseIds.delete(purchaseId);
             // leave the transaction unfinished so the store retries delivery instead of losing the purchase
             if (isActivePurchase) {
               this.setState({
@@ -379,22 +383,22 @@ class StoreContainer extends React.Component<props, state> {
           });
       });
 
-    this.iapHandlersBound = true;
+    iapHandlersBound = true;
   };
 
   initializePurchaseStore = async () => {
     const purchaseApi = getPurchaseApi();
     const store = purchaseApi?.store;
-    if (!purchaseApi || !store || this.iapInitializing || this.iapStoreInitialized) {
+    if (!purchaseApi || !store || iapInitializing || iapStoreInitialized) {
       return;
     }
 
-    this.iapInitializing = true;
+    iapInitializing = true;
 
     try {
       const platformName = await this.resolveDevicePlatform();
       if (!platformName || platformName === "browser") {
-        this.iapInitializing = false;
+        iapInitializing = false;
         return;
       }
 
@@ -405,7 +409,7 @@ class StoreContainer extends React.Component<props, state> {
 
       if (!loadedInAppItems || loadedInAppItems.length === 0) {
         alert("IAP: no in-app items loaded from server, store will not initialize");
-        this.iapInitializing = false;
+        iapInitializing = false;
         return;
       }
 
@@ -416,16 +420,16 @@ class StoreContainer extends React.Component<props, state> {
         type: purchaseApi.ProductType.CONSUMABLE,
       }));
 
-      if (!this.iapProductsRegistered) {
+      if (!iapProductsRegistered) {
         store.register(productList);
-        this.iapProductsRegistered = true;
+        iapProductsRegistered = true;
       }
 
-      if (!this.iapStoreInitialized) {
+      if (!iapStoreInitialized) {
         await store.initialize([targetPlatform]);
         store.ready(() => {
-          this.iapStoreInitialized = true;
-          this.iapInitializing = false;
+          iapStoreInitialized = true;
+          iapInitializing = false;
           alert("IAP: store ready, product count = " + store.products.length);
           this.setState(
             {
@@ -438,7 +442,7 @@ class StoreContainer extends React.Component<props, state> {
           );
         });
       } else {
-        this.iapInitializing = false;
+        iapInitializing = false;
         this.setState(
           {
             allCoinList: store.products,
@@ -452,7 +456,7 @@ class StoreContainer extends React.Component<props, state> {
     } catch (err) {
       alert("IAP: store initialization threw an error - " + err);
       console.log(err);
-      this.iapInitializing = false;
+      iapInitializing = false;
     }
   };
 
