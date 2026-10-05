@@ -336,10 +336,12 @@ class StoreContainer extends React.Component<props, state> {
 
         const productId = this.extractVerifiedProductId(p);
         const value = this.mapProductIdToCreditValue(productId);
+        /*
         const rawCandidates = [
           ...(p?.products || []).map((prod: any) => prod?.id),
           ...(p?.sourceReceipt?.transactions || []).flatMap((tran: any) => (tran?.products || []).map((prod: any) => prod?.id)),
         ];
+        */
         //alert("IAP: verified fired - productId=" + productId + " value=" + value + " candidates=" + JSON.stringify(rawCandidates));
 
         if (!productId || value === 0) {
@@ -352,8 +354,8 @@ class StoreContainer extends React.Component<props, state> {
         }
 
         const purchaseId = this.extractVerifiedPurchaseId(p, productId);
-        const transIds = (p?.sourceReceipt?.transactions || []).map((tran: any) => tran?.transactionId);
         /*
+        const transIds = (p?.sourceReceipt?.transactions || []).map((tran: any) => tran?.transactionId);
         alert(
           "IAP: resolved purchaseId=" + purchaseId +
           " (p.transactionId=" + p?.transactionId +
