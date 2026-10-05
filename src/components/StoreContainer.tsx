@@ -305,16 +305,9 @@ class StoreContainer extends React.Component<props, state> {
         alert("IAP: purchase approved, verifying receipt...");
         p.verify();
       })
-      .cancelled((p: any) => {
-        // user dismissed the native App Store/Play Store payment sheet - approved()/verified()
-        // will never fire for this transaction, so this is the only place that can release the
-        // pending-purchase UI state.
-        alert("IAP: purchase cancelled by user");
-        if (inAppControl === 1) {
-          inAppControl = 0;
-          resetPendingCoinPurchaseUI();
-        }
-      })
+      // NOTE: this plugin version (cordova-plugin-purchase 13.x) has no `.cancelled()` chain
+      // method and does not surface PAYMENT_CANCELLED via store.error() either - user-dismissed
+      // payment sheets are silently swallowed internally, so they can't be detected here.
       .unverified((p: any) => {
         // receipt failed native verification - also never reaches verified(), same UI-stuck risk
         alert("IAP: purchase failed verification, leaving unfinished");
