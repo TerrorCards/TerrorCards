@@ -73,6 +73,15 @@ const processedPurchaseIds = new Set<string>();
 // instance-specific work (setState, props) through whichever instance is currently mounted.
 let activeInstance: any = null;
 
+// shared by every path where a purchase attempt ends without ever reaching verified() (user
+// cancelled the native payment sheet, receipt failed verification, etc.) - without this, the
+// buy buttons stay disabled forever since isIAPActiveBuy/coinPurchaseLock are only otherwise
+// cleared inside the verified() success/failure branches.
+const resetPendingCoinPurchaseUI = () => {
+  activeInstance?.setState({ targetItem: null, targetType: null, isIAPActiveBuy: false });
+  activeInstance?.releaseCoinPurchaseLock();
+};
+
 const getPurchaseApi = () => (window as any).CdvPurchase || null;
 
 class StoreContainer extends React.Component<props, state> {
@@ -296,6 +305,24 @@ class StoreContainer extends React.Component<props, state> {
         alert("IAP: purchase approved, verifying receipt...");
         p.verify();
       })
+      .cancelled((p: any) => {
+        // user dismissed the native App Store/Play Store payment sheet - approved()/verified()
+        // will never fire for this transaction, so this is the only place that can release the
+        // pending-purchase UI state.
+        alert("IAP: purchase cancelled by user");
+        if (inAppControl === 1) {
+          inAppControl = 0;
+          resetPendingCoinPurchaseUI();
+        }
+      })
+      .unverified((p: any) => {
+        // receipt failed native verification - also never reaches verified(), same UI-stuck risk
+        alert("IAP: purchase failed verification, leaving unfinished");
+        if (inAppControl === 1) {
+          inAppControl = 0;
+          resetPendingCoinPurchaseUI();
+        }
+      })
       .verified((p: any) => {
         // isActivePurchase tracks whether *this* JS session initiated the purchase, so we know
         // whether to drive the confirmation UI. It must never gate whether we credit the
@@ -319,8 +346,7 @@ class StoreContainer extends React.Component<props, state> {
           alert("IAP: unrecognized product, leaving transaction unfinished for retry");
           console.log("Unrecognized IAP product on verified transaction, leaving unfinished for retry", p);
           if (isActivePurchase) {
-            activeInstance?.setState({ targetItem: null, targetType: null, isIAPActiveBuy: false });
-            activeInstance?.releaseCoinPurchaseLock();
+            resetPendingCoinPurchaseUI();
           }
           return; // don't finish() - that would discard the purchase without ever crediting it
         }
@@ -380,12 +406,7 @@ class StoreContainer extends React.Component<props, state> {
             if (purchaseId) processedPurchaseIds.delete(purchaseId);
             // leave the transaction unfinished so the store retries delivery instead of losing the purchase
             if (isActivePurchase) {
-              activeInstance?.setState({
-                targetItem: null,
-                targetType: null,
-                isIAPActiveBuy: false,
-              });
-              activeInstance?.releaseCoinPurchaseLock();
+              resetPendingCoinPurchaseUI();
             }
           });
       });
