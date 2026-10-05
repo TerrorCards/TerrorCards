@@ -389,10 +389,21 @@ class StoreContainer extends React.Component<props, state> {
   initializePurchaseStore = async () => {
     const purchaseApi = getPurchaseApi();
     const store = purchaseApi?.store;
-    if (!purchaseApi || !store || iapInitializing || iapStoreInitialized) {
+    if (!purchaseApi || !store) return;
+
+    // the store was already fully initialized by a prior mount of this component - don't
+    // re-register listeners/re-init, just sync this (new) instance's local state from it
+    if (iapStoreInitialized) {
+      this.setState(
+        { allCoinList: store.products, isInAppLoaded: true },
+        () => {
+          if (this.state.storeType === "coins") this.renderCoinsList();
+        }
+      );
       return;
     }
 
+    if (iapInitializing) return;
     iapInitializing = true;
 
     try {
@@ -425,24 +436,11 @@ class StoreContainer extends React.Component<props, state> {
         iapProductsRegistered = true;
       }
 
-      if (!iapStoreInitialized) {
-        await store.initialize([targetPlatform]);
-        store.ready(() => {
-          iapStoreInitialized = true;
-          iapInitializing = false;
-          alert("IAP: store ready, product count = " + store.products.length);
-          this.setState(
-            {
-              allCoinList: store.products,
-              isInAppLoaded: true,
-            },
-            () => {
-              if (this.state.storeType === "coins") this.renderCoinsList();
-            }
-          );
-        });
-      } else {
+      await store.initialize([targetPlatform]);
+      store.ready(() => {
+        iapStoreInitialized = true;
         iapInitializing = false;
+        alert("IAP: store ready, product count = " + store.products.length);
         this.setState(
           {
             allCoinList: store.products,
@@ -452,7 +450,7 @@ class StoreContainer extends React.Component<props, state> {
             if (this.state.storeType === "coins") this.renderCoinsList();
           }
         );
-      }
+      });
     } catch (err) {
       alert("IAP: store initialization threw an error - " + err);
       console.log(err);
