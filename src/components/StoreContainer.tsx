@@ -67,6 +67,11 @@ let iapStoreInitialized = false;
 let iapInitializing = false;
 // guards against re-crediting a transaction the store replays before it's finished
 const processedPurchaseIds = new Set<string>();
+// bindStoreListeners only ever runs once (see iapHandlersBound), so its callbacks must never
+// close over a specific component instance's `this` - that instance can unmount (e.g. switching
+// tabs away and back) while the listener keeps firing for the lifetime of the app. Route all
+// instance-specific work (setState, props) through whichever instance is currently mounted.
+let activeInstance: any = null;
 
 const getPurchaseApi = () => (window as any).CdvPurchase || null;
 
@@ -139,11 +144,13 @@ class StoreContainer extends React.Component<props, state> {
   };
 
   componentDidMount() {
+    activeInstance = this;
     this.pullPacks();
     this.waitForDeviceReady();
   }
 
   ionViewWillEnter() {
+    activeInstance = this;
     this.pullPacks();
     this.waitForDeviceReady();
   }
@@ -281,8 +288,8 @@ class StoreContainer extends React.Component<props, state> {
 
     store.when()
       .productUpdated(() => {
-        if (this.state.storeType === "coins") {
-          this.renderCoinsList();
+        if (activeInstance?.state.storeType === "coins") {
+          activeInstance?.renderCoinsList();
         }
       })
       .approved((p: any) => {
@@ -312,8 +319,8 @@ class StoreContainer extends React.Component<props, state> {
           alert("IAP: unrecognized product, leaving transaction unfinished for retry");
           console.log("Unrecognized IAP product on verified transaction, leaving unfinished for retry", p);
           if (isActivePurchase) {
-            this.setState({ targetItem: null, targetType: null, isIAPActiveBuy: false });
-            this.releaseCoinPurchaseLock();
+            activeInstance?.setState({ targetItem: null, targetType: null, isIAPActiveBuy: false });
+            activeInstance?.releaseCoinPurchaseLock();
           }
           return; // don't finish() - that would discard the purchase without ever crediting it
         }
@@ -341,7 +348,7 @@ class StoreContainer extends React.Component<props, state> {
         if (purchaseId) processedPurchaseIds.add(purchaseId);
 
         alert("IAP: calling server to credit " + value + " (purchaseId " + purchaseId + ")");
-        callServer("updateCredit", { credit: value }, this.props.user.ID)
+        callServer("updateCredit", { credit: value }, activeInstance?.props.user.ID)
           ?.then((resp: any) => resp.json())
           .then((json: any) => {
             alert("IAP: server responded - " + JSON.stringify(json));
@@ -350,10 +357,10 @@ class StoreContainer extends React.Component<props, state> {
             }
 
             p.finish();
-            this.props.callbackPackOpenTimer(Date.now());
+            activeInstance?.props.callbackPackOpenTimer(Date.now());
 
             if (isActivePurchase) {
-              this.setState({
+              activeInstance?.setState({
                 targetItem: null,
                 targetType: null,
                 storeType: "pandora",
@@ -361,8 +368,8 @@ class StoreContainer extends React.Component<props, state> {
                 coinPurchaseMsg: "Thank you. Account updated by " + value + " credit",
                 isIAPActiveBuy: false,
               }, () => {
-                this.releaseCoinPurchaseLock();
-                this.pullPacks();
+                activeInstance?.releaseCoinPurchaseLock();
+                activeInstance?.pullPacks();
               });
             }
           })
@@ -373,12 +380,12 @@ class StoreContainer extends React.Component<props, state> {
             if (purchaseId) processedPurchaseIds.delete(purchaseId);
             // leave the transaction unfinished so the store retries delivery instead of losing the purchase
             if (isActivePurchase) {
-              this.setState({
+              activeInstance?.setState({
                 targetItem: null,
                 targetType: null,
                 isIAPActiveBuy: false,
               });
-              this.releaseCoinPurchaseLock();
+              activeInstance?.releaseCoinPurchaseLock();
             }
           });
       });
