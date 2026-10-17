@@ -12,3 +12,14 @@
 	opacity: 0.58;
 	filter: grayscale(0.3);
 }
+
+.pack-qty-segment {
+	width: auto;
+	max-width: 150px;
+	margin-bottom: 18px;
+}
+
+.pack-qty-segment ion-segment-button {
+	min-width: 40px;
+	flex: 0 0 auto;
+}

@@ -53,19 +53,40 @@ interface state {
   isPackLoading: boolean;
   expandedChasePanel: Record<string, boolean>;
   chaseProgress: Record<string, { CurrentReleaseCompletion: number; AllReleaseCompletion: number } | null>;
+  packSelection?: Record<string, number>;
 }
 
 let inAppControl = 0;
+// store/CdvPurchase.store is a global singleton that outlives this component, so these guards
+// must be module-level, not instance fields - otherwise a remount (e.g. switching tabs away and
+// back) resets them and re-registers duplicate listeners on the same shared store, causing each
+// purchase to be credited once per registered listener.
+let iapHandlersBound = false;
+let iapProductsRegistered = false;
+let iapStoreInitialized = false;
+let iapInitializing = false;
+// guards against re-crediting a transaction the store replays before it's finished
+const processedPurchaseIds = new Set<string>();
+// bindStoreListeners only ever runs once (see iapHandlersBound), so its callbacks must never
+// close over a specific component instance's `this` - that instance can unmount (e.g. switching
+// tabs away and back) while the listener keeps firing for the lifetime of the app. Route all
+// instance-specific work (setState, props) through whichever instance is currently mounted.
+let activeInstance: any = null;
+
+// shared by every path where a purchase attempt ends without ever reaching verified() (user
+// cancelled the native payment sheet, receipt failed verification, etc.) - without this, the
+// buy buttons stay disabled forever since isIAPActiveBuy/coinPurchaseLock are only otherwise
+// cleared inside the verified() success/failure branches.
+const resetPendingCoinPurchaseUI = () => {
+  activeInstance?.setState({ targetItem: null, targetType: null, isIAPActiveBuy: false });
+  activeInstance?.releaseCoinPurchaseLock();
+};
 
 const getPurchaseApi = () => (window as any).CdvPurchase || null;
 
 class StoreContainer extends React.Component<props, state> {
   private packPurchaseLock = false;
   private coinPurchaseLock = false;
-  private iapHandlersBound = false;
-  private iapProductsRegistered = false;
-  private iapStoreInitialized = false;
-  private iapInitializing = false;
 
   constructor(props: any) {
     super(props);
@@ -91,6 +112,7 @@ class StoreContainer extends React.Component<props, state> {
       isPackLoading: false,
       expandedChasePanel: {},
       chaseProgress: {},
+      packSelection: {},
     };
   }
 
@@ -131,13 +153,21 @@ class StoreContainer extends React.Component<props, state> {
   };
 
   componentDidMount() {
+    activeInstance = this;
     this.pullPacks();
     this.waitForDeviceReady();
   }
 
   ionViewWillEnter() {
+    activeInstance = this;
     this.pullPacks();
     this.waitForDeviceReady();
+  }
+
+  componentDidUpdate(prevProps: props) {
+    if (prevProps.user?.credit !== this.props.user?.credit) {
+      this.reconcilePackSelections();
+    }
   }
 
   waitForDeviceReady = () => {
@@ -192,50 +222,166 @@ class StoreContainer extends React.Component<props, state> {
     return purchaseApi.Platform.GOOGLE_PLAY;
   };
 
+  // Read the product straight off this specific transaction - never infer it by matching
+  // against component state (targetItem), which can be stale/cleared by an overlapping purchase.
+  // A transaction's products list can bundle the app's own receipt entry (id = bundle id, e.g.
+  // "com.gisgames.terrocards") alongside the real coin SKU, so index [0] is not reliable - scan
+  // every candidate and prefer the one that actually maps to a known coin pack. Receipts are
+  // cumulative and append new entries at the end, so walk from the newest (last) candidate
+  // backwards rather than taking the first match - repeat buys of the same pack would otherwise
+  // always resolve back to the oldest purchase.
+  extractVerifiedProductId = (p: any): string | null => {
+    const candidates: string[] = [];
+
+    (p?.products || []).forEach((prod: any) => {
+      if (prod?.id) candidates.push(prod.id);
+    });
+
+    (p?.sourceReceipt?.transactions || []).forEach((tran: any) => {
+      (tran?.products || []).forEach((prod: any) => {
+        if (prod?.id) candidates.push(prod.id);
+      });
+    });
+
+    for (let i = candidates.length - 1; i >= 0; i--) {
+      if (this.mapProductIdToCreditValue(candidates[i]) > 0) return candidates[i];
+    }
+    return candidates[candidates.length - 1] || null;
+  };
+
+  // Must be unique per transaction, even for repeat purchases of the same consumable SKU.
+  // Unlike purchaseId, productId is NOT safe here: it's identical across repeat buys of the
+  // same pack, so using it (even as a fallback) would make the 2nd purchase look like a replay
+  // of the 1st and get silently skipped without crediting.
+  // "appstore.application" is a synthesized placeholder id this plugin build attaches to the
+  // app's own receipt entry - it is NOT a real per-purchase transaction id. Also walk the
+  // receipt from newest (last) to oldest: repeat buys of the same SKU add multiple matching
+  // entries, and the one just verified is always the most recently appended, not the first.
+  extractVerifiedPurchaseId = (p: any, productId: string | null): string | null => {
+    const PLACEHOLDER = "appstore.application";
+    const isUsable = (id: any) => !!id && id !== PLACEHOLDER;
+
+    if (isUsable(p?.transactionId)) return p.transactionId;
+    if (isUsable(p?.purchaseId)) return p.purchaseId;
+
+    const trans = p?.sourceReceipt?.transactions || [];
+    for (let i = trans.length - 1; i >= 0; i--) {
+      const tran = trans[i];
+      if ((tran?.products || []).some((prod: any) => prod?.id === productId) && isUsable(tran?.transactionId)) {
+        return tran.transactionId;
+      }
+    }
+
+    for (let i = trans.length - 1; i >= 0; i--) {
+      if (isUsable(trans[i]?.transactionId)) return trans[i].transactionId;
+    }
+
+    return null;
+  };
+
+  mapProductIdToCreditValue = (productId: string | null): number => {
+    if (!productId) return 0;
+    if (productId.indexOf("25k") > -1) return 25000;
+    if (productId.indexOf("100k") > -1) return 100000;
+    if (productId.indexOf("250k") > -1) return 250000;
+    if (productId.indexOf("500k") > -1) return 500000;
+    if (productId.indexOf("750k") > -1) return 750000;
+    if (productId.indexOf("1m") > -1) return 1000000;
+    return 0;
+  };
+
   bindStoreListeners = () => {
     const purchaseApi = getPurchaseApi();
     const store = purchaseApi?.store;
-    if (!store || this.iapHandlersBound) return;
+    if (!store || iapHandlersBound) return;
 
     store.when()
       .productUpdated(() => {
-        if (this.state.storeType === "coins") {
-          this.renderCoinsList();
+        if (activeInstance?.state.storeType === "coins") {
+          activeInstance?.renderCoinsList();
         }
       })
-      .approved((p: any) => p.verify())
-      .verified((p: any) => {
-        let productId = null;
-        if (this.deviceInfo.platform === "android") {
-          productId = p.sourceReceipt.transactions[0].products[0].id;
-        } else {
-          const trans = p.sourceReceipt.transactions;
-          trans.forEach((tran: any) => {
-            if (tran.products[0].id === this.state.targetItem?.id) {
-              productId = tran.products[0].id;
-            }
-          });
-        }
-
-        let value = 0;
-        if (productId?.indexOf("25k") > -1) {
-          value = 25000;
-        } else if (productId?.indexOf("100k") > -1) {
-          value = 100000;
-        } else if (productId?.indexOf("250k") > -1) {
-          value = 250000;
-        } else if (productId?.indexOf("500k") > -1) {
-          value = 500000;
-        } else if (productId?.indexOf("750k") > -1) {
-          value = 750000;
-        } else if (productId?.indexOf("1m") > -1) {
-          value = 1000000;
-        }
-
+      .approved((p: any) => {
+        //alert("IAP: purchase approved, verifying receipt...");
+        p.verify();
+      })
+      // NOTE: this plugin version (cordova-plugin-purchase 13.x) has no `.cancelled()` chain
+      // method and does not surface PAYMENT_CANCELLED via store.error() either - user-dismissed
+      // payment sheets are silently swallowed internally, so they can't be detected here.
+      .unverified((p: any) => {
+        // receipt failed native verification - also never reaches verified(), same UI-stuck risk
+        //alert("IAP: purchase failed verification, leaving unfinished");
         if (inAppControl === 1) {
-          callServer("updateCredit", { credit: value }, this.props.user.ID)
-            ?.then((result: any) => {
-              this.setState({
+          inAppControl = 0;
+          resetPendingCoinPurchaseUI();
+        }
+      })
+      .verified((p: any) => {
+        // isActivePurchase tracks whether *this* JS session initiated the purchase, so we know
+        // whether to drive the confirmation UI. It must never gate whether we credit the
+        // account -- the store can replay an approved-but-unfinished transaction (app restart,
+        // crash, network retry) after this flag has already reset to 0, and every verified
+        // transaction represents money already taken from the user.
+        const isActivePurchase = inAppControl === 1;
+        if (isActivePurchase) {
+          inAppControl = 0;
+        }
+
+        const productId = this.extractVerifiedProductId(p);
+        const value = this.mapProductIdToCreditValue(productId);
+        /*
+        const rawCandidates = [
+          ...(p?.products || []).map((prod: any) => prod?.id),
+          ...(p?.sourceReceipt?.transactions || []).flatMap((tran: any) => (tran?.products || []).map((prod: any) => prod?.id)),
+        ];
+        */
+        //alert("IAP: verified fired - productId=" + productId + " value=" + value + " candidates=" + JSON.stringify(rawCandidates));
+
+        if (!productId || value === 0) {
+          //alert("IAP: unrecognized product, leaving transaction unfinished for retry");
+          //console.log("Unrecognized IAP product on verified transaction, leaving unfinished for retry", p);
+          if (isActivePurchase) {
+            resetPendingCoinPurchaseUI();
+          }
+          return; // don't finish() - that would discard the purchase without ever crediting it
+        }
+
+        const purchaseId = this.extractVerifiedPurchaseId(p, productId);
+        //const transIds = (p?.sourceReceipt?.transactions || []).map((tran: any) => tran?.transactionId);
+        //alert(
+        //  "IAP: resolved purchaseId=" + purchaseId +
+        //  " (p.transactionId=" + p?.transactionId +
+        //  ", p.purchaseId=" + p?.purchaseId +
+        //  ", receipt transactionIds=" + JSON.stringify(transIds) +
+        //  ", p.purchaseDate=" + p?.purchaseDate +
+        //  ", p.transactionDate=" + p?.transactionDate + ")"
+        //);
+        if (purchaseId && processedPurchaseIds.has(purchaseId)) {
+          //alert("IAP: transaction already credited earlier, just finishing - " + purchaseId);
+          p.finish();
+          return;
+        }
+
+        // mark as processed NOW, synchronously - if a duplicate verified() fires for the same
+        // transaction while this server call is still in flight, it must see this id as taken.
+        // Marking it only after the server responds leaves a race window where both calls pass
+        // the check above and both credit the account.
+        if (purchaseId) processedPurchaseIds.add(purchaseId);
+
+        //alert("IAP: calling server to credit " + value + " (purchaseId " + purchaseId + ")");
+        callServer("updateCredit", { credit: value }, activeInstance?.props.user.ID)
+          ?.then((resp: any) => resp.json())
+          .then((json: any) => {
+            //alert("IAP: server responded - " + JSON.stringify(json));
+            if (json?.Status !== "Success") {
+              throw new Error("Server rejected credit update: " + JSON.stringify(json));
+            }
+
+            p.finish();
+            activeInstance?.props.callbackPackOpenTimer(Date.now());
+
+            if (isActivePurchase) {
+              activeInstance?.setState({
                 targetItem: null,
                 targetType: null,
                 storeType: "pandora",
@@ -243,42 +389,50 @@ class StoreContainer extends React.Component<props, state> {
                 coinPurchaseMsg: "Thank you. Account updated by " + value + " credit",
                 isIAPActiveBuy: false,
               }, () => {
-                this.releaseCoinPurchaseLock();
-                this.pullPacks();
+                activeInstance?.releaseCoinPurchaseLock();
+                activeInstance?.pullPacks();
               });
-              this.props.callbackPackOpenTimer(Date.now());
-            })
-            .catch((err: any) => {
-              console.log(err);
-              this.setState({
-                targetItem: null,
-                targetType: null,
-                isIAPActiveBuy: false,
-              });
-              inAppControl = 0;
-              this.releaseCoinPurchaseLock();
-            });
-          inAppControl = 0;
-        }
-        p.finish();
+            }
+          })
+          .catch((err: any) => {
+            //alert("IAP: credit update failed, purchase left unfinished - " + (err?.message || err));
+            console.log(err);
+            // the server call failed, so undo the synchronous mark above - allow a retry/replay to credit it
+            if (purchaseId) processedPurchaseIds.delete(purchaseId);
+            // leave the transaction unfinished so the store retries delivery instead of losing the purchase
+            if (isActivePurchase) {
+              resetPendingCoinPurchaseUI();
+            }
+          });
       });
 
-    this.iapHandlersBound = true;
+    iapHandlersBound = true;
   };
 
   initializePurchaseStore = async () => {
     const purchaseApi = getPurchaseApi();
     const store = purchaseApi?.store;
-    if (!purchaseApi || !store || this.iapInitializing || this.iapStoreInitialized) {
+    if (!purchaseApi || !store) return;
+
+    // the store was already fully initialized by a prior mount of this component - don't
+    // re-register listeners/re-init, just sync this (new) instance's local state from it
+    if (iapStoreInitialized) {
+      this.setState(
+        { allCoinList: store.products, isInAppLoaded: true },
+        () => {
+          if (this.state.storeType === "coins") this.renderCoinsList();
+        }
+      );
       return;
     }
 
-    this.iapInitializing = true;
+    if (iapInitializing) return;
+    iapInitializing = true;
 
     try {
       const platformName = await this.resolveDevicePlatform();
       if (!platformName || platformName === "browser") {
-        this.iapInitializing = false;
+        iapInitializing = false;
         return;
       }
 
@@ -288,7 +442,8 @@ class StoreContainer extends React.Component<props, state> {
       const loadedInAppItems = await callServer("loadInAppItems", "", this.props.user.ID)?.then((resp) => resp.json());
 
       if (!loadedInAppItems || loadedInAppItems.length === 0) {
-        this.iapInitializing = false;
+        //alert("IAP: no in-app items loaded from server, store will not initialize");
+        iapInitializing = false;
         return;
       }
 
@@ -299,28 +454,16 @@ class StoreContainer extends React.Component<props, state> {
         type: purchaseApi.ProductType.CONSUMABLE,
       }));
 
-      if (!this.iapProductsRegistered) {
+      if (!iapProductsRegistered) {
         store.register(productList);
-        this.iapProductsRegistered = true;
+        iapProductsRegistered = true;
       }
 
-      if (!this.iapStoreInitialized) {
-        await store.initialize([targetPlatform]);
-        store.ready(() => {
-          this.iapStoreInitialized = true;
-          this.iapInitializing = false;
-          this.setState(
-            {
-              allCoinList: store.products,
-              isInAppLoaded: true,
-            },
-            () => {
-              if (this.state.storeType === "coins") this.renderCoinsList();
-            }
-          );
-        });
-      } else {
-        this.iapInitializing = false;
+      await store.initialize([targetPlatform]);
+      store.ready(() => {
+        iapStoreInitialized = true;
+        iapInitializing = false;
+        //alert("IAP: store ready, product count = " + store.products.length);
         this.setState(
           {
             allCoinList: store.products,
@@ -330,10 +473,11 @@ class StoreContainer extends React.Component<props, state> {
             if (this.state.storeType === "coins") this.renderCoinsList();
           }
         );
-      }
+      });
     } catch (err) {
+      //alert("IAP: store initialization threw an error - " + err);
       console.log(err);
-      this.iapInitializing = false;
+      iapInitializing = false;
     }
   };
 
@@ -504,6 +648,42 @@ class StoreContainer extends React.Component<props, state> {
     return "#2e7d32";
   };
 
+  setPackQty = (packId: string, qty: number) => {
+    this.setState(
+      (prevState) => ({
+        packSelection: { ...prevState.packSelection, [packId]: qty },
+      }),
+      () => this.filterPacks()
+    );
+  };
+
+  // after credit changes (e.g. post-purchase), drop any pack selection that's no longer affordable
+  reconcilePackSelections = () => {
+    const credit = parseInt(this.props.user.credit);
+    const qtyOptions = [1, 3, 5];
+    const updatedSelection: Record<string, number> = { ...this.state.packSelection };
+    let changed = false;
+
+    this.state.allItemsList.forEach((p: any) => {
+      const packIdStr = String(parseInt(p.ID, 10));
+      const cost = parseInt(p.Cost);
+      const currentQty = updatedSelection[packIdStr] || 1;
+      if (credit < cost * currentQty) {
+        const affordableQty = [...qtyOptions].reverse().find((q) => credit >= cost * q) || 1;
+        if (affordableQty !== currentQty) {
+          updatedSelection[packIdStr] = affordableQty;
+          changed = true;
+        }
+      }
+    });
+
+    if (changed) {
+      this.setState({ packSelection: updatedSelection }, () => {
+        if (this.state.storeType !== "coins") this.filterPacks();
+      });
+    }
+  };
+
   pullInApp = () => {
     this.initializePurchaseStore();
   };
@@ -527,20 +707,25 @@ class StoreContainer extends React.Component<props, state> {
       filtered.forEach((p: any) => {
         const packOddsPack = parseInt(p.Ratio) > 1 ? " Packs" : " Pack";
         let packMsg = "";
-        const isPackDisabled =
-          this.state.isPackLoading ||
-          parseInt(this.props.user.credit) < parseInt(p.Cost);
+        const parsedPackId = parseInt(p.ID, 10);
+        const packIdStr = String(parsedPackId);
+        const packCost = parseInt(p.Cost);
+        const credit = parseInt(this.props.user.credit);
+        const qtyOptions = [1, 3, 5];
+        const qty = this.state.packSelection?.[packIdStr] || 1;
+        const totalCost = packCost * qty;
+        const isThisPackLoading =
+          this.state.isPackLoading && parseInt(this.state.targetItem?.ID, 10) === parsedPackId;
+        const isPackDisabled = this.state.isPackLoading || credit < totalCost;
         if (parseInt(p.Ratio) === 1) {
           packMsg = "1 per pack";
         } else {
-          if (parseInt(p.ID, 10) !== 291) {
+          if (parsedPackId !== 291) {
             packMsg = "1 in " + p.Ratio + packOddsPack;
           }
         }
-        const parsedPackId = parseInt(p.ID, 10);
         const hitPercentage = this.state.packHitIndicators[String(parsedPackId)] || 0;
         const hitIndicatorColor = this.getHitIndicatorColor(hitPercentage);
-        const packIdStr = String(parsedPackId);
         const isChaseOpen = !!this.state.expandedChasePanel[packIdStr];
         const chaseData = this.state.chaseProgress[packIdStr] ?? null;
         items.push(
@@ -583,6 +768,26 @@ class StoreContainer extends React.Component<props, state> {
                           ></div>
                         </div>
                       )}
+                      <div style={{ fontSize: 12, color: "#888", marginBottom: 4 }}>
+                        How many packs?
+                      </div>
+                      <IonSegment
+                        className="pack-qty-segment"
+                        value={String(qty)}
+                        onIonChange={(e: any) => {
+                          this.setPackQty(packIdStr, parseInt(e.detail.value, 10));
+                        }}
+                      >
+                        {qtyOptions.map((option) => (
+                          <IonSegmentButton
+                            key={option}
+                            value={String(option)}
+                            disabled={credit < packCost * option}
+                          >
+                            <IonLabel>{option}</IonLabel>
+                          </IonSegmentButton>
+                        ))}
+                      </IonSegment>
                       <div
                         style={{
                           display: "flex",
@@ -609,7 +814,7 @@ class StoreContainer extends React.Component<props, state> {
                           }}
                           disabled={isPackDisabled}
                         >
-                          {p.Cost}
+                          {isThisPackLoading ? <IonSpinner name="dots" /> : totalCost}
                         </IonButton>
                       </div>
                       {parsedPackId !== 291 && <div style={{ paddingTop: 12 }}>
@@ -706,6 +911,7 @@ class StoreContainer extends React.Component<props, state> {
                             disabled={this.state.isIAPActiveBuy}
                             onClick={() => {
                               if (!this.acquireCoinPurchaseLock()) return;
+                              //alert("IAP: coin purchase tapped - " + p.id);
                               this.setState({
                                 showConfirmPurchase: true,
                                 targetItem: p,
@@ -761,60 +967,78 @@ class StoreContainer extends React.Component<props, state> {
   };
 
   //Buying checks
-  _canBuy = () => {
-    //call server to get latest credit and see if user can buy
-    if (this.state.targetItem !== null) {
-      const p = this.state.targetItem;
-      const openedPackId = p.ID;
-      if (parseInt(this.props.user.credit) >= parseInt(p.Cost)) {
-        //call to pull packs.
-        let packOrder = {
-          packID: p.ID,
-          packName: p.Name,
-          userID: this.props.user.ID,
-          packSets: p.Set,
-          packChase: p.Chase,
-          packCost: p.Cost,
-          packPer: p.PerPack,
-        };
+  _canBuy = async () => {
+    if (this.state.targetItem === null) return;
 
-        callServer("packsOrder", packOrder, this.props.user.ID)
-          ?.then((resp) => {
-            return resp.json();
-          })
-          .then((json) => {
-            if (json.length > 0) {
-              this.renderCards(json);
-              this.refreshPackHitIndicator(openedPackId);
-              this.props.callbackPackOpenTimer(Date.now());
-              const openedPackIdStr = String(parseInt(openedPackId, 10));
-              if (this.state.expandedChasePanel[openedPackIdStr] && p.Chase) {
-                this.fetchChaseProgress(openedPackIdStr, p.Chase);
-              }
-              this.setState({ targetItem: null, targetType: null });
-            } else {
-              this.setState({ targetItem: null, targetType: null });
-              this.releasePackPurchaseLock();
-            }
-          })
-          .catch((err: any) => {
-            console.log(err);
-            this.releasePackPurchaseLock();
-          });
-      } else {
+    const p = this.state.targetItem;
+    const openedPackId = p.ID;
+    const openedPackIdStr = String(parseInt(openedPackId, 10));
+    const qty = this.state.packSelection?.[openedPackIdStr] || 1;
+    const costPer = parseInt(p.Cost);
+
+    for (let i = 0; i < qty; i++) {
+      // re-check affordability before each purchase
+      if (parseInt(this.props.user.credit) < costPer) {
         this.setState({ showNoCoinAlert: true });
-        this.releasePackPurchaseLock();
-        //warn not enough credit
+        break;
+      }
+
+      const packOrder = {
+        packID: p.ID,
+        packName: p.Name,
+        userID: this.props.user.ID,
+        packSets: p.Set,
+        packChase: p.Chase,
+        packCost: p.Cost,
+        packPer: p.PerPack,
+      };
+
+      try {
+        const resp = await callServer("packsOrder", packOrder, this.props.user.ID);
+        const json = resp ? await resp.json() : [];
+        if (json.length > 0) {
+          const append = i > 0;
+          this.renderCards(json, append, false, i, qty);
+          this.refreshPackHitIndicator(openedPackId);
+          this.props.callbackPackOpenTimer(Date.now());
+          if (this.state.expandedChasePanel[openedPackIdStr] && p.Chase) {
+            this.fetchChaseProgress(openedPackIdStr, p.Chase);
+          }
+          // refresh packs and availability
+          this.pullPacks();
+        } else {
+          break;
+        }
+      } catch (err: any) {
+        console.log(err);
+        break;
       }
     }
+
+    this.setState({ targetItem: null, targetType: null, isPackLoading: false }, () => {
+      this.releasePackPurchaseLock();
+    });
   };
 
-  renderCards = (cards: any) => {
+  renderCards = (
+    cards: any,
+    append: boolean = false,
+    releaseLock: boolean = true,
+    packIndex: number = 0,
+    totalPacks: number = 1
+  ) => {
     let items: Array<any> = [];
+    if (totalPacks > 1) {
+      items.push(
+        <div key={`subtitle-${packIndex}`} style={{ fontWeight: 600, margin: "8px 0 4px" }}>
+          {`Pack ${packIndex + 1} results`}
+        </div>
+      );
+    }
     if (cards.length > 0) {
       cards.forEach((c: any, i: number) => {
         items.push(
-          <IonCard key={i}>
+          <IonCard key={`${packIndex}-${i}`}>
             <IonCardContent>
               <IonImg src={c.Image} />
             </IonCardContent>
@@ -822,11 +1046,26 @@ class StoreContainer extends React.Component<props, state> {
         );
       });
     }
-    this.setState({ cardsResult: items }, () => {
-      this.setState({ showCards: true });
-      this.releasePackPurchaseLock();
-    });
+
+    if (append && this.state.cardsResult && this.state.cardsResult.length > 0) {
+      const separator = (
+        <div key={"sep-" + Date.now()} style={{ height: 1, background: "#ddd", margin: "8px 0" }} />
+      );
+      this.setState(
+        (prevState) => ({ cardsResult: [...(prevState.cardsResult || []), separator, ...items] }),
+        () => {
+          this.setState({ showCards: true });
+          if (releaseLock) this.releasePackPurchaseLock();
+        }
+      );
+    } else {
+      this.setState({ cardsResult: items }, () => {
+        this.setState({ showCards: true });
+        if (releaseLock) this.releasePackPurchaseLock();
+      });
+    }
   };
+  
 
   _notSuspended = () => {
     //see if user is suspended, don't show anything
@@ -1061,13 +1300,20 @@ class StoreContainer extends React.Component<props, state> {
     const foundProduct = this.state.allCoinList.filter((coins) => {
       return coins.id === this.state.targetItem.id;
     });
-    //alert(JSON.stringify(foundProduct));
+    //alert("IAP: canBuyCoins - matched " + foundProduct.length + " product(s) for " + this.state.targetItem.id);
     if (foundProduct.length > 0) {
       const offer = foundProduct[0].getOffer();
-      //alert("offer");
-      //alert(JSON.stringify(offer));
+      if (!offer) {
+        //alert("IAP: no offer available for this product, cannot order");
+      }
       inAppControl = 1;
-      if (offer) offer.order();
+      if (offer) {
+        //alert("IAP: submitting order to store...");
+        offer.order();
+      }
+    } else {
+      //alert("IAP: no matching product found, purchase cannot start");
+      console.log("IAP: no matching product found, purchase cannot start");
     }
   };
 }
