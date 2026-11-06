@@ -18,7 +18,7 @@ dependencies {
     implementation "com.android.billingclient:billing:9.0.0"
     implementation "androidx.core:core:1.9.0"
 }
-
+apply from: "../../node_modules/onesignal-cordova-plugin/build-extras-onesignal.gradle"
 
 if (hasProperty('postBuildExtras')) {
   postBuildExtras()

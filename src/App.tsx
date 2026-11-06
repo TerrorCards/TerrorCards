@@ -23,6 +23,7 @@ import {
 import React from "react";
 import { IonReactRouter } from "@ionic/react-router";
 import { Capacitor } from "@capacitor/core";
+import OneSignal from "onesignal-cordova-plugin";
 import {
   cart,
   home,
@@ -96,6 +97,8 @@ interface state {
 const store = new Storage();
 store.create();
 
+const ONESIGNAL_APP_ID = "17829f8f-414c-4ccc-a14a-b0af1d830d29";
+
 setupIonicReact({
   mode: Capacitor.getPlatform() === "ios" ? "ios" : "md",
 });
@@ -155,12 +158,36 @@ class App extends React.Component<props, state> {
     platform: null,
   };
   tradesExist = false;
+  pushUserLinked = false;
 
   componentDidMount() {
     //console.log("componet did mount event fired");
     this.getAppConfig().finally(() => {
       this.getUserStorage();
     });
+    this.initPushNotifications();
+  }
+
+  initPushNotifications() {
+    if (!Capacitor.isNativePlatform()) {
+      return;
+    }
+
+    OneSignal.initialize(ONESIGNAL_APP_ID);
+    OneSignal.Notifications.requestPermission(true);
+  }
+
+  linkPushUser() {
+    if (
+      !Capacitor.isNativePlatform() ||
+      !this.state.user.ID ||
+      this.pushUserLinked
+    ) {
+      return;
+    }
+
+    OneSignal.login(String(this.state.user.ID));
+    this.pushUserLinked = true;
   }
 
   componentWillMount() {
@@ -184,6 +211,8 @@ class App extends React.Component<props, state> {
 
   componentDidUpdate(prevProps: any) {
     //console.log("component did update");
+
+    this.linkPushUser();
 
     callServer("hasTrades", "", this.state.user.ID)
       ?.then((resp) => {
@@ -301,6 +330,10 @@ class App extends React.Component<props, state> {
   };
 
   removeUserFromStore = () => {
+    if (Capacitor.isNativePlatform()) {
+      OneSignal.logout();
+    }
+    this.pushUserLinked = false;
     store.clear();
     this.setState({ appReady: false });
   };
