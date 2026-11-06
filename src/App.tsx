@@ -173,8 +173,15 @@ class App extends React.Component<props, state> {
       return;
     }
 
-    OneSignal.initialize(ONESIGNAL_APP_ID);
-    OneSignal.Notifications.requestPermission(true);
+    try {
+      window.alert("Push: calling OneSignal.initialize");
+      OneSignal.initialize(ONESIGNAL_APP_ID);
+      window.alert("Push: initialize done, requesting permission");
+      OneSignal.Notifications.requestPermission(true);
+      window.alert("Push: permission request sent");
+    } catch (err) {
+      window.alert("Push init error: " + String(err));
+    }
   }
 
   linkPushUser() {
@@ -186,8 +193,13 @@ class App extends React.Component<props, state> {
       return;
     }
 
-    OneSignal.login(String(this.state.user.ID));
-    this.pushUserLinked = true;
+    try {
+      OneSignal.login(String(this.state.user.ID));
+      this.pushUserLinked = true;
+      window.alert("Push: linked user " + this.state.user.ID);
+    } catch (err) {
+      window.alert("Push login error: " + String(err));
+    }
   }
 
   componentWillMount() {
