@@ -17,7 +17,7 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>2.0.97</string>
+	<string>2.0.98</string>
 	<key>CFBundleURLTypes</key>
 	<array>
 		<dict>
@@ -30,7 +30,7 @@
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>
-	<string>2.0.97</string>
+	<string>2.0.98</string>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>remote-notification</string>
@@ -42,6 +42,8 @@
 		<key>NSAllowsArbitraryLoads</key>
 		<true/>
 	</dict>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Terror Cards does not use your location. This permission is only referenced by the push notification SDK's optional location-based alerts feature, which this app does not use.</string>
 	<key>NSCameraUsageDescription</key>
 	<string>To Take Photos for User Profile</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>

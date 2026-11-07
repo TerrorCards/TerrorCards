@@ -23,7 +23,7 @@ import {
 import React from "react";
 import { IonReactRouter } from "@ionic/react-router";
 import { Capacitor } from "@capacitor/core";
-import OneSignal from "onesignal-cordova-plugin";
+import { getOneSignal } from "./components/pushNotifications";
 import {
   cart,
   home,
@@ -174,14 +174,19 @@ class App extends React.Component<props, state> {
     }
 
     try {
-      const oneSignal = (window as any).plugins?.OneSignal || OneSignal;
-      window.alert("Push: calling OneSignal.initialize");
+      const oneSignal = getOneSignal();
       oneSignal.initialize(ONESIGNAL_APP_ID);
-      window.alert("Push: initialize done, requesting permission");
-      oneSignal.Notifications.requestPermission(true);
-      window.alert("Push: permission request sent");
+      // No permission request or opt-in here - that's only triggered when the user
+      // enables the toggle in ProfileManagerContainer, so the iOS prompt only shows in context.
+      // Without this, notifications sent while this device's app is in the foreground are suppressed.
+      oneSignal.Notifications.addEventListener(
+        "foregroundWillDisplay",
+        (event: any) => {
+          event.getNotification().display();
+        }
+      );
     } catch (err) {
-      window.alert("Push init error: " + String(err));
+      console.error("Push init error:", err);
     }
   }
 
@@ -195,12 +200,11 @@ class App extends React.Component<props, state> {
     }
 
     try {
-      const oneSignal = (window as any).plugins?.OneSignal || OneSignal;
+      const oneSignal = getOneSignal();
       oneSignal.login(String(this.state.user.ID));
       this.pushUserLinked = true;
-      window.alert("Push: linked user " + this.state.user.ID);
     } catch (err) {
-      window.alert("Push login error: " + String(err));
+      console.error("Push login error:", err);
     }
   }
 
@@ -345,7 +349,7 @@ class App extends React.Component<props, state> {
 
   removeUserFromStore = () => {
     if (Capacitor.isNativePlatform()) {
-      OneSignal.logout();
+      getOneSignal().logout();
     }
     this.pushUserLinked = false;
     store.clear();

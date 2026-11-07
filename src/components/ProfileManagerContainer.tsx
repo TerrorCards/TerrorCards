@@ -4,12 +4,14 @@ import {
     IonItem, IonIcon, IonLabel, IonButton, IonImg, 
     IonTextarea,
     IonToolbar, IonInput,
-    IonPage, IonAlert,
+    IonPage, IonAlert, IonToggle,
     withIonLifeCycle
 } from '@ionic/react';
 import { checkmark, close, closeCircleOutline } from 'ionicons/icons';
 import { callServer } from './ajaxcalls';
 import { Camera, CameraResultType } from '@capacitor/camera';
+import { Capacitor } from '@capacitor/core';
+import { getOneSignal } from './pushNotifications';
 
 interface props {
     user: any;
@@ -42,6 +44,8 @@ interface state {
 
     showAlert: boolean;
     alertMsg: string;
+
+    notificationsEnabled: boolean;
 };
 
 class ProfileManagerContainer extends React.Component<props, state> {
@@ -68,7 +72,8 @@ class ProfileManagerContainer extends React.Component<props, state> {
             statusInvalidUser: false,
             statusInvalidEmail: false,
             showAlert: false,
-            alertMsg: ""         
+            alertMsg: "",
+            notificationsEnabled: false
         }
     }
 
@@ -84,7 +89,35 @@ class ProfileManagerContainer extends React.Component<props, state> {
 
     componentDidMount() {
         this.pullProfile();
+        this.loadNotificationsPref();
         //console.log('ionViewDidEnter event fired');
+    }
+
+    loadNotificationsPref() {
+        if (!Capacitor.isNativePlatform()) {
+            return;
+        }
+        getOneSignal().User.pushSubscription.getOptedInAsync()
+            .then((optedIn: boolean) => {
+                this.setState({ notificationsEnabled: optedIn });
+            })
+            .catch((err: any) => {
+                console.error("Failed to read push subscription state:", err);
+            });
+    }
+
+    toggleNotifications = (enabled: boolean) => {
+        this.setState({ notificationsEnabled: enabled });
+        if (!Capacitor.isNativePlatform()) {
+            return;
+        }
+        if (enabled) {
+            // Shows the native iOS permission prompt here, in context, rather than at app launch.
+            getOneSignal().Notifications.requestPermission(true);
+            getOneSignal().User.pushSubscription.optIn();
+        } else {
+            getOneSignal().User.pushSubscription.optOut();
+        }
     }
 
     componentDidUpdate(prevProps: any) {
@@ -574,6 +607,16 @@ class ProfileManagerContainer extends React.Component<props, state> {
                             </IonItem> 
                         </IonCol>
                     </IonRow> 
+                    <IonRow>
+                        <IonCol key={"notifications"}>
+                            <IonItem>
+                                <IonLabel>Push notifications</IonLabel>
+                                <IonToggle checked={this.state.notificationsEnabled} onIonChange={(e) => {
+                                    this.toggleNotifications(e.detail.checked);
+                                }}></IonToggle>
+                            </IonItem>
+                        </IonCol>
+                    </IonRow>
                     <IonRow>
                         <IonCol><br></br><br></br></IonCol>
                     </IonRow> 
